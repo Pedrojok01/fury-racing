@@ -3,7 +3,7 @@ src = "src"
 out = "out"
 libs = ["lib"]
 solc = "0.8.24"
-remappings = ['@openzeppelin/contracts=lib/openzeppelin-contracts/contracts']
+remappings = ['@openzeppelin/contracts=lib/openzeppelin-contracts/contracts', "@chainlink=lib/chainlink/contracts/src"]
 # fs_permissions = [
 #     { access = "read", path = "./broadcast" },
 #     { access = "read", path = "./reports" },

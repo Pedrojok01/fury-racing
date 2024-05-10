@@ -12,8 +12,12 @@ const RaceScreen: FC = () => {
       <VStack align="center" justify="center">
         <>THE RACE IS ON!</>
         <HStack>
-          <Button onClick={() => setScreen("LEADERBOARD")}>Leaderboard</Button>
-          <Button onClick={() => setScreen("HOME")}>Home</Button>
+          <Button onClick={() => setScreen("LEADERBOARD")} className="custom-button">
+            Leaderboard
+          </Button>
+          <Button onClick={() => setScreen("HOME")} className="custom-button">
+            Home
+          </Button>
         </HStack>
       </VStack>
     </Center>

@@ -31,6 +31,7 @@ import {
   bscTestnet,
 } from "wagmi/chains";
 
+import { TITLE } from "./data/constants";
 import linea_logo from "../public/img/linea_logo.png";
 import lineaTesnet_logo from "../public/img/lineaTesnet_logo.png";
 import zksync_logo from "../public/img/zksync_logo.svg";
@@ -59,7 +60,7 @@ const connectors = connectorsForWallets(
       ],
     },
   ],
-  { appName: "Next-Web3-Boilerplate", projectId: walletConnectProjectId },
+  { appName: TITLE, projectId: walletConnectProjectId },
 );
 
 // Fix missing icons

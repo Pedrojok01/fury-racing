@@ -16,8 +16,12 @@ const SelectionScreen: FC = () => {
         <CarSpin />
 
         <HStack>
-          <Button onClick={() => setScreen("HOME")}>Back</Button>
-          <Button onClick={() => setScreen("RACE")}>Go</Button>
+          <Button onClick={() => setScreen("HOME")} className="custom-button">
+            Back
+          </Button>
+          <Button onClick={() => setScreen("RACE")} className="custom-button">
+            Go
+          </Button>
         </HStack>
       </VStack>
     </Center>

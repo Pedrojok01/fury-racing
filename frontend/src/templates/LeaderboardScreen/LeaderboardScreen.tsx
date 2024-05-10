@@ -11,7 +11,9 @@ const LeaderboardScreen: FC = () => {
     <Center h={"100%"}>
       <VStack align="center" justify="center">
         <>LEADERBOARD</>
-        <Button onClick={() => setScreen("HOME")}>Back</Button>
+        <Button onClick={() => setScreen("HOME")} className="custom-button">
+          Back
+        </Button>
       </VStack>
     </Center>
   );

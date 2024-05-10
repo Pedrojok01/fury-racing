@@ -7,7 +7,7 @@ import Image from "next/image";
 
 import { TITLE } from "@/data/constants";
 
-import logo from "../../../public/img/logo_transparent.png";
+import logo from "../../../public/img/logo.png";
 import { DarkModeButton } from "../DarkModeButton";
 
 const Header: FC = () => {
@@ -22,7 +22,7 @@ const Header: FC = () => {
     >
       <HStack>
         <Image src={logo.src} alt="logo" width={45} height={45} />
-        <Heading as="h1" fontSize={"1.5rem"} className="text-shadow">
+        <Heading as="h1" fontSize={"1.5rem"} pb={"0.3rem"} className="text-shadow">
           {TITLE}
         </Heading>
       </HStack>

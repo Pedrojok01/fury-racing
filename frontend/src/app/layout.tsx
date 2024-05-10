@@ -5,17 +5,19 @@ import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 
 import "@rainbow-me/rainbowkit/styles.css";
+import { DESCRIPTION, TITLE, URL } from "@/data/constants";
+
 import { Providers } from "./providers";
 
 const open_sans = Open_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Next-Web3-Boilerplate",
-  applicationName: "Next Web3 Boilerplate",
-  description: "Next.js Web3 boilerplate built on Wagmi, Viem, and Rainbow",
+  title: TITLE,
+  applicationName: TITLE,
+  description: DESCRIPTION,
   authors: {
     name: "Pedrojok01",
-    url: "https://github.com/Pedrojok01/Next-Web3-Boilerplate",
+    url: URL,
   },
   icons: "favicon.ico",
   manifest: "site.webmanifest",

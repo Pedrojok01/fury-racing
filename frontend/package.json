@@ -1,15 +1,14 @@
 {
-  "name": "next-web3-boilerplate",
+  "name": "chainlink-racing",
   "version": "1.0.2",
-  "description": "Nextjs web3 boilerplate built on Viem, Wagmi, rainbowkit and Chakra UI",
-  "author": "Pedrojok01 <pedrojok@pm.me>",
+  "description": "Onchain racing simulator leveraging Chainlink VRF and Chainlink API",
   "license": "MIT",
   "private": true,
-  "homepage": "https://next-web3-boilerlate.com",
-  "bugs": "https://github.com/Pedrojok01/Next-Web3-Boilerplate/issues",
+  "homepage": "https://github.com/Pedrojok01/chainlink-hackathon",
+  "bugs": "https://github.com/Pedrojok01/chainlink-hackathon/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Pedrojok01/Next-Web3-Boilerplate"
+    "url": "https://github.com/Pedrojok01/chainlink-hackathon"
   },
   "scripts": {
     "dev": "next dev",
@@ -20,6 +19,8 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@babylonjs/core": "^7.6.0",
+    "@babylonjs/gui": "^7.6.0",
     "@chakra-ui/icons": "2.1.1",
     "@chakra-ui/next-js": "2.2.0",
     "@chakra-ui/react": "2.8.2",
@@ -31,11 +32,14 @@
     "framer-motion": "11.1.7",
     "next": "14.2.3",
     "react": "18.3.0",
+    "react-babylonjs": "^3.1.30",
+    "react-device-detect": "^2.2.3",
     "react-dom": "18.3.0",
     "react-jazzicon": "1.0.4",
     "sharp": "0.33.3",
     "viem": "2.9.27",
-    "wagmi": "2.5.22"
+    "wagmi": "2.5.22",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@types/node": "20.12.7",

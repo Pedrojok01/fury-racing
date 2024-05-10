@@ -22,12 +22,6 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-}
-
 .text-shadow {
   text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
 }
@@ -41,4 +35,53 @@ a {
 
 .custom-button:hover {
   box-shadow: var(--button-box-shadow-hover);
+}
+
+.game-container {
+  flex-direction: column;
+  width: calc(100% - 2rem);
+  height: calc(100vh - 77px - 1rem);
+  margin: auto;
+  font-size: 17px;
+  gap: 1rem;
+  justify-content: center;
+  background-color: rgb(165, 165, 165);
+}
+
+.game-container-iphone {
+  width: 100vw;
+  min-width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  max-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: black;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+@media (orientation: portrait) {
+  .landscape-overlay {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0.7rem;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: white;
+    font-size: 24px;
+    z-index: 1000;
+  }
 }

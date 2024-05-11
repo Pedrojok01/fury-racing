@@ -8,7 +8,6 @@ import { useAccount } from "wagmi";
 import styles from "./home.module.css";
 import homeCar from "../../../public/img/home-car.png";
 
-
 const HomeScreen: FC = () => {
   const { isConnected } = useAccount();
 

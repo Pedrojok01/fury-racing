@@ -5,7 +5,6 @@ import NextLink from "next/link";
 
 import { CarSpin } from "@/components";
 
-
 const SelectionScreen: FC = () => {
   return (
     <Center h={"100%"}>

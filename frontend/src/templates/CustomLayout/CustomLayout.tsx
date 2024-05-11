@@ -4,7 +4,6 @@ import type { FC, ReactNode } from "react";
 import { Box, Flex } from "@chakra-ui/react";
 import { isMobile, useMobileOrientation } from "react-device-detect";
 
-
 import { Header } from "@/components";
 
 type CustomLayoutProps = {

@@ -3,8 +3,8 @@
   --primary-color-hover: #8a2be2;
   --secondary-color: #f5f5f5;
   --accent-color: #008080;
-  --background-light: #fff;
-  --background-dark: #1a202c;
+  --background-light: #f4f4f8;
+  --background-dark: #2c2c31;
   --button-border: 1px solid rgba(152, 161, 192, 0.24);
   --button-box-shadow: 3px 4px 4px rgba(0, 0, 0, 0.4);
   --button-box-shadow-hover: 0px 0px 8px 8px rgba(30, 136, 229, 0.2);
@@ -35,7 +35,7 @@ a {
 .custom-button {
   background-color: var(--primary-color);
   border: var(--button-border);
-  border-radius: 20px;
+  border-radius: 12px;
   box-shadow: var(--button-box-shadow);
   transition: var(--transition-ease);
 }

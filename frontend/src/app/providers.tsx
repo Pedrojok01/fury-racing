@@ -22,6 +22,10 @@ export function Providers({ children }: Readonly<{ children: ReactNode }>) {
   const customTheme: Theme = merge(lightTheme(), {
     colors: {
       accentColor: "var(--primary-color)",
+      closeButton: "var(--primary-color)",
+      connectButtonBackground: "var(--primary-color)",
+      connectButtonInnerBackground: "var(--primary-color)",
+      profileAction: "var(--primary-color)",
     },
   } as Theme);
 

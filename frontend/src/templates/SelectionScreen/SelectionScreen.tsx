@@ -1,13 +1,12 @@
 import { type FC } from "react";
 
-import { Button, Center, HStack, VStack } from "@chakra-ui/react";
+import { Button, Center, HStack, VStack, Link } from "@chakra-ui/react";
+import NextLink from "next/link";
 
 import { CarSpin } from "@/components";
-import { useGame } from "@/stores/useGame";
+
 
 const SelectionScreen: FC = () => {
-  const { setScreen } = useGame();
-
   return (
     <Center h={"100%"}>
       <VStack align="center" justify="center">
@@ -16,12 +15,13 @@ const SelectionScreen: FC = () => {
         <CarSpin />
 
         <HStack>
-          <Button onClick={() => setScreen("HOME")} className="custom-button">
-            Back
-          </Button>
-          <Button onClick={() => setScreen("RACE")} className="custom-button">
-            Go
-          </Button>
+          <Link as={NextLink} href="/" m={"auto"} style={{ textDecoration: "none" }}>
+            <Button className="custom-button">Back</Button>
+          </Link>
+
+          <Link as={NextLink} href="/race" m={"auto"} style={{ textDecoration: "none" }}>
+            <Button className="custom-button">Go</Button>
+          </Link>
         </HStack>
       </VStack>
     </Center>

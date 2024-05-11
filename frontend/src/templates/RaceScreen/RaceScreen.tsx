@@ -1,23 +1,21 @@
 import { type FC } from "react";
 
-import { Button, Center, HStack, VStack } from "@chakra-ui/react";
-
-import { useGame } from "@/stores/useGame";
+import { Button, Center, HStack, VStack, Link } from "@chakra-ui/react";
+import NextLink from "next/link";
 
 const RaceScreen: FC = () => {
-  const { setScreen } = useGame();
-
   return (
     <Center h={"100%"}>
       <VStack align="center" justify="center">
         <>THE RACE IS ON!</>
         <HStack>
-          <Button onClick={() => setScreen("LEADERBOARD")} className="custom-button">
-            Leaderboard
-          </Button>
-          <Button onClick={() => setScreen("HOME")} className="custom-button">
-            Home
-          </Button>
+          <Link as={NextLink} href="/leaderboard" m={"auto"} style={{ textDecoration: "none" }}>
+            <Button className="custom-button">Leaderboard</Button>
+          </Link>
+
+          <Link as={NextLink} href="/" m={"auto"} style={{ textDecoration: "none" }}>
+            <Button className="custom-button">Home</Button>
+          </Link>
         </HStack>
       </VStack>
     </Center>

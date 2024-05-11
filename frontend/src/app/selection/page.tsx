@@ -1,17 +1,18 @@
 "use client";
+
 import { BrowserView, MobileView } from "react-device-detect";
 
-import { HomeScreen, CustomLayout } from "@/templates";
+import { CustomLayout, SelectionScreen } from "@/templates";
 
-export default function Home() {
+export default function Leaderboard() {
   return (
     <CustomLayout>
       <BrowserView className="game-container">
-        <HomeScreen />
+        <SelectionScreen />
       </BrowserView>
 
       <MobileView className="game-container">
-        <HomeScreen />
+        <SelectionScreen />
       </MobileView>
     </CustomLayout>
   );

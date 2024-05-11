@@ -1,5 +1,6 @@
 :root {
   --primary-color: #b032e7;
+  --primary-color-hover: #8a2be2;
   --secondary-color: #f5f5f5;
   --accent-color: #008080;
   --background-light: #fff;
@@ -32,6 +33,7 @@ a {
 }
 
 .custom-button {
+  background-color: var(--primary-color);
   border: var(--button-border);
   border-radius: 20px;
   box-shadow: var(--button-box-shadow);
@@ -40,6 +42,7 @@ a {
 
 .custom-button:hover {
   box-shadow: var(--button-box-shadow-hover);
+  background-color: var(--primary-color-hover);
 }
 
 .game-container {
@@ -50,7 +53,6 @@ a {
   font-size: 17px;
   gap: 1rem;
   justify-content: center;
-  /* background-color: rgb(165, 165, 165); */
 }
 
 .game-container-iphone {

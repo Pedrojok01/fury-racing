@@ -1,0 +1,6 @@
+.menuItems {
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: 800;
+  font-size: large;
+}

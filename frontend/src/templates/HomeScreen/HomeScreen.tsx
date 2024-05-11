@@ -1,16 +1,16 @@
 import { type FC } from "react";
 
-import { Box, Button, Center, HStack, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Center, HStack, Text, VStack, Link } from "@chakra-ui/react";
 import Image from "next/image";
-
-import { useGame } from "@/stores/useGame";
+import NextLink from "next/link";
+import { useAccount } from "wagmi";
 
 import styles from "./home.module.css";
 import homeCar from "../../../public/img/home-car.png";
 
 
 const HomeScreen: FC = () => {
-  const { setScreen } = useGame();
+  const { isConnected } = useAccount();
 
   return (
     <Center h={"100%"} className={styles.container}>
@@ -27,9 +27,20 @@ const HomeScreen: FC = () => {
           </Text>
         </HStack>
 
-        <Button m={"auto"} onClick={() => setScreen("SELECTION")} className="custom-button">
-          Play
-        </Button>
+        {isConnected && (
+          <Link as={NextLink} href="/selection" m={"auto"} style={{ textDecoration: "none" }}>
+            <Button
+              mt={"2rem"}
+              paddingBlock={"2.5rem"}
+              paddingInline={"5rem"}
+              fontSize={"2rem"}
+              fontWeight={"bold"}
+              className="custom-button"
+            >
+              Play
+            </Button>
+          </Link>
+        )}
       </VStack>
 
       <Box className={styles.subContainer}>

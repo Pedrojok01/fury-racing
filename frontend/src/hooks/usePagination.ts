@@ -1,6 +1,6 @@
 import { useState, type SetStateAction } from "react";
 
-function usePagination(initialData = [], itemsPerPage = 10) {
+export const usePagination = (initialData = [], itemsPerPage = 10) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [dataset, setDataset] = useState<Leaderboard>(initialData);
 
@@ -20,6 +20,4 @@ function usePagination(initialData = [], itemsPerPage = 10) {
   };
 
   return { currentData, currentPage, pageCount, changePage, nextPage, prevPage, setDataset };
-}
-
-export default usePagination;
+};

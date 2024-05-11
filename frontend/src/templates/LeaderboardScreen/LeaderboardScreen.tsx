@@ -3,30 +3,23 @@ import { useEffect, type FC } from "react";
 import { Button, Center, HStack, VStack } from "@chakra-ui/react";
 
 import { ScoreItem } from "@/components";
-import { mockLeaderboard } from "@/data/mockLeaderboard";
-import usePagination from "@/hooks/usePagination";
+import { usePagination } from "@/hooks";
+import useLeaderboard from "@/hooks/useLeaderboard";
 
 import styles from "./leaderboard.module.css";
 import crown from "../../../public/img/crown.png";
 import podium from "../../../public/img/podium.png";
 
 const LeaderboardScreen: FC = () => {
+  const { leaderboard } = useLeaderboard();
   const { currentData, currentPage, pageCount, changePage, nextPage, prevPage, setDataset } =
     usePagination([], 10);
 
   useEffect(() => {
-    const fetchScores = async () => {
-      try {
-        // const response = await api.get("/getscores");
-        // setScores(response.data);
-        setDataset(mockLeaderboard);
-      } catch (error) {
-        console.error("Error fetching scores:", error);
-      }
-    };
-
-    fetchScores();
-  }, [setDataset]);
+    if (leaderboard && leaderboard.length > 0) {
+      setDataset(leaderboard);
+    }
+  }, [leaderboard, setDataset]);
 
   return (
     <Center h={"100%"}>

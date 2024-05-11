@@ -1,11 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import "openzeppelin/utils/Strings.sol";
-import "chainlink/ChainlinkClient.sol";
-import "Errors.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {ChainlinkClient} from "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
+import {Chainlink} from "@chainlink/contracts/src/v0.8/Chainlink.sol";
+import {ChainlinkFeed} from "./ChainlinkFeed.sol";
+import "./Errors.sol";
 
-contract Racing is ChainlinkClient {
+// import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
+// import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+// import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+
+contract Racing is ChainlinkClient, ChainlinkFeed {
     using Strings for uint8;
     using Chainlink for Chainlink.Request;
 
@@ -13,19 +19,11 @@ contract Racing is ChainlinkClient {
                                  EVENTS
     //////////////////////////////////////////////////////////////*/
 
-    event PlayerCreated(TeamAttributes attributes, uint64 TeamId);
-    event JoinedRace(uint64 TeamId);
-    event StartedRace(uint64[] racers);
+    event PlayerCreated(PlayerAttributes attributes, uint256 PlayerId);
+    event JoinedRace(uint256 PlayerId);
+    event StartedRace(uint256[] racers);
     event FinishedRace(uint8[] leaderboard);
     event RequestedLeaderboard(bytes32 indexed requestId, uint256 value);
-
-    /*//////////////////////////////////////////////////////////////
-                          CHAINLINK CONSTANTS
-    //////////////////////////////////////////////////////////////*/
-
-    string public id;
-    bytes32 private jobId;
-    uint256 private fee;
 
     /*//////////////////////////////////////////////////////////////
                          MISCELLANEOUS CONSTANTS
@@ -45,7 +43,7 @@ contract Racing is ChainlinkClient {
         FINISHED
     }
 
-    State public state; // The current state of the race: waiting for players, started, done.
+    RaceState public raceState; // The current state of the race: waiting for players, started, done.
     uint256 public races; // Count of completed races.
     uint256[] players; // Count of players
 
@@ -62,7 +60,8 @@ contract Racing is ChainlinkClient {
         uint16 Top_Speed; // Top Speed in km/h
     }
 
-    mapping(uint256 => ExternalFactors) public circuits;
+    // mapping(uint256 => ExternalFactors) public circuits;
+    ExternalFactors[] public circuits;
 
     /*//////////////////////////////////////////////////////////////
                              TEAMS STORAGE
@@ -85,17 +84,33 @@ contract Racing is ChainlinkClient {
 
     mapping(address => uint256) public AddressToPlayer;
     mapping(uint256 => PlayerAttributes) public AddressToAttributes;
-    uint64[] private racers;
+    uint256[] private racers;
 
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
-    constructor(address _link, address _oracle) {
-        setChainlinkToken(_link);
-        setChainlinkOracle(_oracle);
-        jobId = "7d80a6386ef543a3abb52817f6707e3b";
-        fee = (1 * LINK_DIVISIBILITY) / 10; // 0,1 * 10**18 (Varies by network and job)
+    constructor(
+        address _link,
+        address _oracle,
+        uint64 subscriptionId,
+        address vrfCoordinator,
+        address oracle,
+        bytes32 _keyHash,
+        bytes32 _jobId,
+        uint256 _fee
+    )
+        ChainlinkFeed(
+            subscriptionId,
+            vrfCoordinator,
+            oracle,
+            _keyHash,
+            _jobId,
+            _fee
+        )
+    {
+        _setChainlinkToken(_link);
+        _setChainlinkOracle(_oracle);
 
         /*//////////////////////////////////////////////////////////////
                                   CIRCUITS
@@ -136,7 +151,7 @@ contract Racing is ChainlinkClient {
 
         // Configure mappings with team attributes and principal address.
         AddressToPlayer[msg.sender] = playersCounter;
-        PlayerToAttributes[playersCounter] = _attributes;
+        AddressToAttributes[playersCounter] = _attributes;
 
         emit PlayerCreated(_attributes, playersCounter);
     }
@@ -153,7 +168,7 @@ contract Racing is ChainlinkClient {
         _verifyAttributes(_attributes);
 
         // Update team attributes.
-        PlayerToAttributes[AddressToPlayer[msg.sender]] = _attributes;
+        AddressToAttributes[AddressToPlayer[msg.sender]] = _attributes;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -164,17 +179,17 @@ contract Racing is ChainlinkClient {
     function joinRace() external onlyWhenWaiting {
         // Participation fee (requires approval).
         // TODO: Add adjusted fee based on GOO mechanic
-        require(Goo.transferFrom(msg.sender, address(this), 0.01 ether));
+        // require(Goo.transferFrom(msg.sender, address(this), 0.01 ether));
 
-        uint64 team = AddressToTeam[msg.sender];
+        uint256 player = AddressToPlayer[msg.sender];
 
         // Add team ID to the list of current racers.
-        racers.push(team);
+        racers.push(player);
 
-        emit JoinedRace(team);
+        emit JoinedRace(player);
 
         // Run race when it is full.
-        if (racers.length == 5) {
+        if (racers.length == 2) {
             startRace();
         }
     }
@@ -203,27 +218,23 @@ contract Racing is ChainlinkClient {
 
     /// @notice Calls for simulations.
     function requestLeaderboard(uint8 _circuit) internal returns (bytes32) {
-        Chainlink.Request memory req = buildChainlinkRequest(
-            jobId,
-            address(this),
-            this.fulfill.selector
-        );
-
-        // Set the URL to perform the GET request on
-        req.add(
-            "get",
-            string.concat(
-                "https://app.gradient.city/api/",
-                Strings.toString(_circuit)
-            )
-        );
-
-        req.add("path", "val"); // Chainlink nodes 1.0.0 and later support this format
-
-        int256 timesAmount = 1;
-        req.addInt("times", timesAmount);
-
-        return sendChainlinkRequest(req, fee);
+        // Chainlink.Request memory req = _buildChainlinkRequest(
+        //     jobId,
+        //     address(this),
+        //     this.fulfill.selector
+        // );
+        // // Set the URL to perform the GET request on
+        // req.add(
+        //     "get",
+        //     string.concat(
+        //         "https://app.gradient.city/api/",
+        //         Strings.toString(_circuit)
+        //     )
+        // );
+        // req.add("path", "val"); // Chainlink nodes 1.0.0 and later support this format
+        // int256 timesAmount = 1;
+        // req.addInt("times", timesAmount);
+        // return _sendChainlinkRequest(req, fee);
     }
 
     /// @notice Receives leaderboard for race.
@@ -241,33 +252,35 @@ contract Racing is ChainlinkClient {
     //////////////////////////////////////////////////////////////*/
 
     modifier onlyWhenWaiting() {
-        require(state == State.WAITING, "RACE_IS_ACTIVE");
+        require(raceState == RaceState.WAITING, "RACE_IS_ACTIVE");
 
         _;
     }
 
-    function _verifyAttributes(TeamAttributes memory _attributes) private pure {
-        _checkAttribute(_attributes.Reliability);
-        _checkAttribute(_attributes.Pitstops);
-        _checkAttribute(_attributes.Speed);
-        _checkAttribute(_attributes.Drivers);
-        _checkAttribute(_attributes.Strategy);
-        _checkAttribute(_attributes.Cornering);
-        _checkAttribute(_attributes.Luck);
-        _checkAttribute(_attributes.Car_balance);
-        _checkAttribute(_attributes.Staff);
-        _checkAttribute(_attributes.Aerodynamics);
+    function _verifyAttributes(
+        PlayerAttributes memory _attributes
+    ) private pure {
+        _checkAttribute(_attributes.reliability);
+        _checkAttribute(_attributes.pitstops);
+        _checkAttribute(_attributes.speed);
+        _checkAttribute(_attributes.drivers);
+        _checkAttribute(_attributes.strategy);
+        _checkAttribute(_attributes.cornering);
+        _checkAttribute(_attributes.luck);
+        _checkAttribute(_attributes.car_balance);
+        _checkAttribute(_attributes.staff);
+        _checkAttribute(_attributes.aerodynamics);
 
-        uint8 sum_of_attributes = _attributes.Reliability +
-            _attributes.Pitstops +
-            _attributes.Speed +
-            _attributes.Drivers +
-            _attributes.Strategy +
-            _attributes.Cornering +
-            _attributes.Luck +
-            _attributes.Car_balance +
-            _attributes.Staff +
-            _attributes.Aerodynamics;
+        uint8 sum_of_attributes = _attributes.reliability +
+            _attributes.pitstops +
+            _attributes.speed +
+            _attributes.drivers +
+            _attributes.strategy +
+            _attributes.cornering +
+            _attributes.luck +
+            _attributes.car_balance +
+            _attributes.staff +
+            _attributes.aerodynamics;
 
         if (sum_of_attributes < 10 || sum_of_attributes > 50) {
             revert Racing__InvalidAttributesSum();

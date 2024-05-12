@@ -1,60 +1,61 @@
-import { useRef, useState, type FC } from "react";
+import React, { Suspense, type FC, type ReactNode } from "react";
 
-import { Vector3, Color3, Mesh } from "@babylonjs/core";
-import { Engine, Scene, useBeforeRender, useClick, useHover } from "react-babylonjs";
+import {
+  Vector3,
+  SceneLoader,
+  ArcRotateCamera,
+  HemisphericLight,
+  Scene as SceneCore,
+} from "@babylonjs/core";
+import { Box } from "@chakra-ui/react";
+import { Scene, Engine } from "react-babylonjs";
 
-const DefaultScale = new Vector3(1, 1, 1);
-const BiggerScale = new Vector3(1.25, 1.25, 1.25);
+import "@babylonjs/loaders/glTF";
 
-const CarSpin: FC = () => {
-  const boxRef = useRef<Mesh | null>(null);
+interface CarSpinProps {
+  children?: ReactNode;
+}
 
-  const [clicked, setClicked] = useState(false);
-  useClick(() => setClicked((clicked) => !clicked), boxRef);
+const CarSpin: FC<CarSpinProps> = ({ children }) => {
+  const onSceneReady = (scene: SceneCore) => {
+    // Create a hemispheric light
+    const light = new HemisphericLight("light", Vector3.Up(), scene);
+    light.intensity = 0.7;
 
-  const [hovered, setHovered] = useState(false);
-  useHover(
-    () => setHovered(true),
-    () => setHovered(false),
-    boxRef,
-  );
+    // Create and configure the camera
+    const camera = new ArcRotateCamera(
+      "camera",
+      0, // alpha
+      Math.PI / 2, // beta
+      13, // radius
+      Vector3.Zero(), // target
+      scene,
+    );
+    camera.attachControl(scene.getEngine().getRenderingCanvas(), true);
 
-  // This will rotate the box on every Babylon frame.
-  const rpm = 5;
-  useBeforeRender((scene) => {
-    if (boxRef.current) {
-      // Delta time smoothes the animation.
-      const deltaTimeInMillis = scene.getEngine().getDeltaTime();
-      boxRef.current.rotation.y += (rpm / 60) * Math.PI * 2 * (deltaTimeInMillis / 1000);
-    }
-  });
+    // Load the car model and set its initial position
+    SceneLoader.ImportMesh("", "./assets/low-poly/", "scene.gltf", scene, (newMeshes) => {
+      if (newMeshes.length > 0) {
+        const car = newMeshes[0];
+        car.position = new Vector3(0, 1, 0);
+
+        // Add a rotation animation to the car
+        scene.onBeforeRenderObservable.add(() => {
+          car.rotation.y += 0.002;
+          car.rotation.y %= 2 * Math.PI;
+        });
+      }
+    });
+  };
 
   return (
-    <Engine antialias adaptToDeviceRatio canvasId="babylonJS">
-      <Scene>
-        <arcRotateCamera
-          name="camera1"
-          target={Vector3.Zero()}
-          alpha={Math.PI / 2}
-          beta={Math.PI / 4}
-          radius={8}
-        />
-        <hemisphericLight name="light1" intensity={0.7} direction={Vector3.Up()} />
-        <box
-          name={"CAR"}
-          ref={boxRef}
-          size={2}
-          position={new Vector3(0, 1, 0)}
-          scaling={clicked ? BiggerScale : DefaultScale}
-        >
-          <standardMaterial
-            name={"CAR"}
-            diffuseColor={hovered ? Color3.Red() : Color3.Blue()}
-            specularColor={Color3.Black()}
-          />
-        </box>
-      </Scene>
-    </Engine>
+    <Box w="500px" h="300px">
+      <Engine antialias adaptToDeviceRatio canvasId="babylonJS" width="500" height="300">
+        <Suspense fallback={null}>
+          <Scene onSceneMount={({ scene }) => onSceneReady(scene)}>{children}</Scene>
+        </Suspense>
+      </Engine>
+    </Box>
   );
 };
 

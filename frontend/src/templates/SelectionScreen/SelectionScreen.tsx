@@ -3,7 +3,7 @@ import { type FC } from "react";
 import { Button, Center, HStack, VStack, Link } from "@chakra-ui/react";
 import NextLink from "next/link";
 
-import { CarSpin } from "@/components";
+import { CarAnim } from "@/components";
 import { useGame } from "@/stores/useGame";
 
 const SelectionScreen: FC = () => {
@@ -14,7 +14,7 @@ const SelectionScreen: FC = () => {
       <VStack align="center" justify="center">
         <>CUSTOMISE YOUR CAR</>
 
-        <CarSpin />
+        <CarAnim />
 
         <HStack>
           <Link

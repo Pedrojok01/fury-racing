@@ -1,4 +1,4 @@
-export * from "./CarSpin";
+export * from "./CarAnim";
 export * from "./DarkModeButton";
 export * from "./Footer";
 export * from "./Header";

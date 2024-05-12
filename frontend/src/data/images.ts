@@ -5,6 +5,7 @@ import homeCar from "../../public/img/home-car.png";
 import logo from "../../public/img/logo.png";
 import podium from "../../public/img/podium.png";
 import road from "../../public/img/road.png";
+import track from "../../public/img/track-map.png";
 
 export const images = {
   avaxLogo,
@@ -14,4 +15,5 @@ export const images = {
   logo,
   podium,
   road,
+  track,
 };

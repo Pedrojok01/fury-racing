@@ -6,7 +6,6 @@ import { Engine, Scene } from "react-babylonjs";
 
 import CarModel from "./CarModel";
 
-
 const CarAnim: FC = () => {
   return (
     <Box w="500px" h="300px">

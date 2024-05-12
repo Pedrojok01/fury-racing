@@ -7,7 +7,7 @@
 .subContainer {
   width: 60%;
   min-width: 400px;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
 }
 

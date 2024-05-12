@@ -17,13 +17,13 @@ const HomeScreen: FC = () => {
   return (
     <Center h={"100%"} className={styles.container}>
       <VStack className={styles.subContainer}>
-        <HStack>
+        <HStack textAlign={"center"}>
           <Text className={`${styles.title} text-shadow`}>
             Score the <span style={{ color: "var(--primary-color)" }}>best time</span>.
           </Text>
         </HStack>
 
-        <HStack>
+        <HStack textAlign={"center"}>
           <Text className={`${styles.title} text-shadow`}>
             Reach the top of the <span style={{ color: "var(--primary-color)" }}>leaderboard</span>.
           </Text>
@@ -33,7 +33,6 @@ const HomeScreen: FC = () => {
           <Link
             as={NextLink}
             href="/selection"
-            m={"auto"}
             style={{ textDecoration: "none" }}
             onClick={() => setScreen("SELECTION")}
           >

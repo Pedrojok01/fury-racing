@@ -1,5 +1,5 @@
 "use client";
-import type { FC, ReactNode } from "react";
+import { type FC, type ReactNode } from "react";
 
 import { Box, Flex, Image } from "@chakra-ui/react";
 import { isMobile, useMobileOrientation } from "react-device-detect";

@@ -1,14 +1,12 @@
 import { create } from "zustand";
 
-type Screen = "HOME" | "SELECTION" | "RACE" | "ENDED" | "LEADERBOARD";
-
 type GameState = {
   lastTime: number;
   bestTime: number;
-  screen: Screen;
+  screen: CurrentScreen;
   setLastTime: (time: number) => void;
   setBestTime: (time: number) => void;
-  setScreen: (screen: Screen) => void;
+  setScreen: (screen: CurrentScreen) => void;
 };
 
 const useGame = create<GameState>((set) => ({
@@ -19,7 +17,7 @@ const useGame = create<GameState>((set) => ({
   setBestTime: (time: number) => {
     set({ bestTime: time });
   },
-  setScreen: (screen: Screen) => set({ screen }),
+  setScreen: (screen: CurrentScreen) => set({ screen }),
 }));
 
 export { useGame };

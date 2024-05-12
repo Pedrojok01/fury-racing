@@ -3,12 +3,11 @@ import { useEffect, type FC } from "react";
 import { Button, Center, HStack, VStack } from "@chakra-ui/react";
 
 import { ScoreItem } from "@/components";
+import { images } from "@/data/images";
 import { usePagination } from "@/hooks";
 import useLeaderboard from "@/hooks/useLeaderboard";
 
 import styles from "./leaderboard.module.css";
-import crown from "../../../public/img/crown.png";
-import podium from "../../../public/img/podium.png";
 
 const LeaderboardScreen: FC = () => {
   const { leaderboard } = useLeaderboard();
@@ -32,7 +31,7 @@ const LeaderboardScreen: FC = () => {
             user_address={score.user_address}
             score={score.score}
             index={index + 1}
-            image={index === 0 ? crown : index < 3 ? podium : undefined}
+            image={index === 0 ? images.crown : index < 3 ? images.podium : undefined}
           />
         ))}
         <HStack gap={2} mt={"15px"}>

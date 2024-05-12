@@ -5,11 +5,14 @@ import Image from "next/image";
 import NextLink from "next/link";
 import { useAccount } from "wagmi";
 
+import { images } from "@/data/images";
+import { useGame } from "@/stores/useGame";
+
 import styles from "./home.module.css";
-import homeCar from "../../../public/img/home-car.png";
 
 const HomeScreen: FC = () => {
   const { isConnected } = useAccount();
+  const { setScreen } = useGame();
 
   return (
     <Center h={"100%"} className={styles.container}>
@@ -27,7 +30,13 @@ const HomeScreen: FC = () => {
         </HStack>
 
         {isConnected && (
-          <Link as={NextLink} href="/selection" m={"auto"} style={{ textDecoration: "none" }}>
+          <Link
+            as={NextLink}
+            href="/selection"
+            m={"auto"}
+            style={{ textDecoration: "none" }}
+            onClick={() => setScreen("SELECTION")}
+          >
             <Button
               mt={"2rem"}
               paddingBlock={"2.5rem"}
@@ -43,7 +52,7 @@ const HomeScreen: FC = () => {
       </VStack>
 
       <Box className={styles.subContainer}>
-        <Image src={homeCar.src} alt="car background" width={600} height={700} />
+        <Image src={images.homeCar.src} alt="car background" width={600} height={700} />
       </Box>
     </Center>
   );

@@ -46,13 +46,10 @@ a {
 }
 
 .game-container {
-  flex-direction: column;
   width: calc(100% - 2rem);
-  height: calc(100vh - 77px - 1rem);
+  height: calc(100vh - 77px - 1rem - 2.5rem);
   margin: auto;
   font-size: 17px;
-  gap: 1rem;
-  justify-content: center;
 }
 
 .game-container-iphone {

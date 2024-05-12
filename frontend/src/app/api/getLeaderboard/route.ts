@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { mockLeaderboard } from "@/data/mockLeaderboard";
 
-
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     if (req.method !== "GET") {

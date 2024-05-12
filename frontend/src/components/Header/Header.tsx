@@ -9,6 +9,7 @@ import { useAccount } from "wagmi";
 
 import { TITLE } from "@/data/constants";
 import { useWindowSize } from "@/hooks";
+import { useGame } from "@/stores/useGame";
 
 import styles from "./header.module.css";
 import logo from "../../../public/img/logo.png";
@@ -17,13 +18,24 @@ import { DarkModeButton } from "../DarkModeButton";
 const Header: FC = () => {
   const { isSmallScreen } = useWindowSize();
   const { isConnected } = useAccount();
+  const { setScreen } = useGame();
 
   const menuIems = (
     <Center gap={3}>
-      <Link as={NextLink} href="/selection" className={styles.menuItems}>
+      <Link
+        as={NextLink}
+        href="/selection"
+        className={styles.menuItems}
+        onClick={() => setScreen("SELECTION")}
+      >
         <Box>New Game</Box>
       </Link>
-      <Link as={NextLink} href="/leaderboard" className={styles.menuItems}>
+      <Link
+        as={NextLink}
+        href="/leaderboard"
+        className={styles.menuItems}
+        onClick={() => setScreen("LEADERBOARD")}
+      >
         <Box>Leaderboard</Box>
       </Link>
     </Center>
@@ -32,7 +44,14 @@ const Header: FC = () => {
   return (
     <Box as="header" flex={3}>
       <HStack p={"1rem"} position="sticky" top={0} zIndex={10} justifyContent={"left"}>
-        <Link as={NextLink} href="/" textDecoration={"none"} w={"100%"} justifyContent={"left"}>
+        <Link
+          as={NextLink}
+          href="/"
+          textDecoration={"none"}
+          w={"100%"}
+          justifyContent={"left"}
+          onClick={() => setScreen("HOME")}
+        >
           <HStack>
             <Image src={logo.src} alt="logo" width={45} height={45} />
 

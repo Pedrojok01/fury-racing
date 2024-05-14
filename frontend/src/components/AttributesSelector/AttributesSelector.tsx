@@ -58,7 +58,7 @@ const AttributesSelector: FC = () => {
     <CustomBox>
       <VStack spacing={5} w={"100%"}>
         <HStack w={"100%"} justify={"space-between"}>
-          <Text className="subtitle">Select Your Car Attributes</Text>
+          <Text className="subtitle">2. Adjust Your Settings</Text>
           <Text>Remaining: {remainingPoints}</Text>
         </HStack>
 

@@ -16,17 +16,23 @@ const CustomLayout: FC<CustomLayoutProps> = ({ children }) => {
   const { isPortrait } = useMobileOrientation();
   const { screen } = useGame();
 
-  const displayRoadBg = screen === "HOME" || screen === "LEADERBOARD";
+  const displayRoadBg = !isMobile && (screen === "HOME" || screen === "LEADERBOARD");
 
   return (
-    <Flex flexDirection="column" minHeight="100vh" position="relative">
+    <Flex flexDirection="column" minHeight="100vh" position="relative" overflow="hidden">
       {isMobile && isPortrait && (
         <div className="landscape-overlay">Please rotate your device to landscape mode.</div>
       )}
 
       <Header />
 
-      <Box as="main" flex={1}>
+      <Box
+        as="main"
+        flex={1}
+        overflow={"auto"}
+        h={`calc(100vh - 77px - 1rem - 2.5rem)`}
+        overflowX={"hidden"}
+      >
         {children}
       </Box>
 

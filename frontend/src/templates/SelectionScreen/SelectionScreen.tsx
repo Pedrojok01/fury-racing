@@ -1,6 +1,6 @@
 import { type FC } from "react";
 
-import { Button, Center, VStack, Link, Flex } from "@chakra-ui/react";
+import { Button, Center, VStack, Link, Wrap } from "@chakra-ui/react";
 import NextLink from "next/link";
 
 import { AttributesSelector, CarAnim, Track, Weather } from "@/components";
@@ -12,14 +12,14 @@ const SelectionScreen: FC = () => {
   const { setScreen } = useGame();
 
   return (
-    <Center h={"100%"}>
-      <Flex w={"95%"} direction="row" justify="space-between">
-        <VStack flex="1" align="center" justify="center" spacing={4}>
+    <Center h={"auto"}>
+      <Wrap w={"100%"} direction="row" justify="space-between">
+        <VStack flex="1" align="center" justify="center" spacing={4} minW={330}>
           <CarAnim />
           <AttributesSelector />
         </VStack>
 
-        <VStack flex="1">
+        <VStack flex="1" minW={330}>
           <Weather />
           <Track map={images.track} data={tracks[0]} />
 
@@ -41,7 +41,7 @@ const SelectionScreen: FC = () => {
             </Button>
           </Link>
         </VStack>
-      </Flex>
+      </Wrap>
     </Center>
   );
 };

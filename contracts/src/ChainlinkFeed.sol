@@ -14,7 +14,7 @@ contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
     VRFCoordinatorV2Interface COORDINATOR;
     uint64 s_subscriptionId;
     bytes32 keyHash;
-    uint32 callbackGasLimit = 100000; // Adjust gas limit based on the requirements
+    uint32 callbackGasLimit = 100_000; // Adjust gas limit based on the requirements
     uint16 requestConfirmations = 3; // Number of confirmations the Chainlink node should wait before responding
     uint32 numWords = 1; // The number of random words to request
 
@@ -35,47 +35,40 @@ contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
         bytes32 _keyHash,
         bytes32 _jobId,
         uint256 _fee
-    ) VRFConsumerBaseV2(vrfCoordinator) Ownable(msg.sender) {
+    )
+        VRFConsumerBaseV2(vrfCoordinator)
+        Ownable(msg.sender)
+    {
         COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
         s_subscriptionId = subscriptionId;
         keyHash = _keyHash;
 
-        _setChainlinkToken(0x326C977E6efc84E512bB9C30f76E30c160eD06FB); // LINK token address on Polygon (Mumbai Testnet example)
+        _setChainlinkToken(0x326C977E6efc84E512bB9C30f76E30c160eD06FB); // LINK token address on Polygon (Mumbai Testnet
+            // example)
         _setChainlinkOracle(oracle);
         jobId = _jobId;
         fee = _fee; // Typically 0.1 * 10 ** 18; // 0.1 LINK
-        // fee = (1 * LINK_DIVISIBILITY) / 10; // 0,1 * 10**18 (Varies by network and job)
+            // fee = (1 * LINK_DIVISIBILITY) / 10; // 0,1 * 10**18 (Varies by network and job)
     }
 
     // Random Number Request
     function requestRandomNumber() external onlyOwner {
         // Will revert if subscription is not set and funded.
-        uint256 requestId = COORDINATOR.requestRandomWords(
-            keyHash,
-            s_subscriptionId,
-            requestConfirmations,
-            callbackGasLimit,
-            numWords
-        );
+        uint256 requestId =
+            COORDINATOR.requestRandomWords(keyHash, s_subscriptionId, requestConfirmations, callbackGasLimit, numWords);
 
         emit RandomnessRequestSent(requestId);
     }
 
-    function fulfillRandomWords(
-        uint256 /* requestId */,
-        uint256[] memory randomWords
-    ) internal override {
+    function fulfillRandomWords(uint256, /* requestId */ uint256[] memory randomWords) internal override {
         uint256 randomResult = randomWords[0];
         emit RandomnessReceived(randomResult);
     }
 
     // Weather Data Request
     function requestWeatherData(string memory url) public onlyOwner {
-        Chainlink.Request memory request = _buildChainlinkRequest(
-            jobId,
-            address(this),
-            this.fulfillWeatherData.selector
-        );
+        Chainlink.Request memory request =
+            _buildChainlinkRequest(jobId, address(this), this.fulfillWeatherData.selector);
         request._add("get", url);
         request._add("path", "data,weather"); // JSON path to retrieve weather from the response
         _sendChainlinkRequest(request, fee);
@@ -84,7 +77,10 @@ contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
     function fulfillWeatherData(
         bytes32 _requestId,
         string memory _data
-    ) public recordChainlinkFulfillment(_requestId) {
+    )
+        public
+        recordChainlinkFulfillment(_requestId)
+    {
         weatherData = _data;
         emit WeatherRequestFulfilled(_data);
     }

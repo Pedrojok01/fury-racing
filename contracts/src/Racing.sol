@@ -2,63 +2,20 @@
 pragma solidity 0.8.24;
 
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import {ChainlinkClient} from "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
-import {Chainlink} from "@chainlink/contracts/src/v0.8/Chainlink.sol";
 import {ChainlinkFeed} from "./ChainlinkFeed.sol";
+import {IRacing} from "./interface/IRacing.sol";
 import "./Errors.sol";
 
-// import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
-// import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
-// import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
-
-contract Racing is ChainlinkClient, ChainlinkFeed {
+contract Racing is IRacing, ChainlinkFeed {
     using Strings for uint8;
-    using Chainlink for Chainlink.Request;
 
-    /*//////////////////////////////////////////////////////////////
-                                 EVENTS
-    //////////////////////////////////////////////////////////////*/
-
-    event PlayerCreated(PlayerAttributes attributes, uint256 PlayerId);
-    event JoinedRace(uint256 PlayerId);
-    event StartedRace(uint256[] racers);
-    event FinishedRace(uint8[] leaderboard);
-    event RequestedLeaderboard(bytes32 indexed requestId, uint256 value);
-
-    /*//////////////////////////////////////////////////////////////
-                         MISCELLANEOUS CONSTANTS
-    //////////////////////////////////////////////////////////////*/
-
-    uint256 public playerBet = 0.1 ether;
+    uint256 public betAmount = 0.1 ether;
     uint256 private playersCounter = 0;
     uint256 private startELO = 1200;
-
-    /*//////////////////////////////////////////////////////////////
-                               RACE STATE
-    //////////////////////////////////////////////////////////////*/
-
-    enum RaceState {
-        WAITING,
-        ONGOING,
-        FINISHED
-    }
 
     RaceState public raceState; // The current state of the race: waiting for players, started, done.
     uint256 public races; // Count of completed races.
     uint256[] players; // Count of players
-
-    /*//////////////////////////////////////////////////////////////
-                             CIRCUIT STORAGE
-    //////////////////////////////////////////////////////////////*/
-
-    struct ExternalFactors {
-        uint8 Weather; // Precipitation level as how many days it rains per year (0, 33: Low | 33, 66: Medimum | 66,
-        // 100: High)
-        uint8 Crashes; // Safest level (0, 33: Low | 33, 66: Medimum | 66, 100: High)
-        uint16 Full_Throttle; // Full throttle in % (0, 33: Low | 33, 66: Medimum | 66, 100: High)
-        uint8 Downforce; // Downforce level (33: Low | 66: Medimum | 100: High)
-        uint16 Top_Speed; // Top Speed in km/h
-    }
 
     // mapping(uint256 => ExternalFactors) public circuits;
     ExternalFactors[] public circuits;
@@ -66,21 +23,6 @@ contract Racing is ChainlinkClient, ChainlinkFeed {
     /*//////////////////////////////////////////////////////////////
                              TEAMS STORAGE
     //////////////////////////////////////////////////////////////*/
-
-    struct PlayerAttributes {
-        uint8 reliability;
-        uint8 pitstops;
-        uint8 speed;
-        uint8 drivers;
-        uint8 strategy;
-        uint8 cornering;
-        uint8 luck;
-        uint8 car_balance;
-        uint8 staff;
-        uint8 aerodynamics;
-        address player;
-        uint16 ELO;
-    }
 
     mapping(address => uint256) public AddressToPlayer;
     mapping(uint256 => PlayerAttributes) public AddressToAttributes;
@@ -248,12 +190,23 @@ contract Racing is ChainlinkClient, ChainlinkFeed {
     }
 
     /*//////////////////////////////////////////////////////////////
+                                PRIVATE
+    //////////////////////////////////////////////////////////////*/
+
+    function setBetAmount(uint256 _betAmount) external onlyOwner {
+        uint256 oldBetAmount = betAmount;
+        betAmount = _betAmount;
+        emit BetAmountUpdated(_betAmount, oldBetAmount);
+    }
+
+    /*//////////////////////////////////////////////////////////////
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
 
     modifier onlyWhenWaiting() {
-        require(raceState == RaceState.WAITING, "RACE_IS_ACTIVE");
-
+        if (raceState != RaceState.WAITING) {
+            revert Racing__RaceAlreadyOngoing();
+        }
         _;
     }
 
@@ -261,28 +214,24 @@ contract Racing is ChainlinkClient, ChainlinkFeed {
         PlayerAttributes memory _attributes
     ) private pure {
         _checkAttribute(_attributes.reliability);
-        _checkAttribute(_attributes.pitstops);
         _checkAttribute(_attributes.speed);
-        _checkAttribute(_attributes.drivers);
+        _checkAttribute(_attributes.driver);
         _checkAttribute(_attributes.strategy);
         _checkAttribute(_attributes.cornering);
-        _checkAttribute(_attributes.luck);
         _checkAttribute(_attributes.car_balance);
-        _checkAttribute(_attributes.staff);
         _checkAttribute(_attributes.aerodynamics);
+        _checkAttribute(_attributes.luck);
 
         uint8 sum_of_attributes = _attributes.reliability +
-            _attributes.pitstops +
             _attributes.speed +
-            _attributes.drivers +
+            _attributes.driver +
             _attributes.strategy +
             _attributes.cornering +
-            _attributes.luck +
             _attributes.car_balance +
-            _attributes.staff +
-            _attributes.aerodynamics;
+            _attributes.aerodynamics +
+            _attributes.luck;
 
-        if (sum_of_attributes < 10 || sum_of_attributes > 50) {
+        if (sum_of_attributes < 10 || sum_of_attributes > 40) {
             revert Racing__InvalidAttributesSum();
         }
     }

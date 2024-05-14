@@ -24,7 +24,6 @@ const Track: FC<TrackProps> = ({ map, data }) => {
   return (
     <CustomBox>
       <HStack
-        color={"#25292E"}
         h={"100%"}
         justify={"flex-start"}
         alignContent={"flex-start"}

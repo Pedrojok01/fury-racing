@@ -5,7 +5,6 @@ import Image from "next/image";
 import NextLink from "next/link";
 import { useAccount } from "wagmi";
 
-import { CarDisplay } from "@/components";
 import { images } from "@/data/images";
 import { useGame } from "@/stores/useGame";
 
@@ -49,8 +48,6 @@ const HomeScreen: FC = () => {
             </Button>
           </Link>
         )}
-
-        <CarDisplay />
       </VStack>
 
       <Box className={styles.subContainer}>

@@ -6,6 +6,8 @@ import type { AppProps } from "next/app";
 
 import RootLayout from "./layout";
 
+import "@babylonjs/loaders/glTF";
+
 function MyApp({ Component, pageProps }: AppProps) {
   const [mounted, setMounted] = useState(false);
 

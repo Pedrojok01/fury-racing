@@ -1,9 +1,9 @@
 import { type FC } from "react";
 
-import { Button, Center, HStack, VStack, Link, Flex } from "@chakra-ui/react";
+import { Button, Center, VStack, Link, Flex } from "@chakra-ui/react";
 import NextLink from "next/link";
 
-import { AttributesSelector, CarAnim, Track } from "@/components";
+import { AttributesSelector, CarAnim, Track, Weather } from "@/components";
 import { images } from "@/data/images";
 import { tracks } from "@/data/tracks";
 import { useGame } from "@/stores/useGame";
@@ -15,36 +15,31 @@ const SelectionScreen: FC = () => {
     <Center h={"100%"}>
       <Flex w={"95%"} direction="row" justify="space-between">
         <VStack flex="1" align="center" justify="center" spacing={4}>
-          <>CUSTOMISE YOUR CAR</>
-
           <CarAnim />
-
-          <HStack>
-            <Link
-              as={NextLink}
-              href="/"
-              m={"auto"}
-              style={{ textDecoration: "none" }}
-              onClick={() => setScreen("HOME")}
-            >
-              <Button className="custom-button">Back</Button>
-            </Link>
-
-            <Link
-              as={NextLink}
-              href="/race"
-              m={"auto"}
-              style={{ textDecoration: "none" }}
-              onClick={() => setScreen("RACE")}
-            >
-              <Button className="custom-button">Go</Button>
-            </Link>
-          </HStack>
+          <AttributesSelector />
         </VStack>
 
         <VStack flex="1">
+          <Weather />
           <Track map={images.track} data={tracks[0]} />
-          <AttributesSelector />
+
+          <Link
+            as={NextLink}
+            href="/race"
+            style={{ textDecoration: "none" }}
+            onClick={() => setScreen("RACE")}
+          >
+            <Button
+              mt={"2rem"}
+              paddingBlock={"2.5rem"}
+              paddingInline={"5rem"}
+              fontSize={"2rem"}
+              fontWeight={"bold"}
+              className="custom-button"
+            >
+              Go
+            </Button>
+          </Link>
         </VStack>
       </Flex>
     </Center>

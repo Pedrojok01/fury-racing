@@ -28,7 +28,6 @@ const HomeScreen: FC = () => {
           <Text className={`${styles.title} text-shadow`}>
             Reach the top of the <span style={{ color: "var(--primary-color)" }}>leaderboard</span>.
           </Text>
-          
         </HStack>
 
         {isConnected && (

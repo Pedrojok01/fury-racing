@@ -1,5 +1,5 @@
 export * from "./AttributesSelector";
-export * from './CarDisplay';
+export * from "./CarDisplay";
 export * from "./CarAnim";
 export * from "./DarkModeButton";
 export * from "./Footer";

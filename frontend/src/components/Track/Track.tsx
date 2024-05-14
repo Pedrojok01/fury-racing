@@ -40,37 +40,12 @@ const Track: FC<TrackProps> = ({ map, data }) => {
           <Heading fontSize="xl">{data.name}</Heading>
           <Divider my={2} />
           <StatGroup>
-            <VStack spacing={1} align={"left"}>
-              <Stat>
-                <HStack>
-                  <StatLabel>Track Length</StatLabel>
-                  <StatNumber>{data.lengthFormatted}</StatNumber>
-                </HStack>
-              </Stat>
-              <Stat>
-                <HStack>
-                  <StatLabel>Best Time</StatLabel>
-                  <StatNumber>{data.bestTimeFormatted}</StatNumber>
-                </HStack>
-              </Stat>
-              <Stat>
-                <HStack>
-                  <StatLabel>Max Speed</StatLabel>
-                  <StatNumber>{data.maxSpeed} km/h</StatNumber>
-                </HStack>
-              </Stat>
-              <Stat>
-                <HStack>
-                  <StatLabel>Full Throttle</StatLabel>
-                  <StatNumber>{data.fullThrottle}%</StatNumber>
-                </HStack>
-              </Stat>
-              <Stat>
-                <HStack>
-                  <StatLabel>Downforce</StatLabel>
-                  <StatNumber>{data.downforce}</StatNumber>
-                </HStack>
-              </Stat>
+            <VStack spacing={1} align={"left"} minW={"175px"}>
+              <TrackData label="Track Length" data={data.lengthFormatted} />
+              <TrackData label="Best Time" data={data.bestTimeFormatted} />
+              <TrackData label="Max Speed" data={`${data.maxSpeed} km/h`} />
+              <TrackData label="Full Throttle" data={`${data.fullThrottle}%`} />
+              <TrackData label="Downforce" data={`${data.downforce}`} />
             </VStack>
           </StatGroup>
         </VStack>
@@ -80,3 +55,17 @@ const Track: FC<TrackProps> = ({ map, data }) => {
 };
 
 export default Track;
+
+interface TrackDataProps {
+  label: string;
+  data: string;
+}
+
+const TrackData: FC<TrackDataProps> = ({ label, data }) => (
+  <Stat>
+    <HStack>
+      <StatLabel>{label}</StatLabel>
+      <StatNumber fontSize="large">{data}</StatNumber>
+    </HStack>
+  </Stat>
+);

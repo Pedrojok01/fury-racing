@@ -10,6 +10,9 @@ import {
   Box,
   SimpleGrid,
   HStack,
+  StatLabel,
+  StatNumber,
+  Stat,
 } from "@chakra-ui/react";
 
 import { CustomBox } from "../CustomBox";
@@ -37,7 +40,6 @@ const AttributesSelector: FC = () => {
     setRemainingPoints(totalPoints - totalUsedPoints);
   }, [attributes]);
 
-  // Function to handle slider changes
   const handleAttributeChange = useCallback((value: number, attribute: keyof CarAttributes) => {
     setAttributes((prev) => {
       const newValue = Math.max(0, Math.min(value, 10)); // Ensure values are within 0-10
@@ -65,9 +67,12 @@ const AttributesSelector: FC = () => {
         <SimpleGrid columns={2} gap={1} w="full">
           {Object.entries(attributes).map(([key, value]) => (
             <Box key={key}>
-              <Text>
-                {key.charAt(0).toUpperCase() + key.slice(1)}: {value}
-              </Text>
+              <Stat>
+                <HStack>
+                  <StatLabel>{key.charAt(0).toUpperCase() + key.slice(1)}:</StatLabel>
+                  <StatNumber fontSize="large">{value}</StatNumber>
+                </HStack>
+              </Stat>
               <RangeSlider
                 defaultValue={[5]}
                 min={0}

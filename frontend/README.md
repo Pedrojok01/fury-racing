@@ -1,16 +1,15 @@
 <div align="center">
 
-<img src="./public/img/logo_transparent.png" width="70px"/>
+<img src="./public/img/logo.png" width="70px"/>
 <br><br>
 
-<h1><strong> Next Web3 Boilerplate </strong></h1>
+<h1><strong> Fury Racing </strong></h1>
 
-[![Stargazers](https://img.shields.io/github/stars/Pedrojok01/Next-Web3-Boilerplate)](https://github.com/Pedrojok01/Next-Web3-Boilerplate/stargazers)
-[![Forks](https://img.shields.io/github/forks/Pedrojok01/Next-Web3-Boilerplate)](https://github.com/Pedrojok01/Next-Web3-Boilerplate/issues)
-[![Issues](https://img.shields.io/github/issues/Pedrojok01/Next-Web3-Boilerplate)](https://github.com/Pedrojok01/Next-Web3-Boilerplate/issues)
-[![MIT License](https://img.shields.io/github/license/Pedrojok01/Next-Web3-Boilerplate)](https://github.com/Pedrojok01/Next-Web3-Boilerplate/blob/main/License)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/pierre-e/)
-![Vercel](https://img.shields.io/github/deployments/Pedrojok01/Next-Web3-Boilerplate/production?label=Vercel&logo=Vercel&logoColor=white)
+[![Stargazers](https://img.shields.io/github/stars/Pedrojok01/chainlink-hackathon)](https://github.com/Pedrojok01/chainlink-hackathon/stargazers)
+[![Forks](https://img.shields.io/github/forks/Pedrojok01/chainlink-hackathon)](https://github.com/Pedrojok01/chainlink-hackathon/issues)
+[![Issues](https://img.shields.io/github/issues/Pedrojok01/chainlink-hackathon)](https://github.com/Pedrojok01/chainlink-hackathon/issues)
+[![MIT License](https://img.shields.io/github/license/Pedrojok01/chainlink-hackathon)](https://github.com/Pedrojok01/chainlink-hackathon/blob/main/License)
+![Vercel](https://img.shields.io/github/deployments/Pedrojok01/chainlink-hackathon/production?label=Vercel&logo=Vercel&logoColor=white)
 
 <br></br>
 
@@ -18,10 +17,11 @@
 
 </div>
 
+Try it yourself: [https://fury-racing.vercel.app/](https://fury-racing.vercel.app/)
+
 ## Table of Contents
 
 - [Table of Contents](#table-of-contents)
-- [Update:](#update)
 - [Description](#description)
 - [Built With](#built-with)
 - [Installation](#installation)
@@ -31,22 +31,10 @@
   - [Add your API keys in the .env file:](#add-your-api-keys-in-the-env-file)
   - [To start the Next-Web3-Boilerplate:](#to-start-the-next-web3-boilerplate)
 - [Features:](#features)
-- [⭐️ ... and don't forget to leave a star if you like it! ⭐️](#️--and-dont-forget-to-leave-a-star-if-you-like-it-️)
-
-## Update:
-
-2024-02:
-
-- Switched to Next.js v14;
-- Switched to Viem & Wagmi v2;
-- Add support for `Linea`, `lineaTestnet`, `Bsc` & `bscTestnet` networks;
-- Bump all dependencies to the latest versions;
 
 ## Description
 
-Simple and minimalist Web3 boilerplate to boost your Dapp development. Built using the latest tech out there: [Next.js](https://nextjs.org/), [Viem](https://viem.sh/), [Wagmi](https://wagmi.sh/), [RainbowKit](https://www.rainbowkit.com/), [ChakraUI](https://chakra-ui.com/), and [Typescript](https://www.typescriptlang.org/). Eslint, Prettier, and Husky are already configured. The perfect starting point for your next web3 project.
-
-Try it yourself: [https://next-web3-boilerplate.com/](https://next-web3-boilerplate.com/)
+Onchain racing simulator leveraging Chainlink VRF and Chainlink API. Built using the latest tech out there: [Next.js](https://nextjs.org/), [Babylon.js](https://www.babylonjs.com/), [Viem](https://viem.sh/), [Wagmi](https://wagmi.sh/), [RainbowKit](https://www.rainbowkit.com/), [ChakraUI](https://chakra-ui.com/), and [Typescript](https://www.typescriptlang.org/).
 
 ## Built With
 
@@ -71,7 +59,7 @@ Try it yourself: [https://next-web3-boilerplate.com/](https://next-web3-boilerpl
 ### Once your config is ready, create a new repo, open your favorite code editor, and clone the repo with the following cmd:
 
 ```bash
-git clone https://github.com/Pedrojok01/Next-Web3-Boilerplate.git .
+git clone https://github.com/Pedrojok01/chainlink-hackathon.git .
 ```
 
 ### Install all package dependencies by running:
@@ -112,24 +100,24 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Features:
 
-- [x] Web3 Wallet Status (MetaMask / Rainbow / Coinbase Wallet / WalletConnect)
-- [x] Chain selector
-- [x] Block Number / Chain ID & Name
-- [x] Wallet balance
-- [x] Sign Messages & Transfer Native
+- [x] Avalanche Mainnet
+- [x] Car Selection
+- [x] Car Customization
+- [x] Free mode
+- [ ] Tournament mode
 - [x] Dark mode support
-- [x] Hook to query user's Token Balances
+- [x] Responsive design
+- [x] Chainlink VRF
+- [x] Chainlink API
+- [ ] Leaderboard
 
 <br></br>
 
 <div align="center">
-<h2> Enjoy!!!</h2>
+<h2>🎉🎉🎉 Thank you Chailink for this amazing hackathon!🎉🎉🎉</h2>
+</div>
 
 <br>
-
-## ⭐️ ... and don't forget to leave a star if you like it! ⭐️
-
-</div>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

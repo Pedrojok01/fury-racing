@@ -10,7 +10,7 @@ import {
   Vector3,
   Color4,
 } from "@babylonjs/core";
-import { Button, VStack, HStack } from "@chakra-ui/react";
+import { Button, VStack, HStack, Box } from "@chakra-ui/react";
 
 import { useBabylon } from "@/hooks";
 
@@ -106,10 +106,10 @@ const CarAnim = () => {
   }, [carIdx]);
 
   return (
-    <VStack>
-      <div style={{ width: "40rem", height: "20rem" }}>
+    <VStack justify={"center"} align={"center"} w={"100%"}>
+      <Box w={"34rem"} h={"17rem"}>
         <canvas ref={ref} style={{ width: "100%", height: "100%" }} />
-      </div>
+      </Box>
       <HStack>
         <Button onClick={incrementCarIdx} size="sm">
           Prev

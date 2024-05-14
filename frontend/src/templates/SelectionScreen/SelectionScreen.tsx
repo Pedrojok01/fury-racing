@@ -14,7 +14,7 @@ const SelectionScreen: FC = () => {
 
   return (
     <Center h={"auto"} p={isMobile ? 0 : "2rem"}>
-      <Wrap w={"100%"} direction="row" justify="space-between">
+      <Wrap w={"100%"} direction="row" justify="space-between" gap={0}>
         <VStack flex="1" align="center" justify="center" spacing={4} minW={330}>
           <CustomBox>
             <VStack alignItems={"flex-start"}>

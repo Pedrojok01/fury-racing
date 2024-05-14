@@ -1,6 +1,6 @@
 import { type FC } from "react";
 
-import { Box, Button, Center, HStack, Text, VStack, Link } from "@chakra-ui/react";
+import { Box, Button, Center, Text, VStack, Link } from "@chakra-ui/react";
 import Image from "next/image";
 import NextLink from "next/link";
 import { useAccount } from "wagmi";
@@ -15,19 +15,15 @@ const HomeScreen: FC = () => {
   const { setScreen } = useGame();
 
   return (
-    <Center h={"100%"} className={styles.container}>
+    <Center h={"100%"} className={styles.container} gap={5}>
       <VStack className={styles.subContainer}>
-        <HStack textAlign={"center"}>
-          <Text className={`${styles.title} text-shadow`}>
-            Score the <span style={{ color: "var(--primary-color)" }}>best time</span>.
-          </Text>
-        </HStack>
+        <Text className={`${styles.title} text-shadow`}>
+          Score the <span style={{ color: "var(--primary-color)" }}>best time</span>.
+        </Text>
 
-        <HStack textAlign={"center"}>
-          <Text className={`${styles.title} text-shadow`}>
-            Reach the top of the <span style={{ color: "var(--primary-color)" }}>leaderboard</span>.
-          </Text>
-        </HStack>
+        <Text className={`${styles.title} text-shadow`}>
+          Reach the top of the <span style={{ color: "var(--primary-color)" }}>leaderboard</span>.
+        </Text>
 
         {isConnected && (
           <Link

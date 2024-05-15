@@ -3,6 +3,7 @@ import { type FC } from "react";
 import { Button, Center, HStack, VStack, Link } from "@chakra-ui/react";
 import NextLink from "next/link";
 
+import { CarRace } from "@/components";
 import { useGame } from "@/stores/useGame";
 
 const RaceScreen: FC = () => {
@@ -12,6 +13,7 @@ const RaceScreen: FC = () => {
     <Center h={"100%"}>
       <VStack align="center" justify="center">
         <>THE RACE IS ON!</>
+        <CarRace />
         <HStack>
           <Link
             as={NextLink}

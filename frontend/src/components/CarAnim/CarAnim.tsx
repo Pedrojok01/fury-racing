@@ -12,14 +12,10 @@ import {
 } from "@babylonjs/core";
 import { Button, VStack, HStack, Box } from "@chakra-ui/react";
 
+import { carMetadata } from "@/data/game";
 import { useBabylon } from "@/hooks";
 
 import "@babylonjs/loaders/glTF";
-
-const carMetadata = [
-  { path: "car1", scale: 1.0 },
-  { path: "car2", scale: 1.25 },
-];
 
 const CarAnim = () => {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -39,7 +35,7 @@ const CarAnim = () => {
     scene.clearColor = new Color4(0, 0, 0, 0); // Transparent background
 
     // Initialize the camera.
-    const camera = new TargetCamera("camera1", new Vector3(0, 5, -12), scene);
+    const camera = new TargetCamera("camera1", new Vector3(0, 5, -13), scene);
     camera.setTarget(Vector3.Zero());
     camera.attachControl(true);
 
@@ -47,23 +43,29 @@ const CarAnim = () => {
     const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
     light.intensity = 0.7;
 
-    // -- Load the car models.
+    // Load the car models.
     carMetadata.forEach((meta) => {
       SceneLoader.LoadAssetContainer(`./assets/${meta.path}/`, "scene.gltf", scene, (container) => {
         const car = new TransformNode("carRoot");
+
         // Assign the root node to imported mesh objects.
         container.meshes.forEach((mesh) => {
+          mesh.position.x += meta.offset.x;
+          mesh.position.y += meta.offset.y;
+          mesh.position.z += meta.offset.z;
+
           if (!mesh.parent) {
             mesh.parent = car;
           }
         });
+
         car.scaling = new Vector3(meta.scale, meta.scale, meta.scale);
 
         // Collect the handle for that node.
         carNodesRef.current.push(car);
-        console.log(carNodesRef);
+        //car.rotation.y = Math.PI * 2;
 
-        // Add the ndoe to the scene.
+        // Add the node to the scene.
         container.addAllToScene();
       });
     });

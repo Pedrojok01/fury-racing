@@ -1,5 +1,6 @@
 export * from "./AttributesSelector";
 export * from "./CarAnim";
+export * from "./CarRace";
 export * from "./DarkModeButton";
 export * from "./Footer";
 export * from "./Header";

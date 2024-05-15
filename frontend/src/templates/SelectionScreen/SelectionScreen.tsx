@@ -5,8 +5,7 @@ import NextLink from "next/link";
 import { isMobile } from "react-device-detect";
 
 import { AttributesSelector, CarAnim, CustomBox, Track, Weather } from "@/components";
-import { images } from "@/data/images";
-import { tracks } from "@/data/tracks";
+import { images, tracks } from "@/data";
 import { useGame } from "@/stores/useGame";
 
 const SelectionScreen: FC = () => {

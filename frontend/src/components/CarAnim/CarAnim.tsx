@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, type FC } from "react";
 
 import {
   Engine,
@@ -12,26 +12,31 @@ import {
 } from "@babylonjs/core";
 import { Button, VStack, HStack, Box } from "@chakra-ui/react";
 
-import { carMetadata } from "@/data/game";
-import { useBabylon } from "@/hooks";
-
+import { carMetadata } from "@/data/cars";
 import "@babylonjs/loaders/glTF";
+import { useAnim } from "@/stores/useAnim";
 
-const CarAnim = () => {
+const CarAnim: FC = () => {
   const ref = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<Engine | null>(null);
   const sceneRef = useRef<Scene | null>(null);
   const carNodesRef = useRef<TransformNode[]>([]);
-  const { carIdx, incrementCarIdx, decrementCarIdx } = useBabylon();
+  const { carIdx, carData, incrementCarIdx, decrementCarIdx } = useAnim();
+
+  console.log("CarAnim.tsx:", carIdx, carData);
 
   // Initialization
   useEffect(() => {
+    if (!ref.current) return;
+
     // Initialize the engine.
     const engine = new Engine(ref.current, true);
+    engineRef.current = engine;
     engine.resize();
 
     // Initialize the scene.
     const scene = new Scene(engine);
+    sceneRef.current = scene;
     scene.clearColor = new Color4(0, 0, 0, 0); // Transparent background
 
     // Initialize the camera.
@@ -45,6 +50,7 @@ const CarAnim = () => {
 
     // Load the car models.
     carMetadata.forEach((meta) => {
+      console.log("Loading car model:", meta);
       SceneLoader.LoadAssetContainer(`./assets/${meta.path}/`, "scene.gltf", scene, (container) => {
         const car = new TransformNode("carRoot");
 
@@ -63,7 +69,6 @@ const CarAnim = () => {
 
         // Collect the handle for that node.
         carNodesRef.current.push(car);
-        //car.rotation.y = Math.PI * 2;
 
         // Add the node to the scene.
         container.addAllToScene();
@@ -72,10 +77,6 @@ const CarAnim = () => {
 
     // Start engine/scene rendering process.
     engine.runRenderLoop(() => scene.render());
-
-    // Update references and initialization flag.
-    engineRef.current = engine;
-    sceneRef.current = scene;
 
     // Cleanup when component unmounts.
     return () => {

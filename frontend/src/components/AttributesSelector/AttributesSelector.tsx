@@ -20,9 +20,9 @@ import { CustomBox } from "../CustomBox";
 const defaultAttributes: CarAttributes = {
   reliability: 5,
   speed: 5,
-  driver: 5,
-  strategy: 5,
-  cornering: 5,
+  driver_skills: 5,
+  breaks: 5,
+  maniability: 5,
   car_balance: 5,
   aerodynamics: 5,
   luck: 5,
@@ -75,7 +75,7 @@ const AttributesSelector: FC = () => {
               </Stat>
               <RangeSlider
                 defaultValue={[5]}
-                min={0}
+                min={1}
                 max={10}
                 onChangeEnd={(val) => handleAttributeChange(val[0], key as keyof CarAttributes)}
               >

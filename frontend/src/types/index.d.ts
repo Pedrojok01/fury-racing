@@ -17,12 +17,12 @@ type Leaderboard = PlayerScore[];
 
 type CarAttributes = {
   reliability: number;
+  maniability: number;
   speed: number;
-  driver: number;
-  strategy: number;
-  cornering: number; // maniability?
+  breaks: number;
   car_balance: number;
   aerodynamics: number;
+  driver_skills: number;
   luck: number;
 };
 
@@ -34,6 +34,15 @@ type ExternalFactors = {
   top_speed: number; // Top Speed in km/h
 };
 
+type TrackAnim = {
+  tiles: string;
+  startPosition: {
+    x: number;
+    y: number;
+    direction: string;
+  };
+};
+
 type TrackData = {
   name: string;
   length: number;
@@ -43,6 +52,17 @@ type TrackData = {
   maxSpeed: number;
   fullThrottle: number;
   downforce: number;
+  animData: TrackAnim;
 };
 
 type Tracks = TrackData[];
+
+type CarMetadata = {
+  path: string;
+  scale: number;
+  offset: {
+    x: number;
+    y: number;
+    z: number;
+  };
+};

@@ -1,32 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import {ChainlinkFeed} from "./ChainlinkFeed.sol";
-import {IRacing} from "./interface/IRacing.sol";
+import { ChainlinkFeed } from "./ChainlinkFeed.sol";
+import { IRacing } from "./interface/IRacing.sol";
 import "./Errors.sol";
 
-contract Racing is IRacing, ChainlinkFeed {
-    using Strings for uint8;
+contract Racing is ChainlinkFeed, IRacing {
+    uint256 private constant TOURNAMENT_DURATION = 1 weeks; // TODO: handle prize pool every week
+    uint256 private constant START_ELO = 1200;
 
     uint256 public betAmount = 0.1 ether;
-    uint256 private playersCounter = 0;
-    uint256 private startELO = 1200;
+    uint256 public currentPrizePool;
+    uint256 public playersCounter;
 
-    RaceState public raceState; // The current state of the race: waiting for players, started, done.
-    uint256 public races; // Count of completed races.
-    uint256[] players; // Count of players
+    mapping(uint256 => Race) public freeRaces;
+    mapping(uint256 => Race) public races;
+    uint256 public freeRaceCounter;
+    uint256 public raceCounter;
 
-    // mapping(uint256 => ExternalFactors) public circuits;
-    ExternalFactors[] public circuits;
-
-    /*//////////////////////////////////////////////////////////////
-                             TEAMS STORAGE
-    //////////////////////////////////////////////////////////////*/
-
-    mapping(address => uint256) public AddressToPlayer;
-    mapping(uint256 => PlayerAttributes) public AddressToAttributes;
-    uint256[] private racers;
+    mapping(address => Player) public addressToPlayer;
+    Circuits[] public circuits;
 
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
@@ -42,196 +35,223 @@ contract Racing is IRacing, ChainlinkFeed {
         bytes32 _jobId,
         uint256 _fee
     )
-        ChainlinkFeed(
-            subscriptionId,
-            vrfCoordinator,
-            oracle,
-            _keyHash,
-            _jobId,
-            _fee
-        )
+        ChainlinkFeed(subscriptionId, vrfCoordinator, oracle, _keyHash, _jobId, _fee)
     {
         _setChainlinkToken(_link);
         _setChainlinkOracle(_oracle);
 
-        /*//////////////////////////////////////////////////////////////
-                                  CIRCUITS
-        //////////////////////////////////////////////////////////////*/
-
-        // Set the external attributes for the tracks
-
-        // Bahrain = 0
-        circuits.push(ExternalFactors(2, 8, 72, 66, 330));
-
-        // Saudi Arabia = 1
-        circuits.push(ExternalFactors(1, 66, 79, 66, 330));
-
-        // Australia = 2
-        circuits.push(ExternalFactors(25, 5, 70, 80, 310));
-    }
-
-    /*//////////////////////////////////////////////////////////////
-                            TEAM MANAGEMENT
-    //////////////////////////////////////////////////////////////*/
-
-    /// @notice Create a racing player with the given attributes.
-    /// @param _attributes Attributes selected the racing player.
-    function createPlayer(PlayerAttributes memory _attributes) external {
-        // Only one team per address.
-        if (AddressToPlayer[msg.sender] != 0) {
-            revert Racing__PlayerAlreadyCreated();
-        }
-
-        // Verify the given attributes are valid.
-        _verifyAttributes(_attributes);
-
-        // Increase team count (using as ID).
-        ++playersCounter;
-
-        // Add team ID to the list of active teams.
-        players.push(playersCounter);
-
-        // Configure mappings with team attributes and principal address.
-        AddressToPlayer[msg.sender] = playersCounter;
-        AddressToAttributes[playersCounter] = _attributes;
-
-        emit PlayerCreated(_attributes, playersCounter);
-    }
-
-    /// @notice Upgrade the attributes of an existing racing team. Charges a mechanic fee.
-    /// @param _attributes New attributes for the racing team.
-    function upgradePlayer(
-        PlayerAttributes memory _attributes
-    ) external onlyWhenWaiting {
-        // Mechanic fee (requires approval).
-        // TODO: Add adjusted fee based on GOO mechanic
-
-        // Verify given team attributes.
-        _verifyAttributes(_attributes);
-
-        // Update team attributes.
-        AddressToAttributes[AddressToPlayer[msg.sender]] = _attributes;
+        // Monaco = 1
+        circuits[0] = Circuits({ factors: ExternalFactors(17, 66, 59, 90, 290), name: "Monaco" });
     }
 
     /*//////////////////////////////////////////////////////////////
                                 RACES
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Join the queue for the upcoming race.
-    function joinRace() external onlyWhenWaiting {
-        // Participation fee (requires approval).
-        // TODO: Add adjusted fee based on GOO mechanic
-        // require(Goo.transferFrom(msg.sender, address(this), 0.01 ether));
+    /// @notice Join the queue for the upcoming free race or start the free race.
+    function joinFreeRace(PlayerAttributes memory _attributes) public {
+        // Validate input attributes.
+        _verifyAttributes(_attributes);
 
-        uint256 player = AddressToPlayer[msg.sender];
+        // Create new player if it doesn't exist.
+        if (addressToPlayer[msg.sender].playerAddress == address(0)) {
+            _createPlayer(_attributes);
+        } else {
+            addressToPlayer[msg.sender].attributes = _attributes;
+        }
 
-        // Add team ID to the list of current racers.
-        racers.push(player);
-
-        emit JoinedRace(player);
+        bool ongoing = _updateFreeRace();
+        emit JoinedRace(msg.sender);
 
         // Run race when it is full.
-        if (racers.length == 2) {
-            startRace();
+        if (ongoing) {
+            emit FreeRaceStarted(freeRaceCounter);
+            _startRace(0, freeRaceCounter, false); // TODO: handle multiple circuits
         }
     }
 
-    /// @notice Execute the run when it is full.
-    function startRace() internal {
-        emit StartedRace(racers);
+    /// @notice Join the queue for the upcoming race or start the race.
+    function joinRace(PlayerAttributes memory _attributes) public payable {
+        // Validate input bet amount.
+        if (msg.value != betAmount) {
+            revert Racing__InvalidBetAmount();
+        }
 
-        // Gets current circuit and calls simulations to generate leaderboard.
-        requestLeaderboard(_getCircuit());
+        // Validate input attributes.
+        _verifyAttributes(_attributes);
+
+        // Create new player if it doesn't exist.
+        if (addressToPlayer[msg.sender].playerAddress == address(0)) {
+            _createPlayer(_attributes);
+        } else {
+            addressToPlayer[msg.sender].attributes = _attributes;
+        }
+
+        // 5% goes to weekly prize pool
+        currentPrizePool += (msg.value * 5) / 100;
+
+        bool ongoing = _updateRace();
+
+        emit JoinedRace(msg.sender);
+
+        // Run race when it is full.
+        if (ongoing) {
+            emit RaceStarted(raceCounter);
+            _startRace(0, raceCounter, true);
+        }
     }
 
-    /// @notice Finishes the race and pays the winners following the received leaderboard.
-    function finishRace(uint256 values) internal {
-        // The leaderboard is sorted from the lowest average lap time for the 10 laps. Payouts are given when the
-        // leaderboard is generated.
-        // TODO: Create leaderboard array from uint256
-        uint8[] memory leaderboard;
+    /// @notice Finishes the race and pays the winners following the received race result.
+    function _finishRace(
+        uint256 raceId,
+        bool isBetRace,
+        uint256[] memory values
+    )
+        internal
+        override
+    {
+        Race memory race = isBetRace ? races[raceId] : freeRaces[raceId];
 
-        emit FinishedRace(leaderboard);
+        // Update the race times
+        race.player1Time = uint40(values[0]);
+        race.player2Time = uint40(values[1]);
+
+        // take the lowest value as the winner
+        address winner = race.player1Time <= race.player2Time ? race.player1 : race.player2;
+        address loser = race.player1 == winner ? race.player2 : race.player1;
+        uint256 toPay = betAmount == 0 ? 0 : ((betAmount * 2) * 95) / 100;
+
+        // Update racers ELO
+        addressToPlayer[winner].ELO += 3;
+        addressToPlayer[loser].ELO += 1;
+
+        race.state = RaceState.FINISHED;
+        emit FinishedRace(raceId, winner);
+
+        if (!isBetRace) {
+            freeRaces[raceId] = race;
+        } else {
+            races[raceId] = race;
+
+            // Pay the winner
+            (bool success,) = payable(winner).call{ value: toPay }("");
+            if (!success) {
+                revert Racing__WinnerPaymentFailed();
+            }
+        }
     }
 
     /*//////////////////////////////////////////////////////////////
-                               CHAINLINK
+                                RESTRICTED
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Calls for simulations.
-    function requestLeaderboard(uint8 _circuit) internal returns (bytes32) {
-        // Chainlink.Request memory req = _buildChainlinkRequest(
-        //     jobId,
-        //     address(this),
-        //     this.fulfill.selector
-        // );
-        // // Set the URL to perform the GET request on
-        // req.add(
-        //     "get",
-        //     string.concat(
-        //         "https://app.gradient.city/api/",
-        //         Strings.toString(_circuit)
-        //     )
-        // );
-        // req.add("path", "val"); // Chainlink nodes 1.0.0 and later support this format
-        // int256 timesAmount = 1;
-        // req.addInt("times", timesAmount);
-        // return _sendChainlinkRequest(req, fee);
+    /// @notice Allows to add a new circuits
+    function addCircuit(Circuits memory _circuit) external onlyOwner {
+        circuits.push(_circuit);
     }
 
-    /// @notice Receives leaderboard for race.
-    function fulfill(
-        bytes32 _requestId,
-        uint256 _value
-    ) public recordChainlinkFulfillment(_requestId) {
-        emit RequestedLeaderboard(_requestId, _value);
-
-        finishRace(_value);
-    }
-
-    /*//////////////////////////////////////////////////////////////
-                                PRIVATE
-    //////////////////////////////////////////////////////////////*/
-
+    /// @notice Allows to adjust the bet amount per tournament race
     function setBetAmount(uint256 _betAmount) external onlyOwner {
         uint256 oldBetAmount = betAmount;
         betAmount = _betAmount;
         emit BetAmountUpdated(_betAmount, oldBetAmount);
     }
 
+    /// @notice Allows to withdraws funds from the contract if needed.
+    function emergencyWithdraw() external onlyOwner {
+        (bool success,) = payable(owner()).call{ value: address(this).balance }("");
+        if (!success) {
+            revert Racing__EmergencyWithdrawFailed();
+        }
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                               PRIVATE
+    //////////////////////////////////////////////////////////////*/
+
+    /// @notice Calls for simulations.
+    function _startRace(uint256 index, uint256 raceId, bool isBetRace) internal {
+        // Request random number and weather data
+        requestRandomNumber();
+        requestWeatherData(_getCircuit(index).name);
+
+        // Logic to handle the race can be added here
+
+        // Request race result (Data to be added)
+        bytes32 requestId = requestRaceResult(index);
+
+        // Store the mapping for requestId to raceId and isBetRace
+        requestIdToRaceId[requestId] = raceId; // TODO possible overlap!!!
+        requestIdIsBetRace[requestId] = isBetRace;
+    }
+
     /*//////////////////////////////////////////////////////////////
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
 
-    modifier onlyWhenWaiting() {
-        if (raceState != RaceState.WAITING) {
-            revert Racing__RaceAlreadyOngoing();
+    /// @notice Create a racing player with the given attributes.
+    function _updateFreeRace() private returns (bool _ongoing) {
+        // Check if there is an ongoing race
+        if (freeRaces[freeRaceCounter].state == RaceState.WAITING) {
+            // Update the current race
+            Race memory currentRace = freeRaces[freeRaceCounter];
+            currentRace.state = RaceState.ONGOING;
+            currentRace.player2 = msg.sender;
+
+            freeRaces[freeRaceCounter] = currentRace;
+            _ongoing = true;
+        } else {
+            // Create a new race
+            ++freeRaceCounter;
+            freeRaces[freeRaceCounter] = Race({
+                state: RaceState.WAITING,
+                player1: msg.sender,
+                player2: address(0),
+                player1Time: 0,
+                player2Time: 0
+            });
         }
-        _;
     }
 
-    function _verifyAttributes(
-        PlayerAttributes memory _attributes
-    ) private pure {
+    /// @notice Create a racing player with the given attributes.
+    function _updateRace() private returns (bool _ongoing) {
+        // Check if there is an ongoing race
+        if (races[raceCounter].state == RaceState.WAITING) {
+            // Update the current race
+            Race memory currentRace = races[raceCounter];
+            currentRace.state = RaceState.ONGOING;
+            currentRace.player2 = msg.sender;
+
+            races[raceCounter] = currentRace;
+            _ongoing = true;
+        } else {
+            // Create a new race
+            ++raceCounter;
+            races[raceCounter] = Race({
+                state: RaceState.WAITING,
+                player1: msg.sender,
+                player2: address(0),
+                player1Time: 0,
+                player2Time: 0
+            });
+        }
+    }
+
+    function _verifyAttributes(PlayerAttributes memory _attributes) private pure {
         _checkAttribute(_attributes.reliability);
+        _checkAttribute(_attributes.maniability);
         _checkAttribute(_attributes.speed);
-        _checkAttribute(_attributes.driver);
-        _checkAttribute(_attributes.strategy);
-        _checkAttribute(_attributes.cornering);
+        _checkAttribute(_attributes.breaks);
         _checkAttribute(_attributes.car_balance);
         _checkAttribute(_attributes.aerodynamics);
+        _checkAttribute(_attributes.driver_skills);
         _checkAttribute(_attributes.luck);
 
-        uint8 sum_of_attributes = _attributes.reliability +
-            _attributes.speed +
-            _attributes.driver +
-            _attributes.strategy +
-            _attributes.cornering +
-            _attributes.car_balance +
-            _attributes.aerodynamics +
-            _attributes.luck;
+        uint8 sum_of_attributes = _attributes.reliability + _attributes.maniability
+            + _attributes.speed + _attributes.breaks + _attributes.car_balance
+            + _attributes.aerodynamics + _attributes.driver_skills + _attributes.luck;
 
-        if (sum_of_attributes < 10 || sum_of_attributes > 40) {
+        if (sum_of_attributes != 40) {
             revert Racing__InvalidAttributesSum();
         }
     }
@@ -242,7 +262,15 @@ contract Racing is IRacing, ChainlinkFeed {
         }
     }
 
-    function _getCircuit() private returns (uint8) {
-        // TODO: Implement circuit selection
+    function _getCircuit(uint256 index) private view returns (Circuits memory) {
+        return circuits[index];
+    }
+
+    function _createPlayer(PlayerAttributes memory _attributes) private {
+        ++playersCounter;
+        Player memory newPlayer =
+            Player({ attributes: _attributes, playerAddress: msg.sender, ELO: uint16(START_ELO) });
+        addressToPlayer[msg.sender] = newPlayer;
+        emit PlayerCreated(msg.sender, _attributes, playersCounter);
     }
 }

@@ -28,14 +28,14 @@ contract Racing is ChainlinkFeed, IRacing {
     constructor(
         address _link,
         address _oracle,
-        uint64 subscriptionId,
-        address vrfCoordinator,
+        uint64 _subscriptionId,
+        address _vrfCoordinator,
         address oracle,
         bytes32 _keyHash,
         bytes32 _jobId,
         uint256 _fee
     )
-        ChainlinkFeed(subscriptionId, vrfCoordinator, oracle, _keyHash, _jobId, _fee)
+        ChainlinkFeed(_subscriptionId, _vrfCoordinator, oracle, _keyHash, _jobId, _fee)
     {
         _setChainlinkToken(_link);
         _setChainlinkOracle(_oracle);

@@ -16,7 +16,7 @@ abstract contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
     address private authorized;
 
     // VRF parameters
-    VRFCoordinatorV2Interface COORDINATOR;
+    VRFCoordinatorV2Interface immutable COORDINATOR;
     uint64 private s_subscriptionId;
     bytes32 private keyHash;
     uint32 private callbackGasLimit = 100_000; // Adjust gas limit based on the requirements
@@ -27,7 +27,14 @@ abstract contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
     // Weather API parameters
     bytes32 private jobId;
     uint256 private fee;
-    string public weatherData; // To store the response of weather API
+    
+    struct WeatherData {
+        int256 tempC;
+        string condition;
+        string icon;
+        int256 precipMm;
+    }
+    WeatherData public weatherData;
 
     // Mappings for requestId to raceId and whether it's a bet race
     mapping(bytes32 => uint256) internal requestIdToRaceId;
@@ -36,8 +43,9 @@ abstract contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
     // Events
     event RequestedRandomness(uint256 requestId);
     event RandomnessReceived(uint256 randomness);
-    event WeatherRequestFulfilled(string weather);
+    event WeatherRequestFulfilled(bytes32 indexed requestId, int256 tempC, string condition, string icon, int256 precipMm);
     event RaceResultFulfilled(bytes32 indexed requestId, uint256[] values);
+    event AuthorizedAddressUpdated(address indexed newAuthorized, address indexed oldAuthorized);
 
     modifier onlyAuthorized() {
         if (msg.sender != authorized) revert Racing__Unauthorized();
@@ -45,26 +53,25 @@ abstract contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
     }
 
     constructor(
-        uint64 subscriptionId,
-        address vrfCoordinator,
+        uint64 _subscriptionId,
+        address _vrfCoordinator,
         address oracle,
         bytes32 _keyHash,
         bytes32 _jobId,
         uint256 _fee
     )
-        VRFConsumerBaseV2(vrfCoordinator)
+        VRFConsumerBaseV2(_vrfCoordinator)
         Ownable(msg.sender)
     {
-        COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
-        s_subscriptionId = subscriptionId;
+        COORDINATOR = VRFCoordinatorV2Interface(_vrfCoordinator);
+        s_subscriptionId = _subscriptionId;
         keyHash = _keyHash;
 
         _setChainlinkToken(0x0b9d5D9136855f6FEc3c0993feE6E9CE8a297846); // LINK address on Avax Fuji
             // Testnet
         _setChainlinkOracle(oracle);
         jobId = _jobId;
-        fee = _fee; // Typically 0.1 * 10 ** 18; // 0.1 LINK
-            // fee = (1 * LINK_DIVISIBILITY) / 10; // 0,1 * 10**18 (Varies by network and job)
+        fee = _fee; // Typically 0.1 * 10 ** 18; // 0.1 LINK        
     }
 
     /// @notice Random Number Request
@@ -96,22 +103,33 @@ abstract contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
         req._add(
             "get",
             string.concat(
-                "https://api.weatherapi.com/v1/current.json?key=YOUR_API_KEY&q=", circuitName
+                "https://api.weatherapi.com/v1/current.json?key=YOURAPIKEY&q=", circuitName
             )
         );
-        req._add("path", "data,weather"); // JSON path to retrieve weather from the response
+        req._add("path1", "current.temp_c");
+        req._add("path2", "current.condition.text");
+        req._add("path3", "current.condition.icon");
+        req._add("path4", "current.precip_mm");
         return _sendChainlinkRequest(req, fee);
     }
 
     function fulfillWeatherData(
         bytes32 _requestId,
-        string memory _data
+        int256 _tempC,
+        string memory _condition,
+        string memory _icon,
+        int256 _precipMm
     )
         public
         recordChainlinkFulfillment(_requestId)
     {
-        weatherData = _data;
-        emit WeatherRequestFulfilled(_data);
+        weatherData = WeatherData({
+            tempC: _tempC,
+            condition: _condition,
+            icon: _icon,
+            precipMm: _precipMm
+        });
+        emit WeatherRequestFulfilled(_requestId, _tempC, _condition, _icon,  _precipMm);
     }
 
     /// @notice Race Result Data Request
@@ -163,7 +181,9 @@ abstract contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
 
     /// @notice Set authorized address to send the race results
     function setAuthorized(address _authorized) external onlyOwner {
-        if (authorized == address(0)) revert Racing__AddressZero();
+        if (_authorized == address(0)) revert Racing__AddressZero();
+        address old = authorized;
         authorized = _authorized;
+        emit AuthorizedAddressUpdated(_authorized, old);
     }
 }

@@ -1,10 +1,3 @@
-type RequestResponse = {
-  success: boolean;
-  error: string | null;
-  status: number;
-  data: Leaderboard;
-};
-
 type CurrentScreen = "HOME" | "SELECTION" | "RACE" | "ENDED" | "LEADERBOARD";
 
 type PlayerScore = {
@@ -43,7 +36,7 @@ type TrackAnim = {
   };
 };
 
-type TrackData = {
+type DisplayStatData = {
   name: string;
   length: number;
   lengthFormatted: string;
@@ -55,7 +48,7 @@ type TrackData = {
   animData: TrackAnim;
 };
 
-type Tracks = TrackData[];
+type Tracks = DisplayStatData[];
 
 type CarMetadata = {
   path: string;
@@ -65,4 +58,51 @@ type CarMetadata = {
     y: number;
     z: number;
   };
+};
+
+interface Weather {
+  location: {
+    name: string;
+    country: string;
+    localtime_epoch: number;
+    localtime: string;
+  };
+  current: {
+    temp_c: number;
+    temp_f: number;
+    is_day: number;
+    condition: {
+      text: string;
+      icon: string;
+    };
+    wind_mph: number;
+    wind_kph: number;
+    wind_degree: number;
+    wind_dir: string;
+    precip_mm: number;
+    precip_in: number;
+    humidity: number;
+    cloud: number;
+    feelslike_c: number;
+    feelslike_f: number;
+  };
+}
+
+type LeaderboardResponse = {
+  success: boolean;
+  error: string | null;
+  status: number;
+  data: Leaderboard;
+};
+
+type WeatherResponse = {
+  success: boolean;
+  error: string | null;
+  status: number;
+  data: Weather | null;
+};
+
+type FetchError = {
+  message: string;
+  status: number;
 };

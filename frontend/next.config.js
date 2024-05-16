@@ -6,6 +6,15 @@ const nextConfig = {
     config.externals.push("pino-pretty", "lokijs", "encoding");
     return config;
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn.weatherapi.com",
+        port: "",
+      },
+    ],
+  },
 };
 
 module.exports = nextConfig;

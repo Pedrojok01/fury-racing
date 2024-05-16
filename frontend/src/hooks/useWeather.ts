@@ -1,7 +1,12 @@
-// hooks/useLeaderboard.ts
+// hooks/useWeather.ts
 import useSWR from "swr";
 
-const fetcher = async (url: string): Promise<LeaderboardResponse> => {
+type FetchError = {
+  message: string;
+  status: number;
+};
+
+const fetcher = async (url: string): Promise<WeatherResponse> => {
   const response = await fetch(url);
   if (!response.ok) {
     const error: FetchError = {
@@ -13,18 +18,18 @@ const fetcher = async (url: string): Promise<LeaderboardResponse> => {
   return response.json();
 };
 
-function useLeaderboard() {
-  const { data, error, mutate } = useSWR<LeaderboardResponse, FetchError>(
-    "/api/getLeaderboard",
+function useWeather(city: string) {
+  const { data, error, mutate } = useSWR<WeatherResponse, FetchError>(
+    city ? `/api/getWeather?city=${city}` : null,
     fetcher,
   );
 
   return {
-    leaderboard: data?.data ?? [],
+    weather: data?.data ?? null,
     isLoading: !error && !data,
     isError: error,
     refetch: mutate,
   };
 }
 
-export default useLeaderboard;
+export default useWeather;

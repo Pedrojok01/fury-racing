@@ -6,7 +6,6 @@ import { isMobile, useMobileOrientation } from "react-device-detect";
 
 import { Footer, Header } from "@/components";
 import { images } from "@/data/images";
-import { useGame } from "@/stores/useGame";
 
 type CustomLayoutProps = {
   children: ReactNode;
@@ -14,9 +13,6 @@ type CustomLayoutProps = {
 
 const CustomLayout: FC<CustomLayoutProps> = ({ children }) => {
   const { isPortrait } = useMobileOrientation();
-  const { screen } = useGame();
-
-  const displayRoadBg = !isMobile && (screen === "HOME" || screen === "LEADERBOARD");
 
   return (
     <Flex flexDirection="column" minHeight="100vh" position="relative" overflow="hidden">
@@ -36,7 +32,7 @@ const CustomLayout: FC<CustomLayoutProps> = ({ children }) => {
         {children}
       </Box>
 
-      {displayRoadBg && (
+      {!isMobile && (
         <Box position="absolute" bottom="0" left="0" zIndex={-10}>
           <Image
             alt="background shape"

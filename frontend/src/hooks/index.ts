@@ -4,3 +4,4 @@ export * from "./useSignMessageHook";
 export * from "./useWindowSize";
 export * from "./usePagination";
 export * from "./useLeaderboard";
+export * from "./useWeather";

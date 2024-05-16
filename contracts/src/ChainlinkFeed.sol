@@ -17,33 +17,25 @@ abstract contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
 
     // VRF parameters
     VRFCoordinatorV2Interface immutable COORDINATOR;
-    uint64 private s_subscriptionId;
-    bytes32 private keyHash;
-    uint32 private callbackGasLimit = 100_000; // Adjust gas limit based on the requirements
-    uint16 private requestConfirmations = 3; // Number of confirmations the Chainlink node should
-        // wait before responding
-    uint32 private numWords = 1; // The number of random words to request
+    uint64 private immutable s_subscriptionId;
+    bytes32 private immutable keyHash;
+    uint32 private immutable callbackGasLimit = 100_000; // Adjust gas limit based on the
+        // requirements
+    uint16 private immutable requestConfirmations = 3; // Confirmations the Chainlink node should
+        // wait
+    uint32 private immutable numWords = 1; // Number of random words to request
 
-    // Weather API parameters
+    // Chainlink parameters
     bytes32 private jobId;
     uint256 private fee;
-    
-    struct WeatherData {
-        int256 tempC;
-        string condition;
-        string icon;
-        int256 precipMm;
-    }
-    WeatherData public weatherData;
 
-    // Mappings for requestId to raceId and whether it's a bet race
-    mapping(bytes32 => uint256) internal requestIdToRaceId;
-    mapping(bytes32 => bool) internal requestIdIsBetRace;
+    mapping(bytes32 => bool) internal requestIdIsBetRace; // RequestId to isBetRace
+    mapping(bytes32 => mapping(bool => uint256)) internal requestIdToRaceId; // RequestId to
+        // isBetRace to raceId
 
     // Events
     event RequestedRandomness(uint256 requestId);
     event RandomnessReceived(uint256 randomness);
-    event WeatherRequestFulfilled(bytes32 indexed requestId, int256 tempC, string condition, string icon, int256 precipMm);
     event RaceResultFulfilled(bytes32 indexed requestId, uint256[] values);
     event AuthorizedAddressUpdated(address indexed newAuthorized, address indexed oldAuthorized);
 
@@ -71,12 +63,12 @@ abstract contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
             // Testnet
         _setChainlinkOracle(oracle);
         jobId = _jobId;
-        fee = _fee; // Typically 0.1 * 10 ** 18; // 0.1 LINK        
+        fee = _fee; // Typically 0.1 * 10 ** 18; // 0.1 LINK
     }
 
     /// @notice Random Number Request
+    // TODO: Fund subscription on both testnet and Mainnet.
     function requestRandomNumber() internal {
-        // TODO: Fund subscription on both testnet and Mainnet.
         uint256 requestId = COORDINATOR.requestRandomWords(
             keyHash, s_subscriptionId, requestConfirmations, callbackGasLimit, numWords
         );
@@ -96,44 +88,8 @@ abstract contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
         emit RandomnessReceived(randomResult);
     }
 
-    /// @notice Weather Data Request
-    function requestWeatherData(string memory circuitName) internal returns (bytes32) {
-        Chainlink.Request memory req =
-            _buildChainlinkRequest(jobId, address(this), this.fulfillWeatherData.selector);
-        req._add(
-            "get",
-            string.concat(
-                "https://api.weatherapi.com/v1/current.json?key=YOURAPIKEY&q=", circuitName
-            )
-        );
-        req._add("path1", "current.temp_c");
-        req._add("path2", "current.condition.text");
-        req._add("path3", "current.condition.icon");
-        req._add("path4", "current.precip_mm");
-        return _sendChainlinkRequest(req, fee);
-    }
-
-    function fulfillWeatherData(
-        bytes32 _requestId,
-        int256 _tempC,
-        string memory _condition,
-        string memory _icon,
-        int256 _precipMm
-    )
-        public
-        recordChainlinkFulfillment(_requestId)
-    {
-        weatherData = WeatherData({
-            tempC: _tempC,
-            condition: _condition,
-            icon: _icon,
-            precipMm: _precipMm
-        });
-        emit WeatherRequestFulfilled(_requestId, _tempC, _condition, _icon,  _precipMm);
-    }
-
     /// @notice Race Result Data Request
-    function requestRaceResult(uint256 circuit) internal returns (bytes32) {
+    function requestRaceResult(uint256 circuit, uint256 raceId, bool isBetRace) internal returns (bytes32) {
         Chainlink.Request memory req =
             _buildChainlinkRequest(jobId, address(this), this.fulfillRaceResult.selector);
         req._add(
@@ -141,7 +97,11 @@ abstract contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
             string.concat("https://api.yourracingapi.com/race_results/", Strings.toString(circuit))
         );
         req._add("path", "data,race_result"); // JSON path to retrieve race result from the response
-        return _sendChainlinkRequest(req, fee);
+        bytes32 requestId = _sendChainlinkRequest(req, fee);
+        requestIdIsBetRace[requestId] = isBetRace;
+        requestIdToRaceId[requestId][isBetRace] = raceId;
+
+        return requestId;
     }
 
     /// @notice Receives race result.
@@ -153,23 +113,23 @@ abstract contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
         recordChainlinkFulfillment(_requestId)
         onlyAuthorized
     {
-        uint256 raceId = getRaceIdFromRequestId(_requestId);
         bool isBetRace = isBetRaceFromRequestId(_requestId);
+        uint256 raceId = getRaceIdFromRequestId(_requestId, isBetRace);
 
         emit RaceResultFulfilled(_requestId, _values);
 
         _finishRace(raceId, isBetRace, _values);
     }
 
-    /// @notice Helper function to map requestId to raceId.
-    function getRaceIdFromRequestId(bytes32 _requestId) internal view returns (uint256) {
-        return requestIdToRaceId[_requestId];
-    }
-
     /// @notice Helper function to determine if the race is a bet race.
     function isBetRaceFromRequestId(bytes32 _requestId) internal view returns (bool) {
         return requestIdIsBetRace[_requestId];
     }
+
+    /// @notice Helper function to map requestId to raceId.
+    function getRaceIdFromRequestId(bytes32 _requestId, bool isBetRace) internal view returns (uint256) {
+    return requestIdToRaceId[_requestId][isBetRace];
+}
 
     function _finishRace(
         uint256 raceId,

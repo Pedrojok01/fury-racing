@@ -10,12 +10,12 @@ interface IRacing {
     }
 
     struct ExternalFactors {
-        uint8 Weather; // Real time precipitation level in % (0, 33: Low | 33, 66: Medimum | 66,
+        uint8 weather; // Real time precipitation level in % (0, 33: Low | 33, 66: Medimum | 66,
             // 100: High)
-        uint8 Crashes; // Safest level in % (0, 33: Low | 33, 66: Medimum | 66, 100: High)
-        uint16 Full_Throttle; // Full throttle in % (0, 33: Low | 33, 66: Medimum | 66, 100: High)
-        uint8 Downforce; // Downforce level in % (33: Low | 66: Medimum | 100: High)
-        uint16 Top_Speed; // Top Speed in km/h
+        uint8 crashes; // Safest level in % (0, 33: Low | 33, 66: Medimum | 66, 100: High)
+        uint16 full_Throttle; // Full throttle in % (0, 33: Low | 33, 66: Medimum | 66, 100: High)
+        uint8 downforce; // Downforce level in % (33: Low | 66: Medimum | 100: High)
+        uint16 top_Speed; // Top Speed in km/h
     }
 
     struct Circuits {

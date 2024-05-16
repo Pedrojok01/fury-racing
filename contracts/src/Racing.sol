@@ -1,24 +1,29 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
+import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
 import { ChainlinkFeed } from "./ChainlinkFeed.sol";
 import { IRacing } from "./interface/IRacing.sol";
 import "./Errors.sol";
 
-contract Racing is ChainlinkFeed, IRacing {
+contract Racing is ChainlinkFeed, Pausable, IRacing {
     uint256 private constant TOURNAMENT_DURATION = 1 weeks; // TODO: handle prize pool every week
     uint256 private constant START_ELO = 1200;
 
     uint256 public betAmount = 0.1 ether;
     uint256 public currentPrizePool;
+    uint256 public lastPrizeDistribution;
     uint256 public playersCounter;
+    uint256 public betPlayersCounter;
 
-    mapping(uint256 => Race) public freeRaces;
-    mapping(uint256 => Race) public races;
+    mapping(uint256 => Race) private freeRaces;
+    mapping(uint256 => Race) private races;
     uint256 public freeRaceCounter;
     uint256 public raceCounter;
 
     mapping(address => Player) public addressToPlayer;
+    mapping(uint256 => address) private betPlayerIndex;
+    mapping(address => uint256) public betPlayerAddressToIndex;
     Circuits[] public circuits;
 
     /*//////////////////////////////////////////////////////////////
@@ -40,8 +45,10 @@ contract Racing is ChainlinkFeed, IRacing {
         _setChainlinkToken(_link);
         _setChainlinkOracle(_oracle);
 
+        // TODO: Add function to update weather data
         // Monaco = 1
         circuits[0] = Circuits({ factors: ExternalFactors(17, 66, 59, 90, 290), name: "Monaco" });
+        lastPrizeDistribution = block.timestamp;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -58,6 +65,8 @@ contract Racing is ChainlinkFeed, IRacing {
             _createPlayer(_attributes);
         } else {
             addressToPlayer[msg.sender].attributes = _attributes;
+
+            
         }
 
         bool ongoing = _updateFreeRace();
@@ -71,7 +80,7 @@ contract Racing is ChainlinkFeed, IRacing {
     }
 
     /// @notice Join the queue for the upcoming race or start the race.
-    function joinRace(PlayerAttributes memory _attributes) public payable {
+    function joinRace(PlayerAttributes memory _attributes) public payable whenNotPaused {
         // Validate input bet amount.
         if (msg.value != betAmount) {
             revert Racing__InvalidBetAmount();
@@ -85,6 +94,12 @@ contract Racing is ChainlinkFeed, IRacing {
             _createPlayer(_attributes);
         } else {
             addressToPlayer[msg.sender].attributes = _attributes;
+
+          if (betPlayerAddressToIndex[msg.sender] == 0) {
+                betPlayerIndex[++betPlayersCounter] = msg.sender;
+                betPlayerAddressToIndex[msg.sender] = betPlayersCounter;
+            }
+
         }
 
         // 5% goes to weekly prize pool
@@ -98,6 +113,7 @@ contract Racing is ChainlinkFeed, IRacing {
         if (ongoing) {
             emit RaceStarted(raceCounter);
             _startRace(0, raceCounter, true);
+             _checkAndDistributePrizePool();
         }
     }
 
@@ -146,6 +162,17 @@ contract Racing is ChainlinkFeed, IRacing {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Allows to add a new circuits
+    function UpdateWeatherDataForCircuit(uint256 circuitIndex, uint256 data) external onlyOwner {
+        if (circuitIndex >= circuits.length) {
+            revert Racing__CircuitNotFound();
+        }
+        Circuits memory circuit = _getCircuit(circuitIndex);
+        circuit.factors.weather = uint8(data);
+
+        circuits[circuitIndex] = circuit;
+    }
+
+    /// @notice Allows to add a new circuits
     function addCircuit(Circuits memory _circuit) external onlyOwner {
         circuits.push(_circuit);
     }
@@ -155,6 +182,14 @@ contract Racing is ChainlinkFeed, IRacing {
         uint256 oldBetAmount = betAmount;
         betAmount = _betAmount;
         emit BetAmountUpdated(_betAmount, oldBetAmount);
+    }
+
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    function unpause() external onlyOwner {
+        _unpause();
     }
 
     /// @notice Allows to withdraws funds from the contract if needed.
@@ -173,17 +208,55 @@ contract Racing is ChainlinkFeed, IRacing {
     function _startRace(uint256 index, uint256 raceId, bool isBetRace) internal {
         // Request random number and weather data
         requestRandomNumber();
-        requestWeatherData(_getCircuit(index).name);
-
-        // Logic to handle the race can be added here
 
         // Request race result (Data to be added)
-        bytes32 requestId = requestRaceResult(index);
-
-        // Store the mapping for requestId to raceId and isBetRace
-        requestIdToRaceId[requestId] = raceId; // TODO possible overlap!!!
-        requestIdIsBetRace[requestId] = isBetRace;
+        requestRaceResult(index, raceId, isBetRace);
     }
+
+    function _checkAndDistributePrizePool() private {
+        if (block.timestamp >= lastPrizeDistribution + TOURNAMENT_DURATION) {
+            lastPrizeDistribution = block.timestamp;
+            _distributePrizePool();
+        }
+    }
+
+    function _distributePrizePool() private {
+        address topPlayer;
+        uint16 highestELO = uint16(START_ELO);
+
+        // TODO: Find a way to handle this without looping through all players
+        // chainlink function from backend to get top player?
+        uint256 length = betPlayersCounter >= 200 ? 200 : betPlayersCounter;
+        for (uint256 i = 0; i < length;) {
+            address playerAddress = betPlayerIndex[i];
+            Player memory player = addressToPlayer[playerAddress];
+
+            uint16 playerELO = player.ELO;
+            player.ELO = uint16(START_ELO); // Reset ELO
+            addressToPlayer[playerAddress] = player; // Update player
+
+            if (playerELO > highestELO) {
+                highestELO = playerELO;
+                topPlayer = player.playerAddress;
+            }
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        if (topPlayer != address(0) && currentPrizePool > 0) {
+            if (address(this).balance < currentPrizePool) {
+                revert Racing__WeeklyPaymentInsufficientBalance();
+            }
+            (bool success,) = payable(topPlayer).call{ value: currentPrizePool }("");
+            if (!success) {
+                revert Racing__WeeklyPaymentFailed();
+            }
+            currentPrizePool = 0;
+        }
+    }
+
 
     /*//////////////////////////////////////////////////////////////
                                 HELPERS

@@ -9,5 +9,7 @@ error Racing__RaceAlreadyOngoing();
 error Racing__FreeRaceAlreadyOngoing();
 error Racing__EmergencyWithdrawFailed();
 error Racing__WinnerPaymentFailed();
+error Racing__WeeklyPaymentFailed();
+error Racing__WeeklyPaymentInsufficientBalance();
 error Racing__AddressZero();
 error Racing__CircuitNotFound();

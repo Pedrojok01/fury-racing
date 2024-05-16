@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
+import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
 import { ChainlinkFeed } from "./ChainlinkFeed.sol";
 import { IRacing } from "./interface/IRacing.sol";
 import "./Errors.sol";
 
-contract Racing is ChainlinkFeed, Pausable, IRacing {
-    uint256 private constant TOURNAMENT_DURATION = 1 weeks; // TODO: handle prize pool every week
+contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard, IRacing {
+    uint256 private constant TOURNAMENT_DURATION = 1 weeks;
     uint256 private constant START_ELO = 1200;
+    uint256 private constant MAX_BET_PLAYERS = 200; // TODO: Find alternate way to remove hard cap
 
     uint256 public betAmount = 0.1 ether;
     uint256 public currentPrizePool;
@@ -65,8 +67,6 @@ contract Racing is ChainlinkFeed, Pausable, IRacing {
             _createPlayer(_attributes);
         } else {
             addressToPlayer[msg.sender].attributes = _attributes;
-
-            
         }
 
         bool ongoing = _updateFreeRace();
@@ -80,7 +80,12 @@ contract Racing is ChainlinkFeed, Pausable, IRacing {
     }
 
     /// @notice Join the queue for the upcoming race or start the race.
-    function joinRace(PlayerAttributes memory _attributes) public payable whenNotPaused {
+    function joinRace(PlayerAttributes memory _attributes)
+        public
+        payable
+        whenNotPaused
+        nonReentrant
+    {
         // Validate input bet amount.
         if (msg.value != betAmount) {
             revert Racing__InvalidBetAmount();
@@ -95,25 +100,23 @@ contract Racing is ChainlinkFeed, Pausable, IRacing {
         } else {
             addressToPlayer[msg.sender].attributes = _attributes;
 
-          if (betPlayerAddressToIndex[msg.sender] == 0) {
+            if (betPlayerAddressToIndex[msg.sender] == 0) {
                 betPlayerIndex[++betPlayersCounter] = msg.sender;
                 betPlayerAddressToIndex[msg.sender] = betPlayersCounter;
             }
-
         }
 
         // 5% goes to weekly prize pool
         currentPrizePool += (msg.value * 5) / 100;
 
         bool ongoing = _updateRace();
-
         emit JoinedRace(msg.sender);
 
         // Run race when it is full.
         if (ongoing) {
             emit RaceStarted(raceCounter);
             _startRace(0, raceCounter, true);
-             _checkAndDistributePrizePool();
+            _checkAndDistributePrizePool();
         }
     }
 
@@ -224,16 +227,13 @@ contract Racing is ChainlinkFeed, Pausable, IRacing {
         address topPlayer;
         uint16 highestELO = uint16(START_ELO);
 
-        // TODO: Find a way to handle this without looping through all players
-        // chainlink function from backend to get top player?
-        uint256 length = betPlayersCounter >= 200 ? 200 : betPlayersCounter;
-        for (uint256 i = 0; i < length;) {
+        uint256 length = betPlayersCounter >= MAX_BET_PLAYERS ? MAX_BET_PLAYERS : betPlayersCounter;
+        for (uint256 i = 1; i <= length;) {
             address playerAddress = betPlayerIndex[i];
-            Player memory player = addressToPlayer[playerAddress];
+            Player storage player = addressToPlayer[playerAddress];
 
             uint16 playerELO = player.ELO;
             player.ELO = uint16(START_ELO); // Reset ELO
-            addressToPlayer[playerAddress] = player; // Update player
 
             if (playerELO > highestELO) {
                 highestELO = playerELO;
@@ -256,7 +256,6 @@ contract Racing is ChainlinkFeed, Pausable, IRacing {
             currentPrizePool = 0;
         }
     }
-
 
     /*//////////////////////////////////////////////////////////////
                                 HELPERS

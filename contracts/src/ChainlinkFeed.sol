@@ -89,7 +89,14 @@ abstract contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
     }
 
     /// @notice Race Result Data Request
-    function requestRaceResult(uint256 circuit, uint256 raceId, bool isBetRace) internal returns (bytes32) {
+    function requestRaceResult(
+        uint256 circuit,
+        uint256 raceId,
+        bool isBetRace
+    )
+        internal
+        returns (bytes32)
+    {
         Chainlink.Request memory req =
             _buildChainlinkRequest(jobId, address(this), this.fulfillRaceResult.selector);
         req._add(
@@ -127,9 +134,16 @@ abstract contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
     }
 
     /// @notice Helper function to map requestId to raceId.
-    function getRaceIdFromRequestId(bytes32 _requestId, bool isBetRace) internal view returns (uint256) {
-    return requestIdToRaceId[_requestId][isBetRace];
-}
+    function getRaceIdFromRequestId(
+        bytes32 _requestId,
+        bool isBetRace
+    )
+        internal
+        view
+        returns (uint256)
+    {
+        return requestIdToRaceId[_requestId][isBetRace];
+    }
 
     function _finishRace(
         uint256 raceId,

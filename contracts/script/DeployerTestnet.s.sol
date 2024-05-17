@@ -5,15 +5,14 @@ import { Racing } from "../src/Racing.sol";
 import { Script, console2 } from "forge-std/Script.sol";
 
 contract DeployerTest is Script {
-    address immutable ROUTER = 0x9f82a6A0758517FD0AfA463820F586999AF314a0; // AVAX MAINNET
-    address immutable VRF_COORDINATOR = 0xE40895D055bccd2053dD0638C9695E326152b1A4; // AVAX MAINNET
+    address immutable ROUTER = 0xA9d587a00A31A52Ed70D6026794a8FC5E2F5dCb0; // AVAX FUJI
+    address immutable VRF_COORDINATOR = 0x5C210eF41CD1a72de73bF76eC39637bB0d3d7BEE; // AVAX FUJI
     uint256 immutable VRF_SUBSCRIPTION_ID =
-        4734827867964001365405830055140988844088387107361042566903892685164165989088; // TODO: Fill this
-        // in
-    uint64 immutable FUNCTIONS_SUBSCRIPTION_ID = 8170; // TODO: Fill this in
-    bytes32 immutable KEY_HASH = 0xea7f56be19583eeb8255aa79f16d8bd8a64cedf68e42fefee1c9ac5372b1a102; // AVAX
-        // MAINNET
-    bytes32 immutable DON_ID = "fun-avalanche-mainnet-1"; // AVAX MAINNET
+        4734827867964001365405830055140988844088387107361042566903892685164165989088; // AVAX FUJI
+    uint64 immutable FUNCTIONS_SUBSCRIPTION_ID = 8170; // AVAX FUJI
+    bytes32 immutable KEY_HASH = 0xc799bd1e3bd4d1a41cd4968997a4e03dfd2a3c7c04b695881138580163f42887; // AVAX
+        // FUJI
+    bytes32 immutable DON_ID = "fun-avalanche-fuji-1"; // AVAX FUJI
 
     function run() public {
         vm.startBroadcast();

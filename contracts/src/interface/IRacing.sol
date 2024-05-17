@@ -10,8 +10,7 @@ interface IRacing {
     }
 
     struct ExternalFactors {
-        uint8 weather; // Real time precipitation level in % (0, 33: Low | 33, 66: Medimum | 66,
-            // 100: High)
+        uint8 weather; // Precipitation in % (0, 33: Low | 33, 66: Medimum | 66, 100: High)
         uint8 crashes; // Safest level in % (0, 33: Low | 33, 66: Medimum | 66, 100: High)
         uint16 full_Throttle; // Full throttle in % (0, 33: Low | 33, 66: Medimum | 66, 100: High)
         uint8 downforce; // Downforce level in % (33: Low | 66: Medimum | 100: High)
@@ -20,6 +19,7 @@ interface IRacing {
 
     struct Circuits {
         ExternalFactors factors;
+        uint256 index;
         string name;
     }
 
@@ -42,10 +42,18 @@ interface IRacing {
 
     struct Race {
         RaceState state;
+        uint256 circuit;
         address player1;
         address player2;
         uint40 player1Time;
         uint40 player2Time;
+    }
+
+    struct RaceAttributes {
+        string circuitIdStr;
+        string weather;
+        string player1Attributes;
+        string player2Attributes;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -54,7 +62,7 @@ interface IRacing {
 
     event PlayerCreated(address indexed player, PlayerAttributes attributes, uint256 playerId);
     event BetAmountUpdated(uint256 newBetAmount, uint256 oldBetAmount);
-    event JoinedRace(address player);
+    event JoinedRace(uint256 indexed raceId, address indexed player);
     event FreeRaceStarted(uint256 raceId);
     event RaceStarted(uint256 raceId);
     event FinishedRace(uint256 raceId, address winner);

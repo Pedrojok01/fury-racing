@@ -5,7 +5,7 @@ libs = ["lib"]
 solc = "0.8.24"
 remappings = [
     "@openzeppelin/contracts=lib/openzeppelin-contracts/contracts",
-    "@chainlink=lib/chainlink"
+    "@chainlink=lib/chainlink/contracts/src"
 ]
 # fs_permissions = [
 #     { access = "read", path = "./broadcast" },
@@ -32,10 +32,11 @@ bracket_spacing = true
 int_types = "long"
 line_length = 100
 multiline_func_header = "all"
-number_underscore = "thousands"
+number_underscore = "preserve"
 quote_style = "double"
 tab_width = 4
 wrap_comments = true
+sort_imports = true
 
 [etherscan]
 # zksync = no keey needed for zksync

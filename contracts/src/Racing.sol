@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
 import { ChainlinkFeed } from "./ChainlinkFeed.sol";
-import { IRacing } from "./interface/IRacing.sol";
+
 import "./Errors.sol";
 
-contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard, IRacing {
+import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+
+contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     uint256 private constant TOURNAMENT_DURATION = 1 weeks;
     uint256 private constant START_ELO = 1200;
     uint256 private constant MAX_BET_PLAYERS = 200; // TODO: Find alternate way to remove hard cap
@@ -33,23 +34,25 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard, IRacing {
     //////////////////////////////////////////////////////////////*/
 
     constructor(
-        address _link,
-        address _oracle,
-        uint64 _subscriptionId,
+        address _router,
         address _vrfCoordinator,
-        address oracle,
+        uint256 _vrfSubscriptionId,
+        uint64 _functionSubscriptionId,
         bytes32 _keyHash,
-        bytes32 _jobId,
-        uint256 _fee
+        bytes32 _donID
     )
-        ChainlinkFeed(_subscriptionId, _vrfCoordinator, oracle, _keyHash, _jobId, _fee)
+        ChainlinkFeed(_router, _vrfCoordinator)
     {
-        _setChainlinkToken(_link);
-        _setChainlinkOracle(_oracle);
+        ROUTER = _router;
+        VRF_SUBSCRIPTION_ID = _vrfSubscriptionId;
+        FUNCTIONS_SUBSCRIPTION_ID = _functionSubscriptionId;
+        KEY_HASH = _keyHash;
+        DON_ID = _donID;
 
-        // TODO: Add function to update weather data
         // Monaco = 1
-        circuits[0] = Circuits({ factors: ExternalFactors(17, 66, 59, 90, 290), name: "Monaco" });
+        circuits.push(
+            Circuits({ factors: ExternalFactors(17, 66, 59, 90, 290), index: 0, name: "Monaco" })
+        );
         lastPrizeDistribution = block.timestamp;
     }
 
@@ -58,24 +61,23 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard, IRacing {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Join the queue for the upcoming free race or start the free race.
+    // TODO: Allow multiple circuits
     function joinFreeRace(PlayerAttributes memory _attributes) public {
-        // Validate input attributes.
         _verifyAttributes(_attributes);
 
         // Create new player if it doesn't exist.
         if (addressToPlayer[msg.sender].playerAddress == address(0)) {
-            _createPlayer(_attributes);
+            _createPlayer(msg.sender, _attributes);
         } else {
             addressToPlayer[msg.sender].attributes = _attributes;
         }
 
-        bool ongoing = _updateFreeRace();
-        emit JoinedRace(msg.sender);
+        emit JoinedRace(freeRaceCounter, msg.sender);
 
         // Run race when it is full.
-        if (ongoing) {
+        if (_updateFreeRace(0)) {
             emit FreeRaceStarted(freeRaceCounter);
-            _startRace(0, freeRaceCounter, false); // TODO: handle multiple circuits
+            requestRandomNumber(freeRaceCounter, false);
         }
     }
 
@@ -96,27 +98,20 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard, IRacing {
 
         // Create new player if it doesn't exist.
         if (addressToPlayer[msg.sender].playerAddress == address(0)) {
-            _createPlayer(_attributes);
+            _createPlayer(msg.sender, _attributes);
         } else {
-            addressToPlayer[msg.sender].attributes = _attributes;
-
-            if (betPlayerAddressToIndex[msg.sender] == 0) {
-                betPlayerIndex[++betPlayersCounter] = msg.sender;
-                betPlayerAddressToIndex[msg.sender] = betPlayersCounter;
-            }
+            updatePlayerAttributes(msg.sender, _attributes);
         }
 
         // 5% goes to weekly prize pool
         currentPrizePool += (msg.value * 5) / 100;
 
-        bool ongoing = _updateRace();
-        emit JoinedRace(msg.sender);
+        emit JoinedRace(raceCounter, msg.sender);
 
         // Run race when it is full.
-        if (ongoing) {
+        if (_updateRace(0)) {
             emit RaceStarted(raceCounter);
-            _startRace(0, raceCounter, true);
-            _checkAndDistributePrizePool();
+            requestRandomNumber(raceCounter, true);
         }
     }
 
@@ -137,12 +132,11 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard, IRacing {
 
         // take the lowest value as the winner
         address winner = race.player1Time <= race.player2Time ? race.player1 : race.player2;
-        address loser = race.player1 == winner ? race.player2 : race.player1;
         uint256 toPay = betAmount == 0 ? 0 : ((betAmount * 2) * 95) / 100;
 
         // Update racers ELO
         addressToPlayer[winner].ELO += 3;
-        addressToPlayer[loser].ELO += 1;
+        addressToPlayer[race.player1 == winner ? race.player2 : race.player1].ELO += 1;
 
         race.state = RaceState.FINISHED;
         emit FinishedRace(raceId, winner);
@@ -173,6 +167,8 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard, IRacing {
         circuit.factors.weather = uint8(data);
 
         circuits[circuitIndex] = circuit;
+
+        _checkAndDistributePrizePool();
     }
 
     /// @notice Allows to add a new circuits
@@ -208,12 +204,48 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard, IRacing {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Calls for simulations.
-    function _startRace(uint256 index, uint256 raceId, bool isBetRace) internal {
-        // Request random number and weather data
-        requestRandomNumber();
+    function _startRace(uint256[] memory words, uint256 raceId, bool isBetRace) internal override {
+        Race memory _race = isBetRace ? races[raceId] : freeRaces[raceId];
 
-        // Request race result (Data to be added)
-        requestRaceResult(index, raceId, isBetRace);
+        PlayerAttributes[] memory attributes = new PlayerAttributes[](2);
+        attributes[0] = _applyLuckFactor(addressToPlayer[_race.player1].attributes, words[0]);
+        attributes[1] = _applyLuckFactor(addressToPlayer[_race.player2].attributes, words[1]);
+
+        // Request race result (TODO: add weather data)
+        requestRaceResult(_race.circuit, attributes);
+    }
+
+    /// @notice Adjusts the player attributes based on the luck factor.
+    function _applyLuckFactor(
+        PlayerAttributes memory _attributes,
+        uint256 randomNumber
+    )
+        private
+        pure
+        returns (PlayerAttributes memory)
+    {
+        // Range from -50 to +50 to match two-digit precision (up to +/- 5%)
+        int256 baseLuck = int256(randomNumber % 101) - 50;
+        // Adjust based on player luck attribute
+        int256 luckFactor = baseLuck + (int256(uint256(_attributes.luck)) - 5) * 10;
+
+        _attributes.reliability = _adjustAttribute(_attributes.reliability, luckFactor);
+        _attributes.maniability = _adjustAttribute(_attributes.maniability, luckFactor);
+        _attributes.speed = _adjustAttribute(_attributes.speed, luckFactor);
+        _attributes.breaks = _adjustAttribute(_attributes.breaks, luckFactor);
+        _attributes.car_balance = _adjustAttribute(_attributes.car_balance, luckFactor);
+        _attributes.aerodynamics = _adjustAttribute(_attributes.aerodynamics, luckFactor);
+        _attributes.driver_skills = _adjustAttribute(_attributes.driver_skills, luckFactor);
+
+        return _attributes;
+    }
+
+    /// @notice Adjusts the attribute based on the luck factor with two-digit precision.
+    function _adjustAttribute(uint8 attribute, int256 luckFactor) private pure returns (uint8) {
+        int256 adjusted = int256(uint256(attribute) * 10) + luckFactor; // Convert to 2 digits
+        if (adjusted < 10) adjusted = 10; // Ensure minimum value of 1.0
+        if (adjusted >= 100) adjusted = 99; // Ensure maximum value of 9.9
+        return uint8(uint256(adjusted));
     }
 
     function _checkAndDistributePrizePool() private {
@@ -230,10 +262,11 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard, IRacing {
         uint256 length = betPlayersCounter >= MAX_BET_PLAYERS ? MAX_BET_PLAYERS : betPlayersCounter;
         for (uint256 i = 1; i <= length;) {
             address playerAddress = betPlayerIndex[i];
-            Player storage player = addressToPlayer[playerAddress];
+            Player memory player = addressToPlayer[playerAddress];
 
             uint16 playerELO = player.ELO;
             player.ELO = uint16(START_ELO); // Reset ELO
+            addressToPlayer[playerAddress] = player;
 
             if (playerELO > highestELO) {
                 highestELO = playerELO;
@@ -262,21 +295,20 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard, IRacing {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Create a racing player with the given attributes.
-    function _updateFreeRace() private returns (bool _ongoing) {
+    function _updateFreeRace(uint256 _circuitIndex) private returns (bool _ongoing) {
         // Check if there is an ongoing race
         if (freeRaces[freeRaceCounter].state == RaceState.WAITING) {
             // Update the current race
-            Race memory currentRace = freeRaces[freeRaceCounter];
+            Race storage currentRace = freeRaces[freeRaceCounter];
             currentRace.state = RaceState.ONGOING;
             currentRace.player2 = msg.sender;
-
-            freeRaces[freeRaceCounter] = currentRace;
             _ongoing = true;
         } else {
             // Create a new race
             ++freeRaceCounter;
             freeRaces[freeRaceCounter] = Race({
                 state: RaceState.WAITING,
+                circuit: _circuitIndex,
                 player1: msg.sender,
                 player2: address(0),
                 player1Time: 0,
@@ -286,21 +318,20 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard, IRacing {
     }
 
     /// @notice Create a racing player with the given attributes.
-    function _updateRace() private returns (bool _ongoing) {
+    function _updateRace(uint256 _circuitIndex) private returns (bool _ongoing) {
         // Check if there is an ongoing race
         if (races[raceCounter].state == RaceState.WAITING) {
             // Update the current race
-            Race memory currentRace = races[raceCounter];
+            Race storage currentRace = races[raceCounter];
             currentRace.state = RaceState.ONGOING;
             currentRace.player2 = msg.sender;
-
-            races[raceCounter] = currentRace;
             _ongoing = true;
         } else {
             // Create a new race
             ++raceCounter;
             races[raceCounter] = Race({
                 state: RaceState.WAITING,
+                circuit: _circuitIndex,
                 player1: msg.sender,
                 player2: address(0),
                 player1Time: 0,
@@ -338,11 +369,20 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard, IRacing {
         return circuits[index];
     }
 
-    function _createPlayer(PlayerAttributes memory _attributes) private {
+    function updatePlayerAttributes(address player, PlayerAttributes memory _attributes) private {
+        addressToPlayer[player].attributes = _attributes;
+
+        if (betPlayerAddressToIndex[player] == 0) {
+            betPlayerIndex[++betPlayersCounter] = player;
+            betPlayerAddressToIndex[player] = betPlayersCounter;
+        }
+    }
+
+    function _createPlayer(address player, PlayerAttributes memory _attributes) private {
         ++playersCounter;
         Player memory newPlayer =
-            Player({ attributes: _attributes, playerAddress: msg.sender, ELO: uint16(START_ELO) });
-        addressToPlayer[msg.sender] = newPlayer;
-        emit PlayerCreated(msg.sender, _attributes, playersCounter);
+            Player({ attributes: _attributes, playerAddress: player, ELO: uint16(START_ELO) });
+        addressToPlayer[player] = newPlayer;
+        emit PlayerCreated(player, _attributes, playersCounter);
     }
 }

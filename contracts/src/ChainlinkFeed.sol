@@ -1,149 +1,231 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
-import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
-import "@chainlink/contracts/src/v0.8/vrf/interfaces/VRFCoordinatorV2Interface.sol";
-import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
-import "@chainlink/contracts/src/v0.8/Chainlink.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Errors.sol";
+import { IRacing } from "./interface/IRacing.sol";
 
-abstract contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
+import { FunctionsRequest } from "@chainlink/v0.8/functions/v1_0_0/libraries/FunctionsRequest.sol";
+import { FunctionsClient } from "@chainlink/v0.8/functions/v1_3_0/FunctionsClient.sol";
+
+import { ConfirmedOwner } from "@chainlink/v0.8/shared/access/ConfirmedOwner.sol";
+import { LinkTokenInterface } from "@chainlink/v0.8/shared/interfaces/LinkTokenInterface.sol";
+import { VRFConsumerBaseV2Plus } from "@chainlink/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
+import { IVRFCoordinatorV2Plus } from "@chainlink/v0.8/vrf/dev/interfaces/IVRFCoordinatorV2Plus.sol";
+import { VRFV2PlusClient } from "@chainlink/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
+import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
+
+abstract contract ChainlinkFeed is
+    FunctionsClient,
+    ConfirmedOwner,
+    VRFConsumerBaseV2Plus,
+    IRacing
+{
     using Strings for uint8;
-    using Chainlink for Chainlink.Request;
+    using FunctionsRequest for FunctionsRequest.Request;
 
-    address private authorized;
+    // Chainlink VRF parameters
+    IVRFCoordinatorV2Plus internal immutable COORDINATOR;
+    bytes32 internal immutable KEY_HASH;
+    uint256 internal immutable VRF_SUBSCRIPTION_ID;
+    uint16 private constant REQUEST_CONFIRMATIONS = 3;
+    uint32 private constant CALLBACK_GAS_LIMIT = 2_500_000;
+    uint32 private constant NUM_WORDS = 2;
 
-    // VRF parameters
-    VRFCoordinatorV2Interface immutable COORDINATOR;
-    uint64 private immutable s_subscriptionId;
-    bytes32 private immutable keyHash;
-    uint32 private immutable callbackGasLimit = 100_000; // Adjust gas limit based on the
-        // requirements
-    uint16 private immutable requestConfirmations = 3; // Confirmations the Chainlink node should
-        // wait
-    uint32 private immutable numWords = 1; // Number of random words to request
+    // Chainlink Functions parameters
+    address internal immutable ROUTER;
+    uint64 internal immutable FUNCTIONS_SUBSCRIPTION_ID;
+    bytes32 internal immutable DON_ID;
 
-    // Chainlink parameters
-    bytes32 private jobId;
-    uint256 private fee;
-
-    mapping(bytes32 => bool) internal requestIdIsBetRace; // RequestId to isBetRace
-    mapping(bytes32 => mapping(bool => uint256)) internal requestIdToRaceId; // RequestId to
-        // isBetRace to raceId
-
-    // Events
-    event RequestedRandomness(uint256 requestId);
-    event RandomnessReceived(uint256 randomness);
-    event RaceResultFulfilled(bytes32 indexed requestId, uint256[] values);
-    event AuthorizedAddressUpdated(address indexed newAuthorized, address indexed oldAuthorized);
-
-    modifier onlyAuthorized() {
-        if (msg.sender != authorized) revert Racing__Unauthorized();
-        _;
+    struct RandomRequests {
+        bool fulfilled;
+        bool exists;
+        uint256[] randomWords;
     }
 
-    constructor(
-        uint64 _subscriptionId,
-        address _vrfCoordinator,
-        address oracle,
-        bytes32 _keyHash,
-        bytes32 _jobId,
-        uint256 _fee
-    )
-        VRFConsumerBaseV2(_vrfCoordinator)
-        Ownable(msg.sender)
-    {
-        COORDINATOR = VRFCoordinatorV2Interface(_vrfCoordinator);
-        s_subscriptionId = _subscriptionId;
-        keyHash = _keyHash;
+    struct FunctionsRequests {
+        bool fulfilled;
+        bool exists;
+        uint256[] results;
+    }
 
-        _setChainlinkToken(0x0b9d5D9136855f6FEc3c0993feE6E9CE8a297846); // LINK address on Avax Fuji
-            // Testnet
-        _setChainlinkOracle(oracle);
-        jobId = _jobId;
-        fee = _fee; // Typically 0.1 * 10 ** 18; // 0.1 LINK
+    mapping(uint256 => RandomRequests) private requestIdToRandomRequests;
+    mapping(bytes32 => FunctionsRequests) private requestIdToFunctionsRequests;
+    mapping(bytes32 => bool) private requestIdIsBetRace;
+    mapping(bytes32 => uint256) private requestIdToRaceId;
+
+    // Events
+    event RequestedRandomness(uint256 requestId, uint32 numWords);
+    event RandomnessReceived(uint256 requestId, uint256[] randomWords);
+    event RaceResultFulfilled(bytes32 indexed requestId, uint256[] values);
+
+    // JavaScript source code to fetch race results
+    string private constant SOURCE_CODE = string(
+        abi.encodePacked(
+            "const data = args[0];",
+            "const raceResultRequest = Functions.makeHttpRequest({",
+            "url: 'https://racerback.azurewebsites.net/api/races/data',",
+            "method: 'POST',",
+            "data: { data: data }",
+            "});",
+            "const raceResultResponse = await raceResultRequest;",
+            "const raceResult = raceResultResponse.data.race_result;",
+            "return Functions.encodeUint256Array(raceResult);"
+        )
+    );
+
+    constructor(
+        address _router,
+        address _vrfCoordinator
+    )
+        VRFConsumerBaseV2Plus(_vrfCoordinator)
+        FunctionsClient(_router)
+    {
+        COORDINATOR = IVRFCoordinatorV2Plus(_vrfCoordinator);
     }
 
     /// @notice Random Number Request
     // TODO: Fund subscription on both testnet and Mainnet.
-    function requestRandomNumber() internal {
-        uint256 requestId = COORDINATOR.requestRandomWords(
-            keyHash, s_subscriptionId, requestConfirmations, callbackGasLimit, numWords
+    function requestRandomNumber(
+        uint256 raceId,
+        bool isBetRace
+    )
+        internal
+        returns (uint256 requestId)
+    {
+        requestId = COORDINATOR.requestRandomWords(
+            VRFV2PlusClient.RandomWordsRequest({
+                keyHash: KEY_HASH,
+                subId: VRF_SUBSCRIPTION_ID,
+                requestConfirmations: REQUEST_CONFIRMATIONS,
+                callbackGasLimit: CALLBACK_GAS_LIMIT,
+                numWords: NUM_WORDS,
+                extraArgs: VRFV2PlusClient._argsToBytes(
+                    VRFV2PlusClient.ExtraArgsV1({ nativePayment: false })
+                )
+            })
         );
 
-        emit RequestedRandomness(requestId);
+        requestIdToRandomRequests[requestId] =
+            RandomRequests({ fulfilled: false, exists: true, randomWords: new uint256[](0) });
+
+        requestIdIsBetRace[bytes32(requestId)] = isBetRace;
+        requestIdToRaceId[bytes32(requestId)] = raceId;
+
+        emit RequestedRandomness(requestId, NUM_WORDS);
     }
 
     function fulfillRandomWords(
-        uint256,
-        /* requestId */
+        uint256 requestId,
         uint256[] memory randomWords
     )
         internal
         override
     {
-        uint256 randomResult = randomWords[0];
-        emit RandomnessReceived(randomResult);
+        if (!requestIdToRandomRequests[requestId].exists) {
+            revert ChainlinkFeed__InvalidRandomRequestId();
+        }
+
+        requestIdToRandomRequests[requestId].fulfilled = true;
+        requestIdToRandomRequests[requestId].randomWords = randomWords;
+
+        emit RandomnessReceived(requestId, randomWords);
+
+        _startRace(
+            randomWords,
+            requestIdToRaceId[bytes32(requestId)], // raceId
+            requestIdIsBetRace[bytes32(requestId)] // isBetRace
+        );
     }
 
     /// @notice Race Result Data Request
     function requestRaceResult(
         uint256 circuit,
-        uint256 raceId,
-        bool isBetRace
+        PlayerAttributes[] memory attributes
     )
         internal
-        returns (bytes32)
+        returns (bytes32 _requestId)
     {
-        Chainlink.Request memory req =
-            _buildChainlinkRequest(jobId, address(this), this.fulfillRaceResult.selector);
-        req._add(
-            "get",
-            string.concat("https://api.yourracingapi.com/race_results/", Strings.toString(circuit))
-        );
-        req._add("path", "data,race_result"); // JSON path to retrieve race result from the response
-        bytes32 requestId = _sendChainlinkRequest(req, fee);
-        requestIdIsBetRace[requestId] = isBetRace;
-        requestIdToRaceId[requestId][isBetRace] = raceId;
+        FunctionsRequest.Request memory req = initializeRequest(circuit, attributes);
 
-        return requestId;
+        // Send the request and store the request ID
+        _requestId =
+            _sendRequest(req.encodeCBOR(), FUNCTIONS_SUBSCRIPTION_ID, CALLBACK_GAS_LIMIT, DON_ID);
+
+        requestIdToFunctionsRequests[_requestId] =
+            FunctionsRequests({ fulfilled: false, exists: true, results: new uint256[](0) });
     }
 
     /// @notice Receives race result.
-    function fulfillRaceResult(
-        bytes32 _requestId,
-        uint256[] memory _values
-    )
-        public
-        recordChainlinkFulfillment(_requestId)
-        onlyAuthorized
-    {
-        bool isBetRace = isBetRaceFromRequestId(_requestId);
-        uint256 raceId = getRaceIdFromRequestId(_requestId, isBetRace);
-
-        emit RaceResultFulfilled(_requestId, _values);
-
-        _finishRace(raceId, isBetRace, _values);
-    }
-
-    /// @notice Helper function to determine if the race is a bet race.
-    function isBetRaceFromRequestId(bytes32 _requestId) internal view returns (bool) {
-        return requestIdIsBetRace[_requestId];
-    }
-
-    /// @notice Helper function to map requestId to raceId.
-    function getRaceIdFromRequestId(
-        bytes32 _requestId,
-        bool isBetRace
+    function _fulfillRequest(
+        bytes32 requestId,
+        bytes memory response,
+        bytes memory
     )
         internal
-        view
-        returns (uint256)
+        override
     {
-        return requestIdToRaceId[_requestId][isBetRace];
+        if (!requestIdToFunctionsRequests[requestId].exists) {
+            revert ChainlinkFeed__InvalidFunctionRequestId();
+        }
+
+        requestIdToFunctionsRequests[requestId].fulfilled = true;
+
+        // Decode the response bytes into an array of uint256 values
+        uint256[] memory values = abi.decode(response, (uint256[]));
+
+        requestIdToFunctionsRequests[requestId].results = values;
+
+        emit RaceResultFulfilled(requestId, values);
+
+        _finishRace(requestIdToRaceId[requestId], requestIdIsBetRace[requestId], values);
     }
+
+    function initializeRequest(
+        uint256 circuit,
+        PlayerAttributes[] memory attributes
+    )
+        private
+        pure
+        returns (FunctionsRequest.Request memory req)
+    {
+        req.initializeRequest(
+            FunctionsRequest.Location.Inline, FunctionsRequest.CodeLanguage.JavaScript, SOURCE_CODE
+        );
+
+        string[] memory args = new string[](1);
+        args[0] = string(
+            abi.encodePacked(
+                Strings.toString(circuit),
+                "00", // weather placeholder
+                formatPlayerAttributes(attributes[0]),
+                formatPlayerAttributes(attributes[1])
+            )
+        );
+
+        req.setArgs(args);
+        return req;
+    }
+
+    function formatPlayerAttributes(PlayerAttributes memory attributes)
+        private
+        pure
+        returns (string memory)
+    {
+        return string(
+            abi.encodePacked(
+                Strings.toString(attributes.reliability),
+                Strings.toString(attributes.maniability),
+                Strings.toString(attributes.speed),
+                Strings.toString(attributes.breaks),
+                Strings.toString(attributes.car_balance),
+                Strings.toString(attributes.aerodynamics),
+                Strings.toString(attributes.driver_skills),
+                Strings.toString(attributes.luck)
+            )
+        );
+    }
+
+    function _startRace(uint256[] memory words, uint256 raceId, bool isBetRace) internal virtual;
 
     function _finishRace(
         uint256 raceId,
@@ -152,12 +234,4 @@ abstract contract ChainlinkFeed is VRFConsumerBaseV2, ChainlinkClient, Ownable {
     )
         internal
         virtual;
-
-    /// @notice Set authorized address to send the race results
-    function setAuthorized(address _authorized) external onlyOwner {
-        if (_authorized == address(0)) revert Racing__AddressZero();
-        address old = authorized;
-        authorized = _authorized;
-        emit AuthorizedAddressUpdated(_authorized, old);
-    }
 }

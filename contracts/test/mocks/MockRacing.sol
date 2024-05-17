@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import { ChainlinkFeed } from "./ChainlinkFeed.sol";
+import { MockChainlinkFeed } from "./MockChainlinkFeed.sol";
+import { Script, console2 } from "forge-std/Script.sol";
 
-import "./Errors.sol";
+import "../../src/Errors.sol";
 
 import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
-    uint256 private constant TOURNAMENT_DURATION = 1 weeks;
-    uint256 private constant START_ELO = 1200;
-    uint256 private constant MAX_BET_PLAYERS = 200; // TODO: Find alternate way to remove hard cap
+contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
+    uint256 public constant TOURNAMENT_DURATION = 1 weeks;
+    uint256 public constant START_ELO = 1200;
+    uint256 public constant MAX_BET_PLAYERS = 200; // TODO: Find alternate way to remove hard cap
 
     uint256 public betAmount = 0.1 ether;
     uint256 public currentPrizePool;
@@ -19,13 +20,13 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     uint256 public playersCounter;
     uint256 public betPlayersCounter;
 
-    mapping(uint256 => Race) private freeRaces;
-    mapping(uint256 => Race) private races;
+    mapping(uint256 => Race) public freeRaces;
+    mapping(uint256 => Race) public races;
     uint256 public freeRaceCounter;
     uint256 public raceCounter;
 
     mapping(address => Player) public addressToPlayer;
-    mapping(uint256 => address) private betPlayerIndex;
+    mapping(uint256 => address) public betPlayerIndex;
     mapping(address => uint256) public betPlayerAddressToIndex;
     Circuits[] public circuits;
 
@@ -41,7 +42,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         bytes32 _keyHash,
         bytes32 _donID
     )
-        ChainlinkFeed(_router, _vrfCoordinator)
+        MockChainlinkFeed(_router, _vrfCoordinator)
     {
         ROUTER = _router;
         VRF_SUBSCRIPTION_ID = _vrfSubscriptionId;
@@ -119,14 +120,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     }
 
     /// @notice Finishes the race and pays the winners following the received race result.
-    function _finishRace(
-        uint256 raceId,
-        bool isBetRace,
-        uint256[] memory values
-    )
-        internal
-        override
-    {
+    function _finishRace(uint256 raceId, bool isBetRace, uint256[] memory values) public override {
         Race memory race = isBetRace ? races[raceId] : freeRaces[raceId];
 
         // Update the race times
@@ -163,6 +157,9 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
 
     /// @notice Allows to add a new circuits
     function UpdateWeatherDataForCircuit(uint256 circuitIndex, uint256 data) external onlyOwner {
+        if (circuitIndex >= circuits.length) {
+            revert Racing__CircuitNotFound();
+        }
         Circuits memory circuit = _getCircuit(circuitIndex);
         circuit.factors.weather = uint8(data);
 
@@ -206,7 +203,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Calls for simulations.
-    function _startRace(uint256[] memory words, uint256 raceId, bool isBetRace) internal override {
+    function _startRace(uint256[] memory words, uint256 raceId, bool isBetRace) public override {
         Race memory _race = isBetRace ? races[raceId] : freeRaces[raceId];
 
         PlayerAttributes[] memory attributes = new PlayerAttributes[](2);
@@ -222,18 +219,23 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         PlayerAttributes memory _attributes,
         uint256 randomNumber
     )
-        private
+        public
         pure
         returns (PlayerAttributes memory)
     {
         // Range from -5% to +5% based on the random number
         int256 baseLuck = int256((randomNumber % 101) / 10) - 5;
 
+        console2.log("Random Luck: ", baseLuck);
+
         // Calculate final luck factor with influence from player's luck attribute
         // The luck influence ranges from -5 to +5
         int256 luckInfluence = (int256(uint256(_attributes.luck)) - 5);
         int256 luckFactor = baseLuck + luckInfluence;
 
+        console2.log("Luck Factor: ", luckFactor);
+
+        // Adjust all attributes based on the luck factor
         _attributes.reliability = _adjustAttribute(_attributes.reliability, luckFactor);
         _attributes.maniability = _adjustAttribute(_attributes.maniability, luckFactor);
         _attributes.speed = _adjustAttribute(_attributes.speed, luckFactor);
@@ -242,25 +244,27 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         _attributes.aerodynamics = _adjustAttribute(_attributes.aerodynamics, luckFactor);
         _attributes.driver_skills = _adjustAttribute(_attributes.driver_skills, luckFactor);
         _attributes.luck = _adjustAttribute(_attributes.luck, luckFactor); // Not used
+
         return _attributes;
     }
 
     /// @notice Adjusts the attribute based on the luck factor with two-digit precision.
-    function _adjustAttribute(uint8 attribute, int256 luckFactor) private pure returns (uint8) {
+    function _adjustAttribute(uint8 attribute, int256 luckFactor) public pure returns (uint8) {
+        // Convert attribute to two-digit precision, apply luck factor, and convert back
         int256 adjusted = int256(uint256(attribute) * 10) + luckFactor;
         if (adjusted < 10) adjusted = 10; // Ensure minimum value of 1.0
         if (adjusted > 99) adjusted = 99; // Ensure maximum value of 9.9
         return uint8(uint256(adjusted));
     }
 
-    function _checkAndDistributePrizePool() private {
+    function _checkAndDistributePrizePool() public {
         if (block.timestamp >= lastPrizeDistribution + TOURNAMENT_DURATION) {
             lastPrizeDistribution = block.timestamp;
             _distributePrizePool();
         }
     }
 
-    function _distributePrizePool() private {
+    function _distributePrizePool() public {
         address topPlayer;
         uint16 highestELO = uint16(START_ELO);
 
@@ -300,7 +304,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Create a racing player with the given attributes.
-    function _updateFreeRace(uint256 _circuitIndex) private returns (bool _ongoing) {
+    function _updateFreeRace(uint256 _circuitIndex) public returns (bool _ongoing) {
         // Check if there is an ongoing race
         if (freeRaces[freeRaceCounter].state == RaceState.WAITING) {
             // Update the current race
@@ -323,7 +327,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     }
 
     /// @notice Create a racing player with the given attributes.
-    function _updateRace(uint256 _circuitIndex) private returns (bool _ongoing) {
+    function _updateRace(uint256 _circuitIndex) public returns (bool _ongoing) {
         // Check if there is an ongoing race
         if (races[raceCounter].state == RaceState.WAITING) {
             // Update the current race
@@ -345,7 +349,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
-    function _verifyAttributes(PlayerAttributes memory _attributes) private pure {
+    function _verifyAttributes(PlayerAttributes memory _attributes) public pure {
         _checkAttribute(_attributes.reliability);
         _checkAttribute(_attributes.maniability);
         _checkAttribute(_attributes.speed);
@@ -364,21 +368,17 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
-    function _checkAttribute(uint8 _attribute) private pure {
+    function _checkAttribute(uint8 _attribute) public pure {
         if (_attribute < 1 || _attribute > 10) {
             revert Racing__InvalidAttribute();
         }
     }
 
-    function _getCircuit(uint256 index) private view returns (Circuits memory) {
-        if (index >= circuits.length) {
-            revert Racing__CircuitNotFound();
-        }
-
+    function _getCircuit(uint256 index) public view returns (Circuits memory) {
         return circuits[index];
     }
 
-    function updatePlayerAttributes(address player, PlayerAttributes memory _attributes) private {
+    function updatePlayerAttributes(address player, PlayerAttributes memory _attributes) public {
         addressToPlayer[player].attributes = _attributes;
 
         if (betPlayerAddressToIndex[player] == 0) {
@@ -387,7 +387,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
-    function _createPlayer(address player, PlayerAttributes memory _attributes) private {
+    function _createPlayer(address player, PlayerAttributes memory _attributes) public {
         ++playersCounter;
         Player memory newPlayer =
             Player({ attributes: _attributes, playerAddress: player, ELO: uint16(START_ELO) });

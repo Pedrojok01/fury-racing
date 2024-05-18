@@ -56,6 +56,20 @@ interface IRacing {
         string player2Attributes;
     }
 
+    // CHAINLINK REQUESTS
+
+    struct RandomRequests {
+        bool fulfilled;
+        bool exists;
+        uint256[] randomWords;
+    }
+
+    struct FunctionsRequests {
+        bool fulfilled;
+        bool exists;
+        uint256[] results;
+    }
+
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
     //////////////////////////////////////////////////////////////*/

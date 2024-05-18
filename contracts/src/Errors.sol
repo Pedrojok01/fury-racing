@@ -4,6 +4,7 @@ pragma solidity 0.8.24;
 // ChainlinkFeed errors
 error ChainlinkFeed__InvalidRandomRequestId();
 error ChainlinkFeed__InvalidFunctionRequestId();
+error ChainlinkFeed__InvalidCircuitIndex();
 
 // Racing errors
 error Racing__InvalidAttributesSum();

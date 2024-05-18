@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
+import { Script, console2 } from "forge-std/Script.sol";
+
 import "../../src/Errors.sol";
 import { IRacing } from "../../src/interface/IRacing.sol";
 
@@ -15,6 +17,7 @@ import { VRFV2PlusClient } from "@chainlink/v0.8/vrf/dev/libraries/VRFV2PlusClie
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 
 abstract contract MockChainlinkFeed is
+    Script,
     FunctionsClient,
     ConfirmedOwner,
     VRFConsumerBaseV2Plus,
@@ -35,18 +38,6 @@ abstract contract MockChainlinkFeed is
     address public immutable ROUTER;
     uint64 public immutable FUNCTIONS_SUBSCRIPTION_ID;
     bytes32 public immutable DON_ID;
-
-    struct RandomRequests {
-        bool fulfilled;
-        bool exists;
-        uint256[] randomWords;
-    }
-
-    struct FunctionsRequests {
-        bool fulfilled;
-        bool exists;
-        uint256[] results;
-    }
 
     mapping(uint256 => RandomRequests) public requestIdToRandomRequests;
     mapping(bytes32 => FunctionsRequests) public requestIdToFunctionsRequests;
@@ -114,9 +105,13 @@ abstract contract MockChainlinkFeed is
         emit RequestedRandomness(requestId, NUM_WORDS);
     }
 
+    function _fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) public {
+        fulfillRandomWords(requestId, randomWords);
+    }
+
     function fulfillRandomWords(
         uint256 requestId,
-        uint256[] memory randomWords
+        uint256[] calldata randomWords
     )
         internal
         override
@@ -147,12 +142,18 @@ abstract contract MockChainlinkFeed is
     {
         FunctionsRequest.Request memory req = initializeRequest(circuit, attributes);
 
+        // Remove this part for testing.
         // Send the request and store the request ID
-        _requestId =
-            _sendRequest(req.encodeCBOR(), FUNCTIONS_SUBSCRIPTION_ID, CALLBACK_GAS_LIMIT, DON_ID);
+        // _requestId =
+        //     _sendRequest(req.encodeCBOR(), FUNCTIONS_SUBSCRIPTION_ID, CALLBACK_GAS_LIMIT,
+        // DON_ID);
 
         requestIdToFunctionsRequests[_requestId] =
             FunctionsRequests({ fulfilled: false, exists: true, results: new uint256[](0) });
+    }
+
+    function fulfillRequest(bytes32 requestId, bytes memory response, bytes memory err) public {
+        _fulfillRequest(requestId, response, err);
     }
 
     /// @notice Receives race result.
@@ -193,17 +194,44 @@ abstract contract MockChainlinkFeed is
         );
 
         string[] memory args = new string[](1);
-        args[0] = string(
+        args[0] = formatFunctionsArgs(circuit, attributes);
+
+        req.setArgs(args);
+        return req;
+    }
+
+    function formatFunctionsArgs(
+        uint256 circuit,
+        PlayerAttributes[] memory attributes
+    )
+        public
+        pure
+        returns (string memory)
+    {
+        return string(
             abi.encodePacked(
-                Strings.toString(circuit),
+                formatCircuitIndex(circuit),
                 "00", // weather placeholder
                 formatPlayerAttributes(attributes[0]),
                 formatPlayerAttributes(attributes[1])
             )
         );
+    }
 
-        req.setArgs(args);
-        return req;
+    function formatCircuitIndex(uint256 circuitIndex) public pure returns (string memory) {
+        if (circuitIndex == 0) {
+            revert ChainlinkFeed__InvalidCircuitIndex();
+        }
+
+        // Adjust for the array index
+        uint256 adjustedIndex = circuitIndex - 1;
+
+        // Format as two-digit string
+        if (adjustedIndex < 10) {
+            return string(abi.encodePacked("0", Strings.toString(adjustedIndex)));
+        } else {
+            return Strings.toString(adjustedIndex);
+        }
     }
 
     function formatPlayerAttributes(PlayerAttributes memory attributes)
@@ -223,6 +251,14 @@ abstract contract MockChainlinkFeed is
                 Strings.toString(attributes.luck)
             )
         );
+    }
+
+    function getRandomRequestFromID(uint256 id) public view returns (RandomRequests memory) {
+        return requestIdToRandomRequests[id];
+    }
+
+    function getFunctionsRequestFromID(bytes32 id) public view returns (FunctionsRequests memory) {
+        return requestIdToFunctionsRequests[id];
     }
 
     function _startRace(uint256[] memory words, uint256 raceId, bool isBetRace) public virtual;

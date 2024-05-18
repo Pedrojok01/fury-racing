@@ -50,10 +50,7 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         KEY_HASH = _keyHash;
         DON_ID = _donID;
 
-        // Monaco = 0
-        circuits.push(
-            Circuits({ factors: ExternalFactors(17, 66, 59, 90, 290), index: 0, name: "Monaco" })
-        );
+        addCircuit(ExternalFactors(17, 66, 59, 90, 290), "Monaco"); // 1
         lastPrizeDistribution = block.timestamp;
     }
 
@@ -79,7 +76,7 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         emit JoinedRace(freeRaceCounter, msg.sender);
 
         // Run race when it is full.
-        if (_updateFreeRace(0)) {
+        if (_updateFreeRace(1)) {
             emit FreeRaceStarted(freeRaceCounter);
             requestRandomNumber(freeRaceCounter, false);
         }
@@ -113,7 +110,7 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         emit JoinedRace(raceCounter, msg.sender);
 
         // Run race when it is full.
-        if (_updateRace(0)) {
+        if (_updateRace(1)) {
             emit RaceStarted(raceCounter);
             requestRandomNumber(raceCounter, true);
         }
@@ -156,40 +153,38 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Allows to add a new circuits
-    function UpdateWeatherDataForCircuit(uint256 circuitIndex, uint256 data) external onlyOwner {
-        if (circuitIndex >= circuits.length) {
-            revert Racing__CircuitNotFound();
-        }
+    function UpdateWeatherDataForCircuit(uint256 circuitIndex, uint256 data) public onlyOwner {
         Circuits memory circuit = _getCircuit(circuitIndex);
         circuit.factors.weather = uint8(data);
-
-        circuits[circuitIndex] = circuit;
+        circuits[circuitIndex - 1] = circuit;
 
         _checkAndDistributePrizePool();
     }
 
     /// @notice Allows to add a new circuits
-    function addCircuit(Circuits memory _circuit) external onlyOwner {
+    function addCircuit(ExternalFactors memory factors, string memory name) public onlyOwner {
+        Circuits memory _circuit =
+            Circuits({ factors: factors, index: circuits.length + 1, name: name });
         circuits.push(_circuit);
     }
 
     /// @notice Allows to adjust the bet amount per tournament race
-    function setBetAmount(uint256 _betAmount) external onlyOwner {
+    function setBetAmount(uint256 _betAmount) public onlyOwner {
         uint256 oldBetAmount = betAmount;
         betAmount = _betAmount;
         emit BetAmountUpdated(_betAmount, oldBetAmount);
     }
 
-    function pause() external onlyOwner {
+    function pause() public onlyOwner {
         _pause();
     }
 
-    function unpause() external onlyOwner {
+    function unpause() public onlyOwner {
         _unpause();
     }
 
     /// @notice Allows to withdraws funds from the contract if needed.
-    function emergencyWithdraw() external onlyOwner {
+    function emergencyWithdraw() public onlyOwner {
         if (address(this).balance > 0) {
             (bool success,) = payable(owner()).call{ value: address(this).balance }("");
             if (!success) {
@@ -226,14 +221,10 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         // Range from -5% to +5% based on the random number
         int256 baseLuck = int256((randomNumber % 101) / 10) - 5;
 
-        console2.log("Random Luck: ", baseLuck);
-
         // Calculate final luck factor with influence from player's luck attribute
         // The luck influence ranges from -5 to +5
         int256 luckInfluence = (int256(uint256(_attributes.luck)) - 5);
         int256 luckFactor = baseLuck + luckInfluence;
-
-        console2.log("Luck Factor: ", luckFactor);
 
         // Adjust all attributes based on the luck factor
         _attributes.reliability = _adjustAttribute(_attributes.reliability, luckFactor);
@@ -315,7 +306,8 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         } else {
             // Create a new race
             ++freeRaceCounter;
-            freeRaces[freeRaceCounter] = Race({
+
+            Race memory _race = Race({
                 state: RaceState.WAITING,
                 circuit: _circuitIndex,
                 player1: msg.sender,
@@ -323,6 +315,8 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
                 player1Time: 0,
                 player2Time: 0
             });
+
+            freeRaces[freeRaceCounter] = _race;
         }
     }
 
@@ -338,7 +332,7 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         } else {
             // Create a new race
             ++raceCounter;
-            races[raceCounter] = Race({
+            Race memory _race = Race({
                 state: RaceState.WAITING,
                 circuit: _circuitIndex,
                 player1: msg.sender,
@@ -346,6 +340,8 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
                 player1Time: 0,
                 player2Time: 0
             });
+
+            races[raceCounter] = _race;
         }
     }
 
@@ -374,8 +370,13 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
-    function _getCircuit(uint256 index) public view returns (Circuits memory) {
-        return circuits[index];
+    function _getCircuit(uint256 circuit) public view returns (Circuits memory) {
+        uint256 circuitIndex = circuit - 1;
+
+        if (circuitIndex > circuits.length) {
+            revert Racing__CircuitNotFound();
+        }
+        return circuits[circuitIndex];
     }
 
     function updatePlayerAttributes(address player, PlayerAttributes memory _attributes) public {

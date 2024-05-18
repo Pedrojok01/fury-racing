@@ -1,30 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import "../src/interface/IRacing.sol";
-import "./mocks/MockRacing.sol";
+import "../src/Errors.sol";
+import { BaseTestSetup } from "./BaseTestSetup.sol";
 import { Test, console2 } from "forge-std/Test.sol";
 
-contract RacingTest is Test, IRacing {
-    MockRacing public racing;
-
-    address public owner = address(0x1);
-    address public player1 = address(0x2);
-
+contract RacingTest is BaseTestSetup {
     function setUp() public {
-        vm.deal(owner, 10 ether);
-        vm.deal(player1, 10 ether);
-
-        vm.startPrank(owner);
-        racing = new MockRacing(
-            address(0xA9d587a00A31A52Ed70D6026794a8FC5E2F5dCb0), // router
-            address(0x5C210eF41CD1a72de73bF76eC39637bB0d3d7BEE), // vrfCoordinator
-            4734827867964001365405830055140988844088387107361042566903892685164165989088, // vrfSubscriptionId
-            8170, // functionSubscriptionId
-            bytes32(0xc799bd1e3bd4d1a41cd4968997a4e03dfd2a3c7c04b695881138580163f42887), // keyHash
-            bytes32("fun-avalanche-fuji-1") // donID
-        );
-        vm.stopPrank();
+        setUpBase();
     }
 
     function testPauseAndUnpause() public {
@@ -49,23 +32,21 @@ contract RacingTest is Test, IRacing {
     }
 
     function testAddCircuit() public {
-        Circuits memory newCircuit = Circuits({
-            factors: ExternalFactors({
-                weather: 30,
-                crashes: 40,
-                full_Throttle: 50,
-                downforce: 25,
-                top_Speed: 300
-            }),
-            index: 1,
-            name: "Test Circuit"
+        ExternalFactors memory factors = ExternalFactors({
+            weather: 30,
+            crashes: 40,
+            full_Throttle: 50,
+            downforce: 25,
+            top_Speed: 300
         });
+
+        string memory name = "Test Circuit";
 
         // Only owner can add circuit
         vm.prank(racing.owner());
-        racing.addCircuit(newCircuit);
+        racing.addCircuit(factors, name);
 
-        Circuits memory addedCircuit = racing._getCircuit(1);
+        Circuits memory addedCircuit = racing._getCircuit(2);
         assertEq(addedCircuit.name, "Test Circuit");
         assertEq(addedCircuit.factors.weather, 30);
         assertEq(addedCircuit.factors.crashes, 40);
@@ -75,7 +56,7 @@ contract RacingTest is Test, IRacing {
     }
 
     function testUpdateWeatherDataForCircuit() public {
-        uint256 circuitIndex = 0;
+        uint256 circuitIndex = 1;
         uint256 newWeatherData = 30;
 
         // Only owner can update weather data
@@ -90,7 +71,6 @@ contract RacingTest is Test, IRacing {
         vm.deal(address(racing), 10 ether);
 
         uint256 initialBalance = owner.balance;
-        uint256 initialContractBalance = address(racing).balance;
 
         address contractOwner = racing.owner();
         assertEq(contractOwner, owner);

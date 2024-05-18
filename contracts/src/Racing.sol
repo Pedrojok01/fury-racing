@@ -49,10 +49,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         KEY_HASH = _keyHash;
         DON_ID = _donID;
 
-        // Monaco = 0
-        circuits.push(
-            Circuits({ factors: ExternalFactors(17, 66, 59, 90, 290), index: 0, name: "Monaco" })
-        );
+        addCircuit(ExternalFactors(17, 66, 59, 90, 290), "Monaco"); // 1
         lastPrizeDistribution = block.timestamp;
     }
 
@@ -78,7 +75,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         emit JoinedRace(freeRaceCounter, msg.sender);
 
         // Run race when it is full.
-        if (_updateFreeRace(0)) {
+        if (_updateFreeRace(1)) {
             emit FreeRaceStarted(freeRaceCounter);
             requestRandomNumber(freeRaceCounter, false);
         }
@@ -112,7 +109,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         emit JoinedRace(raceCounter, msg.sender);
 
         // Run race when it is full.
-        if (_updateRace(0)) {
+        if (_updateRace(1)) {
             emit RaceStarted(raceCounter);
             requestRandomNumber(raceCounter, true);
         }
@@ -165,14 +162,15 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     function UpdateWeatherDataForCircuit(uint256 circuitIndex, uint256 data) external onlyOwner {
         Circuits memory circuit = _getCircuit(circuitIndex);
         circuit.factors.weather = uint8(data);
-
-        circuits[circuitIndex] = circuit;
+        circuits[circuitIndex - 1] = circuit;
 
         _checkAndDistributePrizePool();
     }
 
-    /// @notice Allows to add a new circuits
-    function addCircuit(Circuits memory _circuit) external onlyOwner {
+    //// @notice Allows to add a new circuits
+    function addCircuit(ExternalFactors memory factors, string memory name) public onlyOwner {
+        Circuits memory _circuit =
+            Circuits({ factors: factors, index: circuits.length + 1, name: name });
         circuits.push(_circuit);
     }
 
@@ -334,7 +332,8 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         } else {
             // Create a new race
             ++raceCounter;
-            races[raceCounter] = Race({
+
+            Race memory _race = Race({
                 state: RaceState.WAITING,
                 circuit: _circuitIndex,
                 player1: msg.sender,
@@ -342,6 +341,8 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
                 player1Time: 0,
                 player2Time: 0
             });
+
+            races[raceCounter] = _race;
         }
     }
 
@@ -370,12 +371,13 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
-    function _getCircuit(uint256 index) private view returns (Circuits memory) {
-        if (index >= circuits.length) {
+    function _getCircuit(uint256 circuit) private view returns (Circuits memory) {
+        uint256 circuitIndex = circuit - 1;
+
+        if (circuitIndex > circuits.length) {
             revert Racing__CircuitNotFound();
         }
-
-        return circuits[index];
+        return circuits[circuitIndex];
     }
 
     function updatePlayerAttributes(address player, PlayerAttributes memory _attributes) private {

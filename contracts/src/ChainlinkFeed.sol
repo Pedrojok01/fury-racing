@@ -36,18 +36,6 @@ abstract contract ChainlinkFeed is
     uint64 internal immutable FUNCTIONS_SUBSCRIPTION_ID;
     bytes32 internal immutable DON_ID;
 
-    struct RandomRequests {
-        bool fulfilled;
-        bool exists;
-        uint256[] randomWords;
-    }
-
-    struct FunctionsRequests {
-        bool fulfilled;
-        bool exists;
-        uint256[] results;
-    }
-
     mapping(uint256 => RandomRequests) private requestIdToRandomRequests;
     mapping(bytes32 => FunctionsRequests) private requestIdToFunctionsRequests;
     mapping(bytes32 => bool) private requestIdIsBetRace;
@@ -83,6 +71,18 @@ abstract contract ChainlinkFeed is
         COORDINATOR = IVRFCoordinatorV2Plus(_vrfCoordinator);
     }
 
+    function getRandomRequestFromID(uint256 id) public view returns (RandomRequests memory) {
+        return requestIdToRandomRequests[id];
+    }
+
+    function getFunctionsRequestFromID(bytes32 id) public view returns (FunctionsRequests memory) {
+        return requestIdToFunctionsRequests[id];
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                            CHAINLINK VRF v2.5
+    //////////////////////////////////////////////////////////////*/
+
     /// @notice Random Number Request
     // TODO: Fund subscription on both testnet and Mainnet.
     function requestRandomNumber(
@@ -116,7 +116,7 @@ abstract contract ChainlinkFeed is
 
     function fulfillRandomWords(
         uint256 requestId,
-        uint256[] memory randomWords
+        uint256[] calldata randomWords
     )
         internal
         override
@@ -136,6 +136,10 @@ abstract contract ChainlinkFeed is
             requestIdIsBetRace[bytes32(requestId)] // isBetRace
         );
     }
+
+    /*//////////////////////////////////////////////////////////////
+                            CHAINLINK FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
 
     /// @notice Race Result Data Request
     function requestRaceResult(
@@ -180,6 +184,10 @@ abstract contract ChainlinkFeed is
         _finishRace(requestIdToRaceId[requestId], requestIdIsBetRace[requestId], values);
     }
 
+    /*//////////////////////////////////////////////////////////////
+                                HELPERS
+    //////////////////////////////////////////////////////////////*/
+
     function initializeRequest(
         uint256 circuit,
         PlayerAttributes[] memory attributes
@@ -193,17 +201,44 @@ abstract contract ChainlinkFeed is
         );
 
         string[] memory args = new string[](1);
-        args[0] = string(
+        args[0] = formatFunctionsArgs(circuit, attributes);
+
+        req.setArgs(args);
+        return req;
+    }
+
+    function formatFunctionsArgs(
+        uint256 circuit,
+        PlayerAttributes[] memory attributes
+    )
+        private
+        pure
+        returns (string memory)
+    {
+        return string(
             abi.encodePacked(
-                Strings.toString(circuit),
+                formatCircuitIndex(circuit),
                 "00", // weather placeholder
                 formatPlayerAttributes(attributes[0]),
                 formatPlayerAttributes(attributes[1])
             )
         );
+    }
 
-        req.setArgs(args);
-        return req;
+    function formatCircuitIndex(uint256 circuitIndex) private pure returns (string memory) {
+        if (circuitIndex == 0) {
+            revert ChainlinkFeed__InvalidCircuitIndex();
+        }
+
+        // Adjust for the array index
+        uint256 adjustedIndex = circuitIndex - 1;
+
+        // Format as two-digit string
+        if (adjustedIndex < 10) {
+            return string(abi.encodePacked("0", Strings.toString(adjustedIndex)));
+        } else {
+            return Strings.toString(adjustedIndex);
+        }
     }
 
     function formatPlayerAttributes(PlayerAttributes memory attributes)

@@ -3,11 +3,13 @@ pragma solidity 0.8.24;
 
 import "../src/Errors.sol";
 import { BaseTestSetup } from "./BaseTestSetup.sol";
+import { FunctionsRequest } from "@chainlink/v0.8/functions/v1_0_0/libraries/FunctionsRequest.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { Test, console2 } from "forge-std/Test.sol";
 
 contract ChainlinkFeedTest is BaseTestSetup {
     using Strings for uint8;
+    using FunctionsRequest for FunctionsRequest.Request;
 
     function setUp() public {
         setUpBase();
@@ -63,6 +65,7 @@ contract ChainlinkFeedTest is BaseTestSetup {
 
     function testFormatFunctionsArgs() public view {
         uint256 circuit = 1;
+        uint256 weather = 17;
         PlayerAttributes[] memory attributes = new PlayerAttributes[](2);
         attributes[0] = attributesAfterLuck1;
         attributes[1] = attributesAfterLuck2;
@@ -70,14 +73,14 @@ contract ChainlinkFeedTest is BaseTestSetup {
         string memory expectedArg = string(
             abi.encodePacked(
                 racing.formatCircuitIndex(circuit),
-                "00",
+                Strings.toString(weather),
                 racing.formatPlayerAttributes(attributes[0]),
                 racing.formatPlayerAttributes(attributes[1])
             )
         );
 
-        string memory manualArg = "000050505050505050508070605040303040";
-        string memory arg = racing.formatFunctionsArgs(circuit, attributes);
+        string memory manualArg = "001750505050505050508070605040303040";
+        string memory arg = racing.formatFunctionsArgs(circuit, weather, attributes);
         assertEq(expectedArg, manualArg);
         assertEq(arg, manualArg);
     }
@@ -130,11 +133,16 @@ contract ChainlinkFeedTest is BaseTestSetup {
     function testFulfillRequest() public {
         vm.startPrank(player1);
         uint256 circuit = 1;
+        uint256 weather = 17;
         PlayerAttributes[] memory attributes = new PlayerAttributes[](2);
         attributes[0] = attributesAfterLuck1;
         attributes[1] = attributesAfterLuck2;
 
-        bytes32 requestId = racing.requestRaceResult(circuit, attributes);
+        uint256 raceId = 1;
+        bool isBetRace = false;
+
+        bytes32 requestId =
+            racing.requestRaceResult(circuit, raceId, weather, isBetRace, attributes);
 
         uint256[] memory raceResults = new uint256[](2);
         raceResults[0] = 100;
@@ -152,4 +160,23 @@ contract ChainlinkFeedTest is BaseTestSetup {
 
         vm.stopPrank();
     }
+
+    // function testInitializeRequest() public {
+    //     uint256 circuit = 1;
+    //     PlayerAttributes[] memory attributes = new PlayerAttributes[](2);
+    //     attributes[0] = attributesAfterLuck1;
+    //     attributes[1] = attributesAfterLuck2;
+    //     FunctionsRequest.Request memory req = racing.initializeRequest(circuit, weather,
+    // attributes);
+
+    //     // Verify the request initialization
+    //     assertEq(req.location, FunctionsRequest.Location.Inline);
+    //     assertEq(req.codeLanguage, FunctionsRequest.CodeLanguage.JavaScript);
+    //     assertEq(req.sourceCode, racing.SOURCE_CODE());
+
+    //     // Verify the arguments
+    //     string[] memory expectedArgs = new string[](1);
+    //     expectedArgs[0] = racing.formatFunctionsArgs(circuit, weather, attributes);
+    //     assertEq(req.args, expectedArgs);
+    // }
 }

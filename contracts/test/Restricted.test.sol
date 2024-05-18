@@ -55,13 +55,13 @@ contract RacingTest is BaseTestSetup {
         assertEq(addedCircuit.factors.top_Speed, 300);
     }
 
-    function testUpdateWeatherDataForCircuit() public {
+    function testupdateWeatherDataForCircuit() public {
         uint256 circuitIndex = 1;
         uint256 newWeatherData = 30;
 
         // Only owner can update weather data
         vm.prank(racing.owner());
-        racing.UpdateWeatherDataForCircuit(circuitIndex, newWeatherData);
+        racing.updateWeatherDataForCircuit(circuitIndex, newWeatherData);
 
         Circuits memory updatedCircuit = racing._getCircuit(circuitIndex);
         assertEq(updatedCircuit.factors.weather, newWeatherData);

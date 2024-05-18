@@ -14,6 +14,10 @@ import { IVRFCoordinatorV2Plus } from "@chainlink/v0.8/vrf/dev/interfaces/IVRFCo
 import { VRFV2PlusClient } from "@chainlink/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 
+/**
+ * @title ChainlinkFeed - Abstract contract containing Chainlink VRF and Functions logic;
+ * @author @Pedrojok01
+ */
 abstract contract ChainlinkFeed is
     FunctionsClient,
     ConfirmedOwner,
@@ -144,12 +148,15 @@ abstract contract ChainlinkFeed is
     /// @notice Race Result Data Request
     function requestRaceResult(
         uint256 circuit,
+        uint256 raceId,
+        uint256 weather,
+        bool isBetRace,
         PlayerAttributes[] memory attributes
     )
         internal
         returns (bytes32 _requestId)
     {
-        FunctionsRequest.Request memory req = initializeRequest(circuit, attributes);
+        FunctionsRequest.Request memory req = initializeRequest(circuit, weather, attributes);
 
         // Send the request and store the request ID
         _requestId =
@@ -157,6 +164,9 @@ abstract contract ChainlinkFeed is
 
         requestIdToFunctionsRequests[_requestId] =
             FunctionsRequests({ fulfilled: false, exists: true, results: new uint256[](0) });
+
+        requestIdIsBetRace[_requestId] = isBetRace;
+        requestIdToRaceId[_requestId] = raceId;
     }
 
     /// @notice Receives race result.
@@ -176,7 +186,6 @@ abstract contract ChainlinkFeed is
 
         // Decode the response bytes into an array of uint256 values
         uint256[] memory values = abi.decode(response, (uint256[]));
-
         requestIdToFunctionsRequests[requestId].results = values;
 
         emit RaceResultFulfilled(requestId, values);
@@ -190,6 +199,7 @@ abstract contract ChainlinkFeed is
 
     function initializeRequest(
         uint256 circuit,
+        uint256 weather,
         PlayerAttributes[] memory attributes
     )
         private
@@ -201,7 +211,7 @@ abstract contract ChainlinkFeed is
         );
 
         string[] memory args = new string[](1);
-        args[0] = formatFunctionsArgs(circuit, attributes);
+        args[0] = formatFunctionsArgs(circuit, weather, attributes);
 
         req.setArgs(args);
         return req;
@@ -209,6 +219,7 @@ abstract contract ChainlinkFeed is
 
     function formatFunctionsArgs(
         uint256 circuit,
+        uint256 weather,
         PlayerAttributes[] memory attributes
     )
         private
@@ -218,7 +229,7 @@ abstract contract ChainlinkFeed is
         return string(
             abi.encodePacked(
                 formatCircuitIndex(circuit),
-                "00", // weather placeholder
+                Strings.toString(weather),
                 formatPlayerAttributes(attributes[0]),
                 formatPlayerAttributes(attributes[1])
             )
@@ -230,7 +241,6 @@ abstract contract ChainlinkFeed is
             revert ChainlinkFeed__InvalidCircuitIndex();
         }
 
-        // Adjust for the array index
         uint256 adjustedIndex = circuitIndex - 1;
 
         // Format as two-digit string

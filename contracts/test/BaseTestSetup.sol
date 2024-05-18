@@ -28,6 +28,13 @@ contract BaseTestSetup is Test, IRacing {
     PlayerAttributes public attributesAfterLuck1;
     PlayerAttributes public attributesAfterLuck2;
 
+    struct InitialBalances {
+        uint256 contractBalance;
+        uint256 player1Balance;
+        uint256 player2Balance;
+        uint256 prizePool;
+    }
+
     function setUpBase() public {
         vm.deal(owner, 10 ether);
         vm.deal(player1, 10 ether);

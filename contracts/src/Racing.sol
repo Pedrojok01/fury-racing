@@ -8,6 +8,10 @@ import "./Errors.sol";
 import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+/**
+ * @title Racing - Main contract containing the game logic for Fury Racing.
+ * @author @Pedrojok01
+ */
 contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     uint256 private constant TOURNAMENT_DURATION = 1 weeks;
     uint256 private constant START_ELO = 1200;
@@ -21,8 +25,8 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
 
     mapping(uint256 => Race) private freeRaces;
     mapping(uint256 => Race) private races;
-    uint256 public freeRaceCounter;
-    uint256 public raceCounter;
+    uint256 public freeRaceCounter = 1;
+    uint256 public raceCounter = 1;
 
     mapping(address => Player) public addressToPlayer;
     mapping(uint256 => address) private betPlayerIndex;
@@ -49,7 +53,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         KEY_HASH = _keyHash;
         DON_ID = _donID;
 
-        addCircuit(ExternalFactors(17, 66, 59, 90, 290), "Monaco"); // 1
+        addCircuit(ExternalFactors(17, 66, 59, 90, 290), "Monaco");
         lastPrizeDistribution = block.timestamp;
     }
 
@@ -71,13 +75,14 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         } else {
             addressToPlayer[msg.sender].attributes = _attributes;
         }
-
+        bool ongoing = _updateFreeRace(1);
         emit JoinedRace(freeRaceCounter, msg.sender);
 
         // Run race when it is full.
-        if (_updateFreeRace(1)) {
+        if (ongoing) {
             emit FreeRaceStarted(freeRaceCounter);
             requestRandomNumber(freeRaceCounter, false);
+            freeRaceCounter++;
         }
     }
 
@@ -88,12 +93,10 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         whenNotPaused
         nonReentrant
     {
-        // Validate input bet amount.
         if (msg.value != betAmount) {
             revert Racing__InvalidBetAmount();
         }
 
-        // Validate input attributes.
         _verifyAttributes(_attributes);
 
         // Create new player if it doesn't exist.
@@ -106,12 +109,14 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         // 5% goes to weekly prize pool
         currentPrizePool += (msg.value * 5) / 100;
 
+        bool ongoing = _updateRace(1);
         emit JoinedRace(raceCounter, msg.sender);
 
         // Run race when it is full.
-        if (_updateRace(1)) {
+        if (ongoing) {
             emit RaceStarted(raceCounter);
             requestRandomNumber(raceCounter, true);
+            raceCounter++;
         }
     }
 
@@ -125,14 +130,11 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         override
     {
         Race memory race = isBetRace ? races[raceId] : freeRaces[raceId];
-
-        // Update the race times
         race.player1Time = uint40(values[0]);
         race.player2Time = uint40(values[1]);
 
         // take the lowest value as the winner
         address winner = race.player1Time <= race.player2Time ? race.player1 : race.player2;
-        uint256 toPay = betAmount == 0 ? 0 : ((betAmount * 2) * 95) / 100;
 
         // Update racers ELO
         addressToPlayer[winner].ELO += 3;
@@ -145,6 +147,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
             freeRaces[raceId] = race;
         } else {
             races[raceId] = race;
+            uint256 toPay = betAmount == 0 ? 0 : ((betAmount * 2) * 95) / 100;
 
             // Pay the winner
             (bool success,) = payable(winner).call{ value: toPay }("");
@@ -154,12 +157,20 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
+    function getRaceFromRaceID(uint256 raceId) public view returns (Race memory) {
+        return races[raceId];
+    }
+
+    function getFreeRaceFromRaceID(uint256 raceId) public view returns (Race memory) {
+        return freeRaces[raceId];
+    }
+
     /*//////////////////////////////////////////////////////////////
                                 RESTRICTED
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Allows to add a new circuits
-    function UpdateWeatherDataForCircuit(uint256 circuitIndex, uint256 data) external onlyOwner {
+    function updateWeatherDataForCircuit(uint256 circuitIndex, uint256 data) external onlyOwner {
         Circuits memory circuit = _getCircuit(circuitIndex);
         circuit.factors.weather = uint8(data);
         circuits[circuitIndex - 1] = circuit;
@@ -207,12 +218,13 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     function _startRace(uint256[] memory words, uint256 raceId, bool isBetRace) internal override {
         Race memory _race = isBetRace ? races[raceId] : freeRaces[raceId];
 
+        uint256 weather = uint256(_getCircuit(_race.circuit).factors.weather);
+
         PlayerAttributes[] memory attributes = new PlayerAttributes[](2);
         attributes[0] = _applyLuckFactor(addressToPlayer[_race.player1].attributes, words[0]);
         attributes[1] = _applyLuckFactor(addressToPlayer[_race.player2].attributes, words[1]);
 
-        // Request race result (TODO: add weather data)
-        requestRaceResult(_race.circuit, attributes);
+        requestRaceResult(_race.circuit, raceId, weather, isBetRace, attributes);
     }
 
     /// @notice Adjusts the player attributes based on the luck factor.
@@ -240,6 +252,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         _attributes.aerodynamics = _adjustAttribute(_attributes.aerodynamics, luckFactor);
         _attributes.driver_skills = _adjustAttribute(_attributes.driver_skills, luckFactor);
         _attributes.luck = _adjustAttribute(_attributes.luck, luckFactor); // Not used
+
         return _attributes;
     }
 
@@ -300,39 +313,8 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     /// @notice Create a racing player with the given attributes.
     function _updateFreeRace(uint256 _circuitIndex) private returns (bool _ongoing) {
         // Check if there is an ongoing race
-        if (freeRaces[freeRaceCounter].state == RaceState.WAITING) {
-            // Update the current race
-            Race storage currentRace = freeRaces[freeRaceCounter];
-            currentRace.state = RaceState.ONGOING;
-            currentRace.player2 = msg.sender;
-            _ongoing = true;
-        } else {
+        if (freeRaces[freeRaceCounter].state == RaceState.NON_EXISTENT) {
             // Create a new race
-            ++freeRaceCounter;
-            freeRaces[freeRaceCounter] = Race({
-                state: RaceState.WAITING,
-                circuit: _circuitIndex,
-                player1: msg.sender,
-                player2: address(0),
-                player1Time: 0,
-                player2Time: 0
-            });
-        }
-    }
-
-    /// @notice Create a racing player with the given attributes.
-    function _updateRace(uint256 _circuitIndex) private returns (bool _ongoing) {
-        // Check if there is an ongoing race
-        if (races[raceCounter].state == RaceState.WAITING) {
-            // Update the current race
-            Race storage currentRace = races[raceCounter];
-            currentRace.state = RaceState.ONGOING;
-            currentRace.player2 = msg.sender;
-            _ongoing = true;
-        } else {
-            // Create a new race
-            ++raceCounter;
-
             Race memory _race = Race({
                 state: RaceState.WAITING,
                 circuit: _circuitIndex,
@@ -342,7 +324,36 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
                 player2Time: 0
             });
 
+            freeRaces[freeRaceCounter] = _race;
+        } else {
+            // Update the current race
+            Race storage currentRace = freeRaces[freeRaceCounter];
+            currentRace.state = RaceState.ONGOING;
+            currentRace.player2 = msg.sender;
+            _ongoing = true;
+        }
+    }
+
+    /// @notice Create a racing player with the given attributes.
+    function _updateRace(uint256 _circuitIndex) private returns (bool _ongoing) {
+        // Check if there is an ongoing race
+        if (races[raceCounter].state == RaceState.NON_EXISTENT) {
+            // Create a new race
+            Race memory _race = Race({
+                state: RaceState.WAITING,
+                circuit: _circuitIndex,
+                player1: msg.sender,
+                player2: address(0),
+                player1Time: 0,
+                player2Time: 0
+            });
             races[raceCounter] = _race;
+        } else {
+            // Update the current race
+            Race storage currentRace = races[raceCounter];
+            currentRace.state = RaceState.ONGOING;
+            currentRace.player2 = msg.sender;
+            _ongoing = true;
         }
     }
 

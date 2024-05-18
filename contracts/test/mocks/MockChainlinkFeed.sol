@@ -74,6 +74,18 @@ abstract contract MockChainlinkFeed is
         COORDINATOR = IVRFCoordinatorV2Plus(_vrfCoordinator);
     }
 
+    function getRandomRequestFromID(uint256 id) public view returns (RandomRequests memory) {
+        return requestIdToRandomRequests[id];
+    }
+
+    function getFunctionsRequestFromID(bytes32 id) public view returns (FunctionsRequests memory) {
+        return requestIdToFunctionsRequests[id];
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                            CHAINLINK VRF v2.5
+    //////////////////////////////////////////////////////////////*/
+
     /// @notice Random Number Request
     // TODO: Fund subscription on both testnet and Mainnet.
     function requestRandomNumber(
@@ -105,6 +117,7 @@ abstract contract MockChainlinkFeed is
         emit RequestedRandomness(requestId, NUM_WORDS);
     }
 
+    /// @notice Added for testing purposes
     function _fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) public {
         fulfillRandomWords(requestId, randomWords);
     }
@@ -132,26 +145,32 @@ abstract contract MockChainlinkFeed is
         );
     }
 
+    /*//////////////////////////////////////////////////////////////
+                            CHAINLINK FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
+
     /// @notice Race Result Data Request
     function requestRaceResult(
         uint256 circuit,
+        uint256 raceId,
+        uint256 weather,
+        bool isBetRace,
         PlayerAttributes[] memory attributes
     )
         public
         returns (bytes32 _requestId)
     {
-        FunctionsRequest.Request memory req = initializeRequest(circuit, attributes);
-
-        // Remove this part for testing.
-        // Send the request and store the request ID
-        // _requestId =
-        //     _sendRequest(req.encodeCBOR(), FUNCTIONS_SUBSCRIPTION_ID, CALLBACK_GAS_LIMIT,
-        // DON_ID);
+        // Logic modified for testing purposes: requestId hardcoded
+        _requestId = keccak256(abi.encodePacked(raceId, isBetRace, circuit));
 
         requestIdToFunctionsRequests[_requestId] =
             FunctionsRequests({ fulfilled: false, exists: true, results: new uint256[](0) });
+
+        requestIdIsBetRace[_requestId] = isBetRace;
+        requestIdToRaceId[_requestId] = raceId;
     }
 
+    /// @notice Added for testing purposes
     function fulfillRequest(bytes32 requestId, bytes memory response, bytes memory err) public {
         _fulfillRequest(requestId, response, err);
     }
@@ -173,7 +192,6 @@ abstract contract MockChainlinkFeed is
 
         // Decode the response bytes into an array of uint256 values
         uint256[] memory values = abi.decode(response, (uint256[]));
-
         requestIdToFunctionsRequests[requestId].results = values;
 
         emit RaceResultFulfilled(requestId, values);
@@ -181,8 +199,13 @@ abstract contract MockChainlinkFeed is
         _finishRace(requestIdToRaceId[requestId], requestIdIsBetRace[requestId], values);
     }
 
+    /*//////////////////////////////////////////////////////////////
+                                HELPERS
+    //////////////////////////////////////////////////////////////*/
+
     function initializeRequest(
         uint256 circuit,
+        uint256 weather,
         PlayerAttributes[] memory attributes
     )
         public
@@ -194,7 +217,7 @@ abstract contract MockChainlinkFeed is
         );
 
         string[] memory args = new string[](1);
-        args[0] = formatFunctionsArgs(circuit, attributes);
+        args[0] = formatFunctionsArgs(circuit, weather, attributes);
 
         req.setArgs(args);
         return req;
@@ -202,6 +225,7 @@ abstract contract MockChainlinkFeed is
 
     function formatFunctionsArgs(
         uint256 circuit,
+        uint256 weather,
         PlayerAttributes[] memory attributes
     )
         public
@@ -211,7 +235,7 @@ abstract contract MockChainlinkFeed is
         return string(
             abi.encodePacked(
                 formatCircuitIndex(circuit),
-                "00", // weather placeholder
+                Strings.toString(weather),
                 formatPlayerAttributes(attributes[0]),
                 formatPlayerAttributes(attributes[1])
             )
@@ -251,14 +275,6 @@ abstract contract MockChainlinkFeed is
                 Strings.toString(attributes.luck)
             )
         );
-    }
-
-    function getRandomRequestFromID(uint256 id) public view returns (RandomRequests memory) {
-        return requestIdToRandomRequests[id];
-    }
-
-    function getFunctionsRequestFromID(bytes32 id) public view returns (FunctionsRequests memory) {
-        return requestIdToFunctionsRequests[id];
     }
 
     function _startRace(uint256[] memory words, uint256 raceId, bool isBetRace) public virtual;

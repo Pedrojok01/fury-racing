@@ -1,6 +1,11 @@
 import { AnimationGroup, Scene, TransformNode } from "@babylonjs/core";
 
-import { carAnimNumFrames, gridTileSize } from "./constants";
+import {
+  carAnimNumFrames,
+  carAnimDriftRatioPos,
+  carAnimDriftRatioRot,
+  gridTileSize,
+} from "./constants";
 import { createCarAnim } from "./createCarAnim";
 
 type CarDirection = "north" | "south" | "east" | "west";
@@ -70,14 +75,24 @@ export const triggerCurrentTileAnim = (scene: Scene, track: TrackAnim, car: Tran
   const animationGroup = new AnimationGroup("car");
   animationGroup.speedRatio = 2.0;
 
-  const addAnimation = (property: string, startValue: number, endValue: number) => {
-    animationGroup.addTargetedAnimation(
-      createCarAnim(property, [
-        { frame: 0, value: startValue },
-        { frame: carAnimNumFrames, value: endValue },
-      ]),
-      car,
-    );
+  const addAnimation = (
+    property: string,
+    startValue: number,
+    endValue: number,
+    drift: number | null = null,
+  ) => {
+    const keyframes = [
+      { frame: 0, value: startValue },
+      { frame: carAnimNumFrames, value: endValue },
+    ];
+
+    if (drift) {
+      const driftValue = startValue + (endValue - startValue) * drift;
+
+      keyframes.splice(carAnimNumFrames - 1, 0, { frame: carAnimNumFrames - 1, value: driftValue });
+    }
+
+    animationGroup.addTargetedAnimation(createCarAnim(property, keyframes), car);
   };
 
   switch (tileChar) {
@@ -98,45 +113,125 @@ export const triggerCurrentTileAnim = (scene: Scene, track: TrackAnim, car: Tran
     case "┌":
       if (carDirection === "north") {
         addAnimation("position.x", car.position.x, car.position.x + gridTileSize / 2);
-        addAnimation("position.z", car.position.z, car.position.z + gridTileSize / 2);
-        addAnimation("rotation.y", car.rotation.y, car.rotation.y + Math.PI / 2);
+        addAnimation(
+          "position.z",
+          car.position.z,
+          car.position.z + gridTileSize / 2,
+          carAnimDriftRatioPos,
+        );
+        addAnimation(
+          "rotation.y",
+          car.rotation.y,
+          car.rotation.y + Math.PI / 2,
+          carAnimDriftRatioRot,
+        );
       } else if (carDirection === "west") {
-        addAnimation("position.x", car.position.x, car.position.x - gridTileSize / 2);
+        addAnimation(
+          "position.x",
+          car.position.x,
+          car.position.x - gridTileSize / 2,
+          carAnimDriftRatioPos,
+        );
         addAnimation("position.z", car.position.z, car.position.z - gridTileSize / 2);
-        addAnimation("rotation.y", car.rotation.y, car.rotation.y - Math.PI / 2);
+        addAnimation(
+          "rotation.y",
+          car.rotation.y,
+          car.rotation.y - Math.PI / 2,
+          carAnimDriftRatioRot,
+        );
       }
       break;
     case "┐":
       if (carDirection === "north") {
         addAnimation("position.x", car.position.x, car.position.x - gridTileSize / 2);
-        addAnimation("position.z", car.position.z, car.position.z + gridTileSize / 2);
-        addAnimation("rotation.y", car.rotation.y, car.rotation.y - Math.PI / 2);
+        addAnimation(
+          "position.z",
+          car.position.z,
+          car.position.z + gridTileSize / 2,
+          carAnimDriftRatioPos,
+        );
+        addAnimation(
+          "rotation.y",
+          car.rotation.y,
+          car.rotation.y - Math.PI / 2,
+          carAnimDriftRatioRot,
+        );
       } else if (carDirection === "east") {
-        addAnimation("position.x", car.position.x, car.position.x + gridTileSize / 2);
+        addAnimation(
+          "position.x",
+          car.position.x,
+          car.position.x + gridTileSize / 2,
+          carAnimDriftRatioPos,
+        );
         addAnimation("position.z", car.position.z, car.position.z - gridTileSize / 2);
-        addAnimation("rotation.y", car.rotation.y, car.rotation.y + Math.PI / 2);
+        addAnimation(
+          "rotation.y",
+          car.rotation.y,
+          car.rotation.y + Math.PI / 2,
+          carAnimDriftRatioRot,
+        );
       }
       break;
     case "└":
       if (carDirection === "south") {
         addAnimation("position.x", car.position.x, car.position.x + gridTileSize / 2);
-        addAnimation("position.z", car.position.z, car.position.z - gridTileSize / 2);
-        addAnimation("rotation.y", car.rotation.y, car.rotation.y - Math.PI / 2);
+        addAnimation(
+          "position.z",
+          car.position.z,
+          car.position.z - gridTileSize / 2,
+          carAnimDriftRatioPos,
+        );
+        addAnimation(
+          "rotation.y",
+          car.rotation.y,
+          car.rotation.y - Math.PI / 2,
+          carAnimDriftRatioRot,
+        );
       } else if (carDirection === "west") {
-        addAnimation("position.x", car.position.x, car.position.x - gridTileSize / 2);
+        addAnimation(
+          "position.x",
+          car.position.x,
+          car.position.x - gridTileSize / 2,
+          carAnimDriftRatioPos,
+        );
         addAnimation("position.z", car.position.z, car.position.z + gridTileSize / 2);
-        addAnimation("rotation.y", car.rotation.y, car.rotation.y + Math.PI / 2);
+        addAnimation(
+          "rotation.y",
+          car.rotation.y,
+          car.rotation.y + Math.PI / 2,
+          carAnimDriftRatioRot,
+        );
       }
       break;
     case "┘":
       if (carDirection === "south") {
         addAnimation("position.x", car.position.x, car.position.x - gridTileSize / 2);
-        addAnimation("position.z", car.position.z, car.position.z - gridTileSize / 2);
-        addAnimation("rotation.y", car.rotation.y, car.rotation.y + Math.PI / 2);
+        addAnimation(
+          "position.z",
+          car.position.z,
+          car.position.z - gridTileSize / 2,
+          carAnimDriftRatioPos,
+        );
+        addAnimation(
+          "rotation.y",
+          car.rotation.y,
+          car.rotation.y + Math.PI / 2,
+          carAnimDriftRatioRot,
+        );
       } else if (carDirection === "east") {
-        addAnimation("position.x", car.position.x, car.position.x + gridTileSize / 2);
+        addAnimation(
+          "position.x",
+          car.position.x,
+          car.position.x + gridTileSize / 2,
+          carAnimDriftRatioPos,
+        );
         addAnimation("position.z", car.position.z, car.position.z + gridTileSize / 2);
-        addAnimation("rotation.y", car.rotation.y, car.rotation.y - Math.PI / 2);
+        addAnimation(
+          "rotation.y",
+          car.rotation.y,
+          car.rotation.y - Math.PI / 2,
+          carAnimDriftRatioRot,
+        );
       }
       break;
   }

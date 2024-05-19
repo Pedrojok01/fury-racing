@@ -52,7 +52,7 @@ const CarAnim: FC = () => {
     carMetadata.forEach((meta) => {
       console.log("Loading car model:", meta);
       SceneLoader.LoadAssetContainer(`./assets/${meta.path}/`, "scene.gltf", scene, (container) => {
-        const car = new TransformNode("carRoot");
+        const car = new TransformNode(`${meta.path}`);
 
         // Assign the root node to imported mesh objects.
         container.meshes.forEach((mesh) => {
@@ -72,11 +72,21 @@ const CarAnim: FC = () => {
 
         // Add the node to the scene.
         container.addAllToScene();
+
+        // If we finished loading the last car...
+        if (carNodesRef.current.length === carMetadata.length) {
+          // Sort the array at the end, to ensure order is preserved, as loading
+          // assets is performed asynchronously and some models will load faster
+          // than others.
+          carNodesRef.current.sort((firstNode, secondNode) =>
+            firstNode.name.localeCompare(secondNode.name),
+          );
+
+          // Start engine/scene rendering process.
+          engine.runRenderLoop(() => scene.render());
+        }
       });
     });
-
-    // Start engine/scene rendering process.
-    engine.runRenderLoop(() => scene.render());
 
     // Cleanup when component unmounts.
     return () => {

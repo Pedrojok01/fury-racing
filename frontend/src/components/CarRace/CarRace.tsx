@@ -2,11 +2,15 @@ import React, { useRef, useEffect, useMemo, type FC } from "react";
 
 import {
   AbstractMesh,
+  Color3,
+  CubeTexture,
   Engine,
+  HemisphericLight,
   KeyboardEventTypes,
+  ParticleSystem,
   Scene,
   SceneLoader,
-  HemisphericLight,
+  Texture,
   TransformNode,
   Vector3,
 } from "@babylonjs/core";
@@ -23,12 +27,10 @@ const CarRace: FC = () => {
   const ref = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<Engine | null>(null);
   const sceneRef = useRef<Scene | null>(null);
-  const carNodeRef = useRef<TransformNode | null>(null);
-  const { carIdx, carData } = useAnim();
+  const targetNodeRef = useRef<TransformNode | null>(null);
+  const { carIdx, carData, skybox, weatherFx } = useAnim();
   const track = tracks[0].animData;
   const isKeyboardControlEnabled = false;
-
-  console.log("CarRace.tsx:", carIdx, carData);
 
   const controlState = useMemo(() => ({ up: false, down: false, left: false, right: false }), []);
 
@@ -45,25 +47,29 @@ const CarRace: FC = () => {
     const scene = new Scene(engine);
     sceneRef.current = scene;
 
+    // Initialize the camera.
+    const camera = initializeCamera(scene, track, gridTileSize);
+
     // Initialize the light.
     const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
     light.intensity = 0.7;
 
+    // Initialize the sky box.
+    const skyTexture = new CubeTexture(`/assets/skybox_${skybox}/skybox`, scene);
+    scene.createDefaultSkybox(skyTexture, true, 10000);
+
     // Initialize the track.
     initializeTrack(scene, track, gridTileSize);
 
-    // Initialize the camera.
-    const camera = initializeCamera(scene, track, gridTileSize);
-
     // Load and place the car model.
-    // const meta = carMetadata[carIdx];
-    const car = new TransformNode("carRoot");
+    const target = new TransformNode("target");
+    const car = new TransformNode("car");
     SceneLoader.LoadAssetContainer(
       `./assets/${carData.path}/`,
       "scene.gltf",
       scene,
       (container) => {
-        // Assign the root node to imported mesh objects.
+        // Adjust the loaded meshes.
         container.meshes.forEach((mesh) => {
           mesh.position.x += carData.offset.x;
           mesh.position.y += carData.offset.y;
@@ -75,48 +81,95 @@ const CarRace: FC = () => {
         });
 
         car.scaling = new Vector3(carData.scale, carData.scale, carData.scale);
+        car.position.y += 1.3; // Lift the car so that it sits on the road.
+
+        // Group the adjusted car within a camera target object.
+        car.parent = target;
 
         // Place the car on the track.
-        car.position.y += 1.3; // Lift the car so that it sits on the road.
-        car.position.x += track.startPosition.x * gridTileSize;
-        car.position.z += track.startPosition.y * gridTileSize;
+        target.position.x += track.startPosition.x * gridTileSize;
+        target.position.z += track.startPosition.y * gridTileSize;
         switch (track.startPosition.direction) {
           case "north":
-            car.position.x += gridTileSize / 2;
+            target.position.x += gridTileSize / 2;
             break;
 
           case "south":
-            car.position.x += gridTileSize / 2;
-            car.rotation.y += Math.PI;
+            target.position.x += gridTileSize / 2;
+            target.rotation.y += Math.PI;
             break;
 
           case "west":
-            car.position.x += gridTileSize;
-            car.position.z += gridTileSize / 2;
-            car.rotation.y += 1.5 * Math.PI;
+            target.position.x += gridTileSize;
+            target.position.z += gridTileSize / 2;
+            target.rotation.y += 1.5 * Math.PI;
             break;
 
           case "east":
-            car.position.z += gridTileSize / 2;
-            car.rotation.y += 0.5 * Math.PI;
+            target.position.z += gridTileSize / 2;
+            target.rotation.y += 0.5 * Math.PI;
             break;
         }
 
         // Collect the handle for that node.
-        carNodeRef.current = car;
+        targetNodeRef.current = target;
 
         // Add the node to the scene.
         container.addAllToScene();
 
         // Update camera target.
         const cameraTarget = new AbstractMesh("cameraTarget", scene);
-        cameraTarget.parent = car;
+        cameraTarget.parent = target;
         cameraTarget.position.y = 5; // Have the camera aim a bit higher than the car.
         camera.lockedTarget = cameraTarget;
 
         if (!isKeyboardControlEnabled) {
           // Trigger animation process.
-          triggerCurrentTileAnim(scene, track, car);
+          triggerCurrentTileAnim(scene, track, target);
+        }
+
+        // Initialize the weather effect.
+        switch (weatherFx) {
+          case "fog":
+            scene.fogMode = Scene.FOGMODE_EXP;
+            scene.fogColor = new Color3(0.5, 0.5, 0.6);
+            scene.fogDensity = 0.0125;
+            break;
+
+          case "rain":
+            const particleSystem = new ParticleSystem("rain", 4000, scene);
+
+            particleSystem.particleTexture = new Texture("/assets/particle-rain.png");
+            particleSystem.emitter = new Vector3(0, 0, 0);
+            particleSystem.createCylinderEmitter(15, 0, 1, 0);
+            particleSystem.emitRate = 400;
+            particleSystem.updateSpeed = 0.05;
+            particleSystem.minLifeTime = 4;
+            particleSystem.maxLifeTime = 4;
+            particleSystem.gravity = new Vector3(0, -20, 0);
+
+            particleSystem.minSize = 0.35;
+            particleSystem.maxSize = 0.4;
+
+            particleSystem.minScaleX = 0.1;
+            particleSystem.maxScaleX = 0.15;
+
+            particleSystem.minScaleY = 1;
+            particleSystem.maxScaleY = 1;
+
+            particleSystem.start();
+
+            scene.onBeforeRenderObservable.add(() => {
+              // Make the emitter follow the camera.
+              if (particleSystem.emitter instanceof Vector3) {
+                particleSystem.emitter.x =
+                  camera.position.x + 0.6 * (target.position.x - camera.position.x);
+                particleSystem.emitter.y = camera.position.y + 14;
+                particleSystem.emitter.z =
+                  camera.position.z + 0.6 * (target.position.z - camera.position.z);
+              }
+            });
+            break;
         }
       },
     );
@@ -141,28 +194,28 @@ const CarRace: FC = () => {
 
     scene.onBeforeRenderObservable.add(() => {
       // Modify the car's position based on keyboard controls.
-      if (!isKeyboardControlEnabled || !carNodeRef.current) return;
+      if (!isKeyboardControlEnabled || !targetNodeRef.current) return;
 
-      const car = carNodeRef.current;
+      const target = targetNodeRef.current;
 
       // -- Rotation.
       const isRotatingLeft = controlState.left && !controlState.right;
       const isRotatingRight = controlState.right && !controlState.left;
       if (isRotatingLeft) {
-        car.rotation.y += -carRotateFactor;
+        target.rotation.y += -carRotateFactor;
       } else if (isRotatingRight) {
-        car.rotation.y += carRotateFactor;
+        target.rotation.y += carRotateFactor;
       }
 
       // -- Throttle.
       const isThrottlingForward = controlState.up && !controlState.down;
       const isThrottlingBackward = controlState.down && !controlState.up;
       if (isThrottlingForward) {
-        car.position.x += Math.sin(car.rotation.y) * carThrottleFactor;
-        car.position.z += Math.cos(car.rotation.y) * carThrottleFactor;
+        target.position.x += Math.sin(target.rotation.y) * carThrottleFactor;
+        target.position.z += Math.cos(target.rotation.y) * carThrottleFactor;
       } else if (isThrottlingBackward) {
-        car.position.x += Math.sin(car.rotation.y) * -carThrottleFactor;
-        car.position.z += Math.cos(car.rotation.y) * -carThrottleFactor;
+        target.position.x += Math.sin(target.rotation.y) * -carThrottleFactor;
+        target.position.z += Math.cos(target.rotation.y) * -carThrottleFactor;
       }
     });
 
@@ -175,7 +228,7 @@ const CarRace: FC = () => {
       scene.dispose();
       engine.dispose();
     };
-  }, [carIdx, carData, controlState, isKeyboardControlEnabled, track]);
+  }, [carIdx, carData, skybox, weatherFx, controlState, isKeyboardControlEnabled, track]);
 
   return (
     <Box w={"70vw"}>

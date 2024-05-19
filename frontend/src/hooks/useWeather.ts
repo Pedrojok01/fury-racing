@@ -1,5 +1,10 @@
 // hooks/useWeather.ts
+import { useEffect } from "react";
+
 import useSWR from "swr";
+
+import { useAnim } from "@/stores/useAnim";
+import { mapWeatherData } from "@/utils/mapWeatherData";
 
 type FetchError = {
   message: string;
@@ -23,6 +28,16 @@ function useWeather(city: string) {
     city ? `/api/getWeather?city=${city}` : null,
     fetcher,
   );
+
+  const { setWeather, setSky } = useAnim();
+
+  useEffect(() => {
+    if (data?.data) {
+      const { weatherFx, skybox } = mapWeatherData(data.data);
+      setWeather(weatherFx);
+      setSky(skybox);
+    }
+  }, [data?.data, setWeather, setSky]);
 
   return {
     weather: data?.data ?? null,

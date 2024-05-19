@@ -1,5 +1,8 @@
 type CurrentScreen = "HOME" | "SELECTION" | "RACE" | "ENDED" | "LEADERBOARD";
 
+type WeatherFx = "none" | "fog" | "rain";
+type Sky = "sunny" | "cloudy" | "storm" | "night";
+
 type PlayerScore = {
   _id: string;
   user_address: `0x${string}`;

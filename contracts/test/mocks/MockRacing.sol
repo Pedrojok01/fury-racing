@@ -13,13 +13,14 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
     address constant AI_PLAYER_ADDRESS = 0x00000000000000000000000000000000000000A1;
     uint256 public constant TOURNAMENT_DURATION = 1 weeks;
     uint256 public constant START_ELO = 1200;
-    uint256 public constant MAX_BET_PLAYERS = 200; // TODO: Find alternate way to remove hard cap
+    uint256 public constant MAX_BET_PLAYERS = 200;
 
     uint256 public betAmount = 0.1 ether;
     uint256 public currentPrizePool;
     uint256 public lastPrizeDistribution;
     uint256 public playersCounter;
-    uint256 public betPlayersCounter;
+    uint256 public tournamentPlayersCounter;
+    uint256 public weeklyTournamentCounter = 1;
 
     mapping(uint256 => Race) public soloRaces;
     mapping(uint256 => Race) public freeRaces;
@@ -28,9 +29,12 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
     uint256 public freeRaceCounter = 1;
     uint256 public raceCounter = 1;
 
+    // Get any exisitng Player struct by address
     mapping(address => Player) public addressToPlayer;
-    mapping(uint256 => address) public betPlayerIndex;
-    mapping(address => uint256) public betPlayerAddressToIndex;
+
+    // Additonal mapping related to weekly tournament
+    mapping(uint256 => mapping(uint256 => address)) public weeklyBetPlayerIndex;
+    mapping(uint256 => mapping(address => uint256)) public weeklyBetPlayerAddressToIndex;
     Circuits[] public circuits;
 
     /*//////////////////////////////////////////////////////////////
@@ -54,7 +58,7 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         DON_ID = _donID;
 
         addCircuit(ExternalFactors(17, 66, 59, 90, 290), "Monaco");
-        _createPlayer(AI_PLAYER_ADDRESS, PlayerAttributes(5, 5, 5, 5, 5, 5, 5, 5));
+        _createPlayer(AI_PLAYER_ADDRESS, RaceMode.SOLO, PlayerAttributes(5, 5, 5, 5, 5, 5, 5, 5));
         lastPrizeDistribution = block.timestamp;
     }
 
@@ -78,7 +82,7 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
 
         // Create new player if it doesn't exist.
         if (addressToPlayer[msg.sender].playerAddress == address(0)) {
-            _createPlayer(msg.sender, attributes1);
+            _createPlayer(msg.sender, RaceMode.SOLO, attributes1);
         } else {
             addressToPlayer[msg.sender].attributes = attributes1;
         }
@@ -99,7 +103,7 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
 
         // Create new player if it doesn't exist.
         if (addressToPlayer[msg.sender].playerAddress == address(0)) {
-            _createPlayer(msg.sender, attributes);
+            _createPlayer(msg.sender, RaceMode.FREE, attributes);
         } else {
             addressToPlayer[msg.sender].attributes = attributes;
         }
@@ -133,7 +137,7 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
 
         // Create new player if it doesn't exist.
         if (addressToPlayer[msg.sender].playerAddress == address(0)) {
-            _createPlayer(msg.sender, _attributes);
+            _createPlayer(msg.sender, RaceMode.TOURNAMENT, _attributes);
         } else {
             updatePlayerAttributes(msg.sender, _attributes);
         }
@@ -191,6 +195,7 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
             // Update racers ELO
             addressToPlayer[winner].ELO += 3;
             addressToPlayer[race.player1 == winner ? race.player2 : race.player1].ELO += 1;
+
             races[_raceId] = race;
             uint256 toPay = betAmount == 0 ? 0 : ((betAmount * 2) * 95) / 100;
 
@@ -312,9 +317,10 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         address topPlayer;
         uint16 highestELO = uint16(START_ELO);
 
-        uint256 length = betPlayersCounter >= MAX_BET_PLAYERS ? MAX_BET_PLAYERS : betPlayersCounter;
+        uint256 length =
+            tournamentPlayersCounter >= MAX_BET_PLAYERS ? MAX_BET_PLAYERS : tournamentPlayersCounter;
         for (uint256 i = 1; i <= length;) {
-            address playerAddress = betPlayerIndex[i];
+            address playerAddress = weeklyBetPlayerIndex[weeklyTournamentCounter][i];
             Player memory player = addressToPlayer[playerAddress];
 
             uint16 playerELO = player.ELO;
@@ -341,6 +347,9 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
             }
             currentPrizePool = 0;
         }
+
+        weeklyTournamentCounter++; // Increment the weekly tournament counter
+        tournamentPlayersCounter = 0; // Reset the bet players counter
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -442,17 +451,32 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
     function updatePlayerAttributes(address _player, PlayerAttributes memory _attributes) public {
         addressToPlayer[_player].attributes = _attributes;
 
-        if (betPlayerAddressToIndex[_player] == 0) {
-            betPlayerIndex[++betPlayersCounter] = _player;
-            betPlayerAddressToIndex[_player] = betPlayersCounter;
+        if (weeklyBetPlayerAddressToIndex[weeklyTournamentCounter][_player] == 0) {
+            tournamentPlayersCounter++;
+            weeklyBetPlayerIndex[weeklyTournamentCounter][tournamentPlayersCounter] = _player;
+            weeklyBetPlayerAddressToIndex[weeklyTournamentCounter][_player] =
+                tournamentPlayersCounter;
         }
     }
 
-    function _createPlayer(address _player, PlayerAttributes memory _attributes) public {
-        ++playersCounter;
+    function _createPlayer(
+        address _player,
+        RaceMode _mode,
+        PlayerAttributes memory _attributes
+    )
+        public
+    {
+        playersCounter++;
         Player memory newPlayer =
             Player({ attributes: _attributes, playerAddress: _player, ELO: uint16(START_ELO) });
         addressToPlayer[_player] = newPlayer;
         emit PlayerCreated(_player, _attributes, playersCounter);
+
+        if (_mode == RaceMode.TOURNAMENT) {
+            tournamentPlayersCounter++;
+            weeklyBetPlayerIndex[weeklyTournamentCounter][tournamentPlayersCounter] = _player;
+            weeklyBetPlayerAddressToIndex[weeklyTournamentCounter][_player] =
+                tournamentPlayersCounter;
+        }
     }
 }

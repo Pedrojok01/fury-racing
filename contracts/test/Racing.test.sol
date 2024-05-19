@@ -356,8 +356,7 @@ contract RacingTest is BaseTestSetup {
         initialBalances.prizePool = racing.currentPrizePool();
 
         // Move forward in time by one week and trigger prize pool distribution
-        uint256 oneWeekInSeconds = 7 days;
-        vm.warp(block.timestamp + oneWeekInSeconds);
+        vm.warp(block.timestamp + 1 weeks + 1000);
 
         uint256 initialTopPlayerBalance =
             player1.balance > player2.balance ? player1.balance : player2.balance;
@@ -369,45 +368,5 @@ contract RacingTest is BaseTestSetup {
         // Verify that the prize pool was distributed to the top player
         assertEq(topPlayer.balance, initialTopPlayerBalance + initialBalances.prizePool);
         assertEq(racing.currentPrizePool(), 0);
-    }
-
-    function verifyRaceState(
-        uint256 raceId,
-        RaceMode mode,
-        uint256 winnerTime,
-        uint256 loserTime
-    )
-        internal
-        view
-    {
-        Race memory race = racing._getRaceByMode(raceId, mode);
-        assertEq(uint256(race.state), uint256(RaceState.FINISHED));
-        assertEq(race.player1Time, winnerTime);
-        assertEq(race.player2Time, loserTime);
-    }
-
-    function verifyELOScores(uint256 expectedScore1, uint256 expectedScore2) internal view {
-        (,, uint16 updatedPlayer1ELO) = racing.addressToPlayer(player1);
-        (,, uint16 updatedPlayer2ELO) = racing.addressToPlayer(player2);
-        assertEq(updatedPlayer1ELO, expectedScore1);
-        assertEq(updatedPlayer2ELO, expectedScore2);
-    }
-
-    // Winner should receive the prize
-    function verifyPrizeDistribution(address winner, uint256 initialWinnerBalance) internal view {
-        uint256 prize = (0.1 ether * 2 * 95) / 100;
-        assertEq(winner.balance, initialWinnerBalance + prize - 0.1 ether); // substract bet amount
-    }
-
-    // Contract balance should decrease
-    function verifyContractBalance(uint256 initialContractBalance) internal view {
-        uint256 prize = (0.1 ether * 2 * 95) / 100;
-        assertEq(address(racing).balance, initialContractBalance + 0.2 ether - prize);
-    }
-
-    // Prize pool increases by 5% of the bet amount per race
-    function verifyPrizePool(uint256 initialPrizePool) internal view {
-        uint256 updatedPrizePool = racing.currentPrizePool();
-        assertEq(updatedPrizePool, initialPrizePool + (0.2 ether * 5) / 100);
     }
 }

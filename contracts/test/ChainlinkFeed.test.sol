@@ -18,36 +18,37 @@ contract ChainlinkFeedTest is BaseTestSetup {
     function testRequestRandomNumber() public {
         vm.startPrank(player1);
         uint256 raceId = 1;
-        bool isBetRace = true;
+        RaceMode raceMode = RaceMode.TOURNAMENT;
 
-        uint256 requestId = racing.requestRandomNumber(raceId, isBetRace);
+        uint256 requestId = racing.requestRandomNumber(raceId, raceMode);
 
         RandomRequests memory request = racing.getRandomRequestFromID(requestId);
         assert(request.exists);
         assert(!request.fulfilled);
         assertEq(request.randomWords.length, 0);
 
-        bool betRace = racing.requestIdIsBetRace(bytes32(requestId));
+        RaceMode mode = racing.requestIdToRaceMode(bytes32(requestId));
         uint256 storedRaceId = racing.requestIdToRaceId(bytes32(requestId));
-        assertEq(betRace, isBetRace);
+        assertEq(uint256(mode), uint256(raceMode));
         assertEq(storedRaceId, raceId);
 
         vm.stopPrank();
     }
 
     function testFulfillRandomWords() public {
+        uint256 circuitId = 1;
         vm.startPrank(player1);
-        racing.joinRace{ value: 0.1 ether }(attributes1);
+        racing.joinRace{ value: 0.1 ether }(attributes1, circuitId);
         vm.stopPrank();
 
         vm.startPrank(player2);
-        racing.joinRace{ value: 0.1 ether }(attributes2);
+        racing.joinRace{ value: 0.1 ether }(attributes2, circuitId);
         vm.stopPrank();
 
         uint256 raceId = 1;
-        bool isBetRace = true;
+        RaceMode mode = RaceMode.TOURNAMENT;
 
-        uint256 requestId = racing.requestRandomNumber(raceId, isBetRace);
+        uint256 requestId = racing.requestRandomNumber(raceId, mode);
         uint256[] memory randomWords = new uint256[](2);
         randomWords[0] = uint256(keccak256(abi.encodePacked("random_word_1")));
         randomWords[1] = uint256(keccak256(abi.encodePacked("random_word_2")));
@@ -72,10 +73,10 @@ contract ChainlinkFeedTest is BaseTestSetup {
 
         string memory expectedArg = string(
             abi.encodePacked(
-                racing.formatCircuitIndex(circuit),
+                racing._formatCircuitIndex(circuit),
                 Strings.toString(weather),
-                racing.formatPlayerAttributes(attributes[0]),
-                racing.formatPlayerAttributes(attributes[1])
+                racing._formatPlayerAttributes(attributes[0]),
+                racing._formatPlayerAttributes(attributes[1])
             )
         );
 
@@ -86,7 +87,7 @@ contract ChainlinkFeedTest is BaseTestSetup {
     }
 
     function testFormatPlayerAttributes() public view {
-        string memory formattedAttributes = racing.formatPlayerAttributes(attributesAfterLuck1);
+        string memory formattedAttributes = racing._formatPlayerAttributes(attributesAfterLuck1);
 
         string memory expected = string(
             abi.encodePacked(
@@ -108,24 +109,24 @@ contract ChainlinkFeedTest is BaseTestSetup {
 
     function testFormatCircuitIndex() public view {
         // Test for single-digit circuit indices
-        string memory formattedIndex1 = racing.formatCircuitIndex(1);
+        string memory formattedIndex1 = racing._formatCircuitIndex(1);
         string memory expectedIndex1 = "00";
         assertEq(formattedIndex1, expectedIndex1);
 
-        string memory formattedIndex2 = racing.formatCircuitIndex(2);
+        string memory formattedIndex2 = racing._formatCircuitIndex(2);
         string memory expectedIndex2 = "01";
         assertEq(formattedIndex2, expectedIndex2);
 
-        string memory formattedIndex9 = racing.formatCircuitIndex(10);
+        string memory formattedIndex9 = racing._formatCircuitIndex(10);
         string memory expectedIndex9 = "09";
         assertEq(formattedIndex9, expectedIndex9);
 
         // Test for double-digit circuit indices
-        string memory formattedIndex10 = racing.formatCircuitIndex(11);
+        string memory formattedIndex10 = racing._formatCircuitIndex(11);
         string memory expectedIndex10 = "10";
         assertEq(formattedIndex10, expectedIndex10);
 
-        string memory formattedIndex15 = racing.formatCircuitIndex(16);
+        string memory formattedIndex15 = racing._formatCircuitIndex(16);
         string memory expectedIndex15 = "15";
         assertEq(formattedIndex15, expectedIndex15);
     }
@@ -139,10 +140,9 @@ contract ChainlinkFeedTest is BaseTestSetup {
         attributes[1] = attributesAfterLuck2;
 
         uint256 raceId = 1;
-        bool isBetRace = false;
+        RaceMode mode = RaceMode.FREE;
 
-        bytes32 requestId =
-            racing.requestRaceResult(circuit, raceId, weather, isBetRace, attributes);
+        bytes32 requestId = racing.requestRaceResult(circuit, raceId, weather, mode, attributes);
 
         uint256[] memory raceResults = new uint256[](2);
         raceResults[0] = 100;

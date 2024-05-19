@@ -6,6 +6,8 @@ import { BaseTestSetup } from "./BaseTestSetup.sol";
 import { Test, console2 } from "forge-std/Test.sol";
 
 contract RacingTest is BaseTestSetup {
+    uint256 circuitId = 1;
+
     function setUp() public {
         setUpBase();
     }
@@ -24,16 +26,80 @@ contract RacingTest is BaseTestSetup {
 
         vm.startPrank(player3);
         vm.expectRevert(Racing__InvalidAttributesSum.selector);
-        racing.joinRace{ value: 0.1 ether }(_attributes3);
+        racing.joinRace{ value: 0.1 ether }(_attributes3, circuitId);
         vm.stopPrank();
+    }
+
+    function testThreeSoloRacesInARow() public {
+        uint256 requestId = 1;
+        uint256[] memory randomWords = new uint256[](2);
+        randomWords[0] = uint256(keccak256(abi.encode(block.timestamp, 0)));
+        randomWords[1] = uint256(keccak256(abi.encode(block.timestamp, 1)));
+
+        // First solo race
+        vm.prank(player1);
+        racing.joinSoloRace(attributes1, attributes2, circuitId);
+
+        racing._fulfillRandomWords(requestId, randomWords);
+
+        bytes32 functionsRequestId1 =
+            keccak256(abi.encodePacked(uint256(1), RaceMode.SOLO, uint256(1)));
+        uint256[] memory raceResults1 = new uint256[](2);
+        raceResults1[0] = 100; // Player 1's time
+        raceResults1[1] = 200; // Player 2's time
+        racing.fulfillRequest(functionsRequestId1, abi.encode(raceResults1), "");
+
+        verifyRaceState(requestId, RaceMode.SOLO, 100, 200);
+        verifyELOScores(1200, 0); // no ELO attribution, only 1 player
+
+        // Second solo race
+        requestId++;
+
+        vm.prank(player1);
+        racing.joinSoloRace(attributes1, attributes2, circuitId);
+
+        uint256[] memory randomWords2 = new uint256[](2);
+        randomWords2[0] = uint256(keccak256(abi.encode(block.timestamp, 2)));
+        randomWords2[1] = uint256(keccak256(abi.encode(block.timestamp, 3)));
+        racing._fulfillRandomWords(requestId, randomWords2);
+
+        bytes32 functionsRequestId2 =
+            keccak256(abi.encodePacked(uint256(2), RaceMode.SOLO, uint256(1)));
+        uint256[] memory raceResults2 = new uint256[](2);
+        raceResults2[0] = 200; // Player 1's time
+        raceResults2[1] = 100; // Player 2's time
+        racing.fulfillRequest(functionsRequestId2, abi.encode(raceResults2), "");
+
+        verifyRaceState(requestId, RaceMode.SOLO, 200, 100);
+
+        // Third solo race
+        requestId++;
+
+        vm.prank(player1);
+        racing.joinSoloRace(attributes1, attributes2, circuitId);
+
+        uint256[] memory randomWords3 = new uint256[](2);
+        randomWords3[0] = uint256(keccak256(abi.encode(block.timestamp, 4)));
+        randomWords3[1] = uint256(keccak256(abi.encode(block.timestamp, 5)));
+        racing._fulfillRandomWords(requestId, randomWords3);
+
+        bytes32 functionsRequestId3 =
+            keccak256(abi.encodePacked(uint256(3), RaceMode.SOLO, uint256(1)));
+        uint256[] memory raceResults3 = new uint256[](2);
+        raceResults3[0] = 150; // Player 1's time
+        raceResults3[1] = 100; // Player 2's time
+        racing.fulfillRequest(functionsRequestId3, abi.encode(raceResults3), "");
+
+        verifyRaceState(requestId, RaceMode.SOLO, 150, 100);
+        assertEq(racing.currentPrizePool(), 0);
     }
 
     function testJoinFreeRace() public {
         vm.prank(player1);
-        racing.joinFreeRace(attributes1);
+        racing.joinFreeRace(attributes1, circuitId);
 
         vm.prank(player2);
-        racing.joinFreeRace(attributes2);
+        racing.joinFreeRace(attributes2, circuitId);
 
         (, address player1Address, uint16 player1ELO) = racing.addressToPlayer(player1);
         assertEq(player1Address, player1);
@@ -47,7 +113,8 @@ contract RacingTest is BaseTestSetup {
         racing._fulfillRandomWords(requestId, randomWords);
 
         // Mock Chainlink Functions callback
-        bytes32 functionsRequestId = keccak256(abi.encodePacked(uint256(1), false, uint256(1)));
+        bytes32 functionsRequestId =
+            keccak256(abi.encodePacked(uint256(1), RaceMode.FREE, uint256(1)));
         uint256[] memory raceResults = new uint256[](2);
         raceResults[0] = 100; // Player 1's time
         raceResults[1] = 200; // Player 2's time
@@ -60,12 +127,85 @@ contract RacingTest is BaseTestSetup {
         assertEq(race.player2Time, 200);
     }
 
-    function testJoinBetRace() public {
+    function testThreeFreeRacesInARow() public {
+        uint256 requestId = 1;
+        uint256[] memory randomWords = new uint256[](2);
+        randomWords[0] = uint256(keccak256(abi.encode(block.timestamp, 0)));
+        randomWords[1] = uint256(keccak256(abi.encode(block.timestamp, 1)));
+
+        // First free race
         vm.prank(player1);
-        racing.joinRace{ value: 0.1 ether }(attributes1);
+        racing.joinFreeRace(attributes1, circuitId);
 
         vm.prank(player2);
-        racing.joinRace{ value: 0.1 ether }(attributes2);
+        racing.joinFreeRace(attributes2, circuitId);
+
+        racing._fulfillRandomWords(requestId, randomWords);
+
+        bytes32 functionsRequestId1 =
+            keccak256(abi.encodePacked(uint256(1), RaceMode.FREE, uint256(1)));
+        uint256[] memory raceResults1 = new uint256[](2);
+        raceResults1[0] = 100; // Player 1's time
+        raceResults1[1] = 200; // Player 2's time
+        racing.fulfillRequest(functionsRequestId1, abi.encode(raceResults1), "");
+
+        verifyRaceState(requestId, RaceMode.FREE, 100, 200);
+        verifyELOScores(1200, 1200); // no ELO attribution
+
+        // Second free race
+        requestId++;
+
+        vm.prank(player1);
+        racing.joinFreeRace(attributes1, circuitId);
+
+        vm.prank(player2);
+        racing.joinFreeRace(attributes2, circuitId);
+
+        uint256[] memory randomWords2 = new uint256[](2);
+        randomWords2[0] = uint256(keccak256(abi.encode(block.timestamp, 2)));
+        randomWords2[1] = uint256(keccak256(abi.encode(block.timestamp, 3)));
+        racing._fulfillRandomWords(requestId, randomWords2);
+
+        bytes32 functionsRequestId2 =
+            keccak256(abi.encodePacked(uint256(2), RaceMode.FREE, uint256(1)));
+        uint256[] memory raceResults2 = new uint256[](2);
+        raceResults2[0] = 200; // Player 1's time
+        raceResults2[1] = 100; // Player 2's time
+        racing.fulfillRequest(functionsRequestId2, abi.encode(raceResults2), "");
+
+        verifyRaceState(requestId, RaceMode.FREE, 200, 100);
+
+        // Third free race
+        requestId++;
+
+        vm.prank(player1);
+        racing.joinFreeRace(attributes1, circuitId);
+
+        vm.prank(player2);
+        racing.joinFreeRace(attributes2, circuitId);
+
+        uint256[] memory randomWords3 = new uint256[](2);
+        randomWords3[0] = uint256(keccak256(abi.encode(block.timestamp, 4)));
+        randomWords3[1] = uint256(keccak256(abi.encode(block.timestamp, 5)));
+        racing._fulfillRandomWords(requestId, randomWords3);
+
+        bytes32 functionsRequestId3 =
+            keccak256(abi.encodePacked(uint256(3), RaceMode.FREE, uint256(1)));
+        uint256[] memory raceResults3 = new uint256[](2);
+        raceResults3[0] = 150; // Player 1's time
+        raceResults3[1] = 100; // Player 2's time
+        racing.fulfillRequest(functionsRequestId3, abi.encode(raceResults3), "");
+
+        verifyRaceState(requestId, RaceMode.FREE, 150, 100);
+        assertEq(racing.currentPrizePool(), 0);
+    }
+
+    function testJoinBetRace() public {
+        vm.prank(player1);
+        racing.joinRace{ value: 0.1 ether }(attributes1, circuitId);
+
+        vm.prank(player2);
+        racing.joinRace{ value: 0.1 ether }(attributes2, circuitId);
 
         (, address player1Address, uint16 player1ELO) = racing.addressToPlayer(player1);
         assertEq(player1Address, player1);
@@ -83,7 +223,8 @@ contract RacingTest is BaseTestSetup {
         racing._fulfillRandomWords(requestId, randomWords);
 
         // Mock Chainlink Functions callback
-        bytes32 functionsRequestId = keccak256(abi.encodePacked(uint256(1), true, uint256(1)));
+        bytes32 functionsRequestId =
+            keccak256(abi.encodePacked(uint256(1), RaceMode.TOURNAMENT, uint256(1)));
         uint256[] memory raceResults = new uint256[](2);
         raceResults[0] = 100; // Player 1's time
         raceResults[1] = 200; // Player 2's time
@@ -122,20 +263,21 @@ contract RacingTest is BaseTestSetup {
 
         // First bet race
         vm.prank(player1);
-        racing.joinRace{ value: 0.1 ether }(attributes1);
+        racing.joinRace{ value: 0.1 ether }(attributes1, circuitId);
 
         vm.prank(player2);
-        racing.joinRace{ value: 0.1 ether }(attributes2);
+        racing.joinRace{ value: 0.1 ether }(attributes2, circuitId);
 
         racing._fulfillRandomWords(requestId, randomWords);
 
-        bytes32 functionsRequestId1 = keccak256(abi.encodePacked(uint256(1), true, uint256(1)));
+        bytes32 functionsRequestId1 =
+            keccak256(abi.encodePacked(uint256(1), RaceMode.TOURNAMENT, uint256(1)));
         uint256[] memory raceResults1 = new uint256[](2);
         raceResults1[0] = 100; // Player 1's time
         raceResults1[1] = 200; // Player 2's time
         racing.fulfillRequest(functionsRequestId1, abi.encode(raceResults1), "");
 
-        verifyRaceState(requestId, 100, 200);
+        verifyRaceState(requestId, RaceMode.TOURNAMENT, 100, 200);
         verifyELOScores(1203, 1201); // Winner +3, loser +1
         verifyPrizeDistribution(player1, initialBalances.player1Balance);
         verifyContractBalance(initialBalances.contractBalance);
@@ -151,23 +293,24 @@ contract RacingTest is BaseTestSetup {
         requestId++;
 
         vm.prank(player1);
-        racing.joinRace{ value: 0.1 ether }(attributes1);
+        racing.joinRace{ value: 0.1 ether }(attributes1, circuitId);
 
         vm.prank(player2);
-        racing.joinRace{ value: 0.1 ether }(attributes2);
+        racing.joinRace{ value: 0.1 ether }(attributes2, circuitId);
 
         uint256[] memory randomWords2 = new uint256[](2);
         randomWords2[0] = uint256(keccak256(abi.encode(block.timestamp, 2)));
         randomWords2[1] = uint256(keccak256(abi.encode(block.timestamp, 3)));
         racing._fulfillRandomWords(requestId, randomWords2);
 
-        bytes32 functionsRequestId2 = keccak256(abi.encodePacked(uint256(2), true, uint256(1)));
+        bytes32 functionsRequestId2 =
+            keccak256(abi.encodePacked(uint256(2), RaceMode.TOURNAMENT, uint256(1)));
         uint256[] memory raceResults2 = new uint256[](2);
         raceResults2[0] = 200; // Player 1's time
         raceResults2[1] = 100; // Player 2's time
         racing.fulfillRequest(functionsRequestId2, abi.encode(raceResults2), "");
 
-        verifyRaceState(requestId, 200, 100);
+        verifyRaceState(requestId, RaceMode.TOURNAMENT, 200, 100);
         verifyELOScores(1204, 1204); // Winner +3, loser +1
         verifyPrizeDistribution(player2, initialBalances.player2Balance);
         verifyContractBalance(initialBalances.contractBalance);
@@ -183,23 +326,24 @@ contract RacingTest is BaseTestSetup {
         requestId++;
 
         vm.prank(player1);
-        racing.joinRace{ value: 0.1 ether }(attributes1);
+        racing.joinRace{ value: 0.1 ether }(attributes1, circuitId);
 
         vm.prank(player2);
-        racing.joinRace{ value: 0.1 ether }(attributes2);
+        racing.joinRace{ value: 0.1 ether }(attributes2, circuitId);
 
         uint256[] memory randomWords3 = new uint256[](2);
         randomWords3[0] = uint256(keccak256(abi.encode(block.timestamp, 4)));
         randomWords3[1] = uint256(keccak256(abi.encode(block.timestamp, 5)));
         racing._fulfillRandomWords(requestId, randomWords3);
 
-        bytes32 functionsRequestId3 = keccak256(abi.encodePacked(uint256(3), true, uint256(1)));
+        bytes32 functionsRequestId3 =
+            keccak256(abi.encodePacked(uint256(3), RaceMode.TOURNAMENT, uint256(1)));
         uint256[] memory raceResults3 = new uint256[](2);
         raceResults3[0] = 150; // Player 1's time
         raceResults3[1] = 100; // Player 2's time
         racing.fulfillRequest(functionsRequestId3, abi.encode(raceResults3), "");
 
-        verifyRaceState(requestId, 150, 100);
+        verifyRaceState(requestId, RaceMode.TOURNAMENT, 150, 100);
         verifyELOScores(1205, 1207); // Winner +3, loser +1
         verifyPrizeDistribution(player2, initialBalances.player2Balance);
         verifyContractBalance(initialBalances.contractBalance);
@@ -227,8 +371,16 @@ contract RacingTest is BaseTestSetup {
         assertEq(racing.currentPrizePool(), 0);
     }
 
-    function verifyRaceState(uint256 raceId, uint256 winnerTime, uint256 loserTime) internal view {
-        Race memory race = racing.getRaceFromRaceID(raceId);
+    function verifyRaceState(
+        uint256 raceId,
+        RaceMode mode,
+        uint256 winnerTime,
+        uint256 loserTime
+    )
+        internal
+        view
+    {
+        Race memory race = racing._getRaceByMode(raceId, mode);
         assertEq(uint256(race.state), uint256(RaceState.FINISHED));
         assertEq(race.player1Time, winnerTime);
         assertEq(race.player2Time, loserTime);

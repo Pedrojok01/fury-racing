@@ -11,6 +11,12 @@ interface IRacing {
                                RACES
     //////////////////////////////////////////////////////////////*/
 
+    enum RaceMode {
+        SOLO,
+        FREE,
+        TOURNAMENT
+    }
+
     enum RaceState {
         NON_EXISTENT,
         WAITING,
@@ -29,6 +35,7 @@ interface IRacing {
      */
     struct Race {
         uint256 circuit;
+        RaceMode mode;
         RaceState state;
         address player1;
         address player2;
@@ -129,7 +136,8 @@ interface IRacing {
 
     event PlayerCreated(address indexed player, PlayerAttributes attributes, uint256 playerId);
     event BetAmountUpdated(uint256 newBetAmount, uint256 oldBetAmount);
-    event JoinedRace(uint256 indexed raceId, address indexed player);
+    event JoinedRace(address indexed player, uint256 raceId);
+    event SoloRaceStarted(address indexed player, uint256 raceId);
     event FreeRaceStarted(uint256 raceId);
     event RaceStarted(uint256 raceId);
     event FinishedRace(uint256 raceId, address winner);

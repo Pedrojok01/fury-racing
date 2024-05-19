@@ -42,7 +42,7 @@ abstract contract ChainlinkFeed is
 
     mapping(uint256 => RandomRequests) private requestIdToRandomRequests;
     mapping(bytes32 => FunctionsRequests) private requestIdToFunctionsRequests;
-    mapping(bytes32 => bool) private requestIdIsBetRace;
+    mapping(bytes32 => RaceMode) private requestIdToRaceMode;
     mapping(bytes32 => uint256) private requestIdToRaceId;
 
     // Events
@@ -91,7 +91,7 @@ abstract contract ChainlinkFeed is
     // TODO: Fund subscription on both testnet and Mainnet.
     function requestRandomNumber(
         uint256 raceId,
-        bool isBetRace
+        RaceMode mode
     )
         internal
         returns (uint256 requestId)
@@ -112,7 +112,7 @@ abstract contract ChainlinkFeed is
         requestIdToRandomRequests[requestId] =
             RandomRequests({ fulfilled: false, exists: true, randomWords: new uint256[](0) });
 
-        requestIdIsBetRace[bytes32(requestId)] = isBetRace;
+        requestIdToRaceMode[bytes32(requestId)] = mode;
         requestIdToRaceId[bytes32(requestId)] = raceId;
 
         emit RequestedRandomness(requestId, NUM_WORDS);
@@ -137,7 +137,7 @@ abstract contract ChainlinkFeed is
         _startRace(
             randomWords,
             requestIdToRaceId[bytes32(requestId)], // raceId
-            requestIdIsBetRace[bytes32(requestId)] // isBetRace
+            requestIdToRaceMode[bytes32(requestId)] // raceMode
         );
     }
 
@@ -150,7 +150,7 @@ abstract contract ChainlinkFeed is
         uint256 circuit,
         uint256 raceId,
         uint256 weather,
-        bool isBetRace,
+        RaceMode mode,
         PlayerAttributes[] memory attributes
     )
         internal
@@ -165,7 +165,7 @@ abstract contract ChainlinkFeed is
         requestIdToFunctionsRequests[_requestId] =
             FunctionsRequests({ fulfilled: false, exists: true, results: new uint256[](0) });
 
-        requestIdIsBetRace[_requestId] = isBetRace;
+        requestIdToRaceMode[_requestId] = mode;
         requestIdToRaceId[_requestId] = raceId;
     }
 
@@ -190,7 +190,7 @@ abstract contract ChainlinkFeed is
 
         emit RaceResultFulfilled(requestId, values);
 
-        _finishRace(requestIdToRaceId[requestId], requestIdIsBetRace[requestId], values);
+        _finishRace(requestIdToRaceId[requestId], requestIdToRaceMode[requestId], values);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -228,20 +228,20 @@ abstract contract ChainlinkFeed is
     {
         return string(
             abi.encodePacked(
-                formatCircuitIndex(circuit),
+                _formatCircuitIndex(circuit),
                 Strings.toString(weather),
-                formatPlayerAttributes(attributes[0]),
-                formatPlayerAttributes(attributes[1])
+                _formatPlayerAttributes(attributes[0]),
+                _formatPlayerAttributes(attributes[1])
             )
         );
     }
 
-    function formatCircuitIndex(uint256 circuitIndex) private pure returns (string memory) {
-        if (circuitIndex == 0) {
+    function _formatCircuitIndex(uint256 _circuitIndex) private pure returns (string memory) {
+        if (_circuitIndex == 0) {
             revert ChainlinkFeed__InvalidCircuitIndex();
         }
 
-        uint256 adjustedIndex = circuitIndex - 1;
+        uint256 adjustedIndex = _circuitIndex - 1;
 
         // Format as two-digit string
         if (adjustedIndex < 10) {
@@ -251,32 +251,26 @@ abstract contract ChainlinkFeed is
         }
     }
 
-    function formatPlayerAttributes(PlayerAttributes memory attributes)
+    function _formatPlayerAttributes(PlayerAttributes memory _attributes)
         private
         pure
         returns (string memory)
     {
         return string(
             abi.encodePacked(
-                Strings.toString(attributes.reliability),
-                Strings.toString(attributes.maniability),
-                Strings.toString(attributes.speed),
-                Strings.toString(attributes.breaks),
-                Strings.toString(attributes.car_balance),
-                Strings.toString(attributes.aerodynamics),
-                Strings.toString(attributes.driver_skills),
-                Strings.toString(attributes.luck)
+                Strings.toString(_attributes.reliability),
+                Strings.toString(_attributes.maniability),
+                Strings.toString(_attributes.speed),
+                Strings.toString(_attributes.breaks),
+                Strings.toString(_attributes.car_balance),
+                Strings.toString(_attributes.aerodynamics),
+                Strings.toString(_attributes.driver_skills),
+                Strings.toString(_attributes.luck)
             )
         );
     }
 
-    function _startRace(uint256[] memory words, uint256 raceId, bool isBetRace) internal virtual;
+    function _startRace(uint256[] memory words, uint256 raceId, RaceMode modes) internal virtual;
 
-    function _finishRace(
-        uint256 raceId,
-        bool isBetRace,
-        uint256[] memory values
-    )
-        internal
-        virtual;
+    function _finishRace(uint256 raceId, RaceMode mode, uint256[] memory values) internal virtual;
 }

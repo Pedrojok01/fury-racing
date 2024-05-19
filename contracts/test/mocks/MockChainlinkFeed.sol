@@ -41,7 +41,7 @@ abstract contract MockChainlinkFeed is
 
     mapping(uint256 => RandomRequests) public requestIdToRandomRequests;
     mapping(bytes32 => FunctionsRequests) public requestIdToFunctionsRequests;
-    mapping(bytes32 => bool) public requestIdIsBetRace;
+    mapping(bytes32 => RaceMode) public requestIdToRaceMode;
     mapping(bytes32 => uint256) public requestIdToRaceId;
 
     // Events
@@ -90,7 +90,7 @@ abstract contract MockChainlinkFeed is
     // TODO: Fund subscription on both testnet and Mainnet.
     function requestRandomNumber(
         uint256 raceId,
-        bool isBetRace
+        RaceMode mode
     )
         public
         returns (uint256 requestId)
@@ -111,7 +111,7 @@ abstract contract MockChainlinkFeed is
         requestIdToRandomRequests[requestId] =
             RandomRequests({ fulfilled: false, exists: true, randomWords: new uint256[](0) });
 
-        requestIdIsBetRace[bytes32(requestId)] = isBetRace;
+        requestIdToRaceMode[bytes32(requestId)] = mode;
         requestIdToRaceId[bytes32(requestId)] = raceId;
 
         emit RequestedRandomness(requestId, NUM_WORDS);
@@ -141,7 +141,7 @@ abstract contract MockChainlinkFeed is
         _startRace(
             randomWords,
             requestIdToRaceId[bytes32(requestId)], // raceId
-            requestIdIsBetRace[bytes32(requestId)] // isBetRace
+            requestIdToRaceMode[bytes32(requestId)] // raceMode
         );
     }
 
@@ -154,19 +154,19 @@ abstract contract MockChainlinkFeed is
         uint256 circuit,
         uint256 raceId,
         uint256 weather,
-        bool isBetRace,
+        RaceMode mode,
         PlayerAttributes[] memory attributes
     )
         public
         returns (bytes32 _requestId)
     {
         // Logic modified for testing purposes: requestId hardcoded
-        _requestId = keccak256(abi.encodePacked(raceId, isBetRace, circuit));
+        _requestId = keccak256(abi.encodePacked(raceId, mode, circuit));
 
         requestIdToFunctionsRequests[_requestId] =
             FunctionsRequests({ fulfilled: false, exists: true, results: new uint256[](0) });
 
-        requestIdIsBetRace[_requestId] = isBetRace;
+        requestIdToRaceMode[_requestId] = mode;
         requestIdToRaceId[_requestId] = raceId;
     }
 
@@ -196,7 +196,7 @@ abstract contract MockChainlinkFeed is
 
         emit RaceResultFulfilled(requestId, values);
 
-        _finishRace(requestIdToRaceId[requestId], requestIdIsBetRace[requestId], values);
+        _finishRace(requestIdToRaceId[requestId], requestIdToRaceMode[requestId], values);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -234,21 +234,21 @@ abstract contract MockChainlinkFeed is
     {
         return string(
             abi.encodePacked(
-                formatCircuitIndex(circuit),
+                _formatCircuitIndex(circuit),
                 Strings.toString(weather),
-                formatPlayerAttributes(attributes[0]),
-                formatPlayerAttributes(attributes[1])
+                _formatPlayerAttributes(attributes[0]),
+                _formatPlayerAttributes(attributes[1])
             )
         );
     }
 
-    function formatCircuitIndex(uint256 circuitIndex) public pure returns (string memory) {
-        if (circuitIndex == 0) {
+    function _formatCircuitIndex(uint256 _circuitIndex) public pure returns (string memory) {
+        if (_circuitIndex == 0) {
             revert ChainlinkFeed__InvalidCircuitIndex();
         }
 
         // Adjust for the array index
-        uint256 adjustedIndex = circuitIndex - 1;
+        uint256 adjustedIndex = _circuitIndex - 1;
 
         // Format as two-digit string
         if (adjustedIndex < 10) {
@@ -258,26 +258,26 @@ abstract contract MockChainlinkFeed is
         }
     }
 
-    function formatPlayerAttributes(PlayerAttributes memory attributes)
+    function _formatPlayerAttributes(PlayerAttributes memory _attributes)
         public
         pure
         returns (string memory)
     {
         return string(
             abi.encodePacked(
-                Strings.toString(attributes.reliability),
-                Strings.toString(attributes.maniability),
-                Strings.toString(attributes.speed),
-                Strings.toString(attributes.breaks),
-                Strings.toString(attributes.car_balance),
-                Strings.toString(attributes.aerodynamics),
-                Strings.toString(attributes.driver_skills),
-                Strings.toString(attributes.luck)
+                Strings.toString(_attributes.reliability),
+                Strings.toString(_attributes.maniability),
+                Strings.toString(_attributes.speed),
+                Strings.toString(_attributes.breaks),
+                Strings.toString(_attributes.car_balance),
+                Strings.toString(_attributes.aerodynamics),
+                Strings.toString(_attributes.driver_skills),
+                Strings.toString(_attributes.luck)
             )
         );
     }
 
-    function _startRace(uint256[] memory words, uint256 raceId, bool isBetRace) public virtual;
+    function _startRace(uint256[] memory words, uint256 raceId, RaceMode mode) public virtual;
 
-    function _finishRace(uint256 raceId, bool isBetRace, uint256[] memory values) public virtual;
+    function _finishRace(uint256 raceId, RaceMode mode, uint256[] memory values) public virtual;
 }

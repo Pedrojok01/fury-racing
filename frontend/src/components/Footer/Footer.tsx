@@ -25,7 +25,7 @@ const Footer: FC = () => {
         <Link href="https://chain.link/" target="_blank" rel="noopener noreferrer">
           <HStack>
             <img src={images.chainlinkLogo.src} alt="logo" width={25} height={25} />
-            <Text>Chainlink</Text>
+            <Text fontWeight={800}>Chainlink</Text>
           </HStack>
         </Link>
 
@@ -33,14 +33,14 @@ const Footer: FC = () => {
         <Link href="https://www.avax.network/" target="_blank" rel="noopener noreferrer">
           <HStack>
             <img src={images.avaxLogo.src} alt="logo" width={25} height={25} />
-            <Text>Avalanche</Text>
+            <Text fontWeight={800}>Avalanche</Text>
           </HStack>
         </Link>
 
         <Text> | </Text>
 
         <Link href={GITHUB_REPO} target="_blank" rel="noopener noreferrer">
-          <Text>GitHub</Text>
+          <Text fontWeight={800}>GitHub</Text>
         </Link>
       </HStack>
     </Flex>

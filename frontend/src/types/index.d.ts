@@ -1,4 +1,4 @@
-type CurrentScreen = "HOME" | "SELECTION" | "RACE" | "ENDED" | "LEADERBOARD";
+type CurrentScreen = "HOME" | "MODE" | "SELECTION" | "RACE" | "ENDED" | "LEADERBOARD";
 
 type WeatherFx = "none" | "fog" | "rain";
 type Sky = "sunny" | "cloudy" | "storm" | "night";
@@ -61,6 +61,8 @@ type CarMetadata = {
     y: number;
     z: number;
   };
+  attributes: CarAttributes;
+  description: string;
 };
 
 interface Weather {
@@ -109,3 +111,5 @@ type FetchError = {
   message: string;
   status: number;
 };
+
+type RaceMode = "SOLO" | "FREE" | "TOURNAMENT";

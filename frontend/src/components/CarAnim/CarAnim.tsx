@@ -16,14 +16,14 @@ import { carMetadata } from "@/data/cars";
 import "@babylonjs/loaders/glTF";
 import { useAnim } from "@/stores/useAnim";
 
+import { CustomToolTip } from "../CustomToolTip";
+
 const CarAnim: FC = () => {
   const ref = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<Engine | null>(null);
   const sceneRef = useRef<Scene | null>(null);
   const carNodesRef = useRef<TransformNode[]>([]);
   const { carIdx, carData, incrementCarIdx, decrementCarIdx } = useAnim();
-
-  console.log("CarAnim.tsx:", carIdx, carData);
 
   // Initialization
   useEffect(() => {
@@ -121,7 +121,9 @@ const CarAnim: FC = () => {
   return (
     <VStack justify={"center"} align={"center"} w={"100%"}>
       <Box w={"34rem"} h={"17rem"}>
-        <canvas ref={ref} style={{ width: "100%", height: "100%" }} />
+        <CustomToolTip label={carData.description}>
+          <canvas ref={ref} style={{ width: "100%", height: "100%" }} />
+        </CustomToolTip>
       </Box>
       <HStack>
         <Button onClick={incrementCarIdx} size="sm">

@@ -16,23 +16,32 @@ import {
 } from "@chakra-ui/react";
 
 import { CustomBox } from "../CustomBox";
+import { CustomToolTip } from "../CustomToolTip";
 
-const defaultAttributes: CarAttributes = {
-  reliability: 5,
-  speed: 5,
-  driver_skills: 5,
-  breaks: 5,
-  maniability: 5,
-  car_balance: 5,
-  aerodynamics: 5,
-  luck: 5,
+const attributeLabels: { [key in keyof CarAttributes]: string } = {
+  reliability: "Increase the car's reliability and reduce the chance of a breakdown.",
+  maniability: "Increase the car's ability to turn and corner at high speeds.",
+  speed: "Increase the car's top speed and acceleration.",
+  breaks: "Increase the car's braking power and reduce the stopping distance.",
+  car_balance: "Increase the car's stability and reduce the chance of spinning out.",
+  aerodynamics: "Increase the car's downforce and reduce the chance of losing grip.",
+  driver_skills: "Increase the driver's skill and reduce the chance of making mistakes.",
+  luck: "Increase your luck and improve the chance of a lucky event.",
 };
 
 const totalPoints = 40;
 
-const AttributesSelector: FC = () => {
+interface AttributesSelectorProps {
+  defaultAttributes: CarAttributes;
+}
+
+const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes }) => {
   const [attributes, setAttributes] = useState<CarAttributes>(defaultAttributes);
   const [remainingPoints, setRemainingPoints] = useState<number>(totalPoints);
+
+  useEffect(() => {
+    setAttributes(defaultAttributes);
+  }, [defaultAttributes]);
 
   // Update remaining points whenever attributes change
   useEffect(() => {
@@ -69,12 +78,16 @@ const AttributesSelector: FC = () => {
             <Box key={key}>
               <Stat>
                 <HStack>
+                  <CustomToolTip
+                    label={attributeLabels[key as keyof CarAttributes]}
+                    size="1.1rem"
+                  />
                   <StatLabel>{key.charAt(0).toUpperCase() + key.slice(1)}:</StatLabel>
                   <StatNumber fontSize="large">{value}</StatNumber>
                 </HStack>
               </Stat>
               <RangeSlider
-                defaultValue={[5]}
+                value={[value]}
                 min={1}
                 max={10}
                 onChangeEnd={(val) => handleAttributeChange(val[0], key as keyof CarAttributes)}

@@ -68,8 +68,6 @@ const WeatherDisplay: FC<{ weather: Weather }> = ({ weather }) => {
 const Weather: FC = () => {
   const { weather, isLoading, isError } = useWeather("Monaco");
 
-  console.log(weather);
-
   return (
     <CustomBox>
       <VStack alignItems="flex-start">

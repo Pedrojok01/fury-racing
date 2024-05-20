@@ -37,16 +37,17 @@ export const initializeTrack = (scene: Scene, track: TrackAnim, gridTileSize: nu
     xmax: gridWidth * gridTileSize,
     zmax: gridHeight * gridTileSize,
     subdivisions: { w: gridWidth, h: gridHeight },
+    precision: { w: 2, h: 2}
   });
 
   const materials = {
-    empty: createMaterial("empty", "assets/texture-grass.png", scene),
-    roadEn: createMaterial("roadEn", "assets/texture-road-en.png", scene),
-    roadEs: createMaterial("roadEs", "assets/texture-road-es.png", scene),
-    roadEw: createMaterial("roadEw", "assets/texture-road-ew.png", scene),
-    roadNs: createMaterial("roadNs", "assets/texture-road-ns.png", scene),
-    roadNw: createMaterial("roadNw", "assets/texture-road-nw.png", scene),
-    roadSw: createMaterial("roadSw", "assets/texture-road-sw.png", scene),
+    empty: createMaterial("empty", "assets/texture-grass-alt.svg", scene),
+    roadEn: createMaterial("roadEn", "assets/texture-road-en-alt.svg", scene),
+    roadEs: createMaterial("roadEs", "assets/texture-road-es-alt.svg", scene),
+    roadEw: createMaterial("roadEw", "assets/texture-road-ew-alt.svg", scene),
+    roadNs: createMaterial("roadNs", "assets/texture-road-ns-alt.svg", scene),
+    roadNw: createMaterial("roadNw", "assets/texture-road-nw-alt.svg", scene),
+    roadSw: createMaterial("roadSw", "assets/texture-road-sw-alt.svg", scene),
   };
 
   const multimat = new MultiMaterial("multi", scene);
@@ -91,4 +92,11 @@ export const initializeTrack = (scene: Scene, track: TrackAnim, gridTileSize: nu
       base += tileIndicesLength;
     }
   }
+
+  // Completion.
+  return {
+    'tiledGround': tiledGround,
+    'gridWidth': gridWidth,
+    'gridHeight': gridHeight
+  };
 };

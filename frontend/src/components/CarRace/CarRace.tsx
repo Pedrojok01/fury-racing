@@ -4,12 +4,14 @@ import {
   AbstractMesh,
   Color3,
   CubeTexture,
+  DirectionalLight,
   Engine,
   HemisphericLight,
   KeyboardEventTypes,
   ParticleSystem,
   Scene,
   SceneLoader,
+  ShadowGenerator,
   Texture,
   TransformNode,
   Vector3,
@@ -50,17 +52,30 @@ const CarRace: FC = () => {
     // Initialize the camera.
     const camera = initializeCamera(scene, track, gridTileSize);
 
-    // Initialize the light.
-    const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
-    light.intensity = 0.7;
-
     // Initialize the sky box.
     const skyTexture = new CubeTexture(`/assets/skybox_${skybox}/skybox`, scene);
     scene.createDefaultSkybox(skyTexture, true, 10000);
 
     // Initialize the track.
-    initializeTrack(scene, track, gridTileSize);
+    const trackInfo = initializeTrack(scene, track, gridTileSize);
 
+    // Initialize lighting.
+    const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
+    switch (skybox) {
+      default: light.intensity = 0.6; break;
+      case 'cloudy': light.intensity = 0.5; break;
+      case 'storm': light.intensity = 0.3; break;
+      case 'night': light.intensity = 0.1; break;
+    }
+
+    const lightForShadows = new DirectionalLight("dir01", new Vector3(-1, -2, -1), scene);
+	  lightForShadows.position = new Vector3(
+      (trackInfo['gridWidth'] * gridTileSize) / 2, 
+      40, // High in the sky.
+      (trackInfo['gridHeight'] * gridTileSize) / 2);
+
+	  lightForShadows.intensity = 0.3;
+    
     // Load and place the car model.
     const target = new TransformNode("target");
     const car = new TransformNode("car");
@@ -171,6 +186,12 @@ const CarRace: FC = () => {
             });
             break;
         }
+
+        // Initialize shadows.
+        const shadowGenerator = new ShadowGenerator(1024, lightForShadows);
+        container.meshes.forEach(mesh => shadowGenerator.addShadowCaster(mesh));
+        shadowGenerator.useExponentialShadowMap = true;        
+        trackInfo['tiledGround'].receiveShadows = true;
       },
     );
 

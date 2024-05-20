@@ -6,10 +6,12 @@ import { isMobile } from "react-device-detect";
 
 import { AttributesSelector, CarAnim, CustomBox, Track, Weather } from "@/components";
 import { images, tracks } from "@/data";
+import { useAnim } from "@/stores/useAnim";
 import { useGame } from "@/stores/useGame";
 
 const SelectionScreen: FC = () => {
   const { setScreen } = useGame();
+  const { carData } = useAnim();
 
   return (
     <Center h={"auto"} p={isMobile ? 0 : "2rem"}>
@@ -23,7 +25,7 @@ const SelectionScreen: FC = () => {
               <CarAnim />
             </VStack>
           </CustomBox>
-          <AttributesSelector />
+          <AttributesSelector defaultAttributes={carData.attributes} />
         </VStack>
 
         <VStack flex="1" minW={330}>

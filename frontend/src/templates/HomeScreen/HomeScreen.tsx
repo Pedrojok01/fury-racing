@@ -28,9 +28,9 @@ const HomeScreen: FC = () => {
         {isConnected && (
           <Link
             as={NextLink}
-            href="/selection"
+            href="/mode"
             style={{ textDecoration: "none" }}
-            onClick={() => setScreen("SELECTION")}
+            onClick={() => setScreen("MODE")}
           >
             <Button
               mt={"2rem"}

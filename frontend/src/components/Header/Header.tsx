@@ -24,9 +24,9 @@ const Header: FC = () => {
     <Center gap={3}>
       <Link
         as={NextLink}
-        href="/selection"
+        href="/mode"
         className={styles.menuItems}
-        onClick={() => setScreen("SELECTION")}
+        onClick={() => setScreen("MODE")}
       >
         <Box>New Game</Box>
       </Link>

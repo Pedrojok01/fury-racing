@@ -50,16 +50,16 @@ abstract contract MockChainlinkFeed is
     event RaceResultFulfilled(bytes32 indexed requestId, uint256[] values);
 
     // JavaScript source code to fetch race results
-    string public constant SOURCE_CODE = string(
+    string private constant SOURCE_CODE = string(
         abi.encodePacked(
             "const data = args[0];",
             "const raceResultRequest = Functions.makeHttpRequest({",
             "url: 'https://racerback.azurewebsites.net/api/races/data',",
             "method: 'POST',",
-            "data: { data: data }",
+            "data: { attributes: data }",
             "});",
             "const raceResultResponse = await raceResultRequest;",
-            "const raceResult = raceResultResponse.data.race_result;",
+            "const raceResult = raceResultResponse.data.result;",
             "return Functions.encodeUint256Array(raceResult);"
         )
     );

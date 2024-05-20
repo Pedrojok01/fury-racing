@@ -9,7 +9,7 @@ const submit = async (req, res, next) => {
         return next(new HttpError('Inavlid input passed. Please check and try again', 422));
     }
 
-    const { attributes } = req.body;
+    const { attributes } = req.params;
     const circuit = attributes.slice(0, 2);
     const weather = attributes.slice(2, 4);
     const player1Attributes = attributes.slice(4, 20);

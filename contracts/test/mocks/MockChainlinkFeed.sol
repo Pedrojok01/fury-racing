@@ -6,8 +6,8 @@ import { Script, console2 } from "forge-std/Script.sol";
 import "../../src/Errors.sol";
 import { IRacing } from "../../src/interface/IRacing.sol";
 
+import { FunctionsClient } from "@chainlink/v0.8/functions/v1_0_0/FunctionsClient.sol";
 import { FunctionsRequest } from "@chainlink/v0.8/functions/v1_0_0/libraries/FunctionsRequest.sol";
-import { FunctionsClient } from "@chainlink/v0.8/functions/v1_3_0/FunctionsClient.sol";
 
 import { ConfirmedOwner } from "@chainlink/v0.8/shared/access/ConfirmedOwner.sol";
 import { LinkTokenInterface } from "@chainlink/v0.8/shared/interfaces/LinkTokenInterface.sol";
@@ -15,6 +15,8 @@ import { VRFConsumerBaseV2Plus } from "@chainlink/v0.8/vrf/dev/VRFConsumerBaseV2
 import { IVRFCoordinatorV2Plus } from "@chainlink/v0.8/vrf/dev/interfaces/IVRFCoordinatorV2Plus.sol";
 import { VRFV2PlusClient } from "@chainlink/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
+
+import { FunctionsSource } from "../../src/FunctionsSource.sol";
 
 abstract contract MockChainlinkFeed is
     Script,
@@ -31,12 +33,13 @@ abstract contract MockChainlinkFeed is
     bytes32 public immutable KEY_HASH;
     uint256 public immutable VRF_SUBSCRIPTION_ID;
     uint16 public constant REQUEST_CONFIRMATIONS = 3;
-    uint32 public constant CALLBACK_GAS_LIMIT = 2_500_000;
+    uint32 private constant VRF_GAS_LIMIT = 2_500_000;
     uint32 public constant NUM_WORDS = 2;
 
     // Chainlink Functions parameters
     address public immutable ROUTER;
     uint64 public immutable FUNCTIONS_SUBSCRIPTION_ID;
+    uint32 private constant FUNCTIONS_GAS_LIMIT = 300_000;
     bytes32 public immutable DON_ID;
 
     mapping(uint256 => RandomRequests) public requestIdToRandomRequests;
@@ -48,21 +51,6 @@ abstract contract MockChainlinkFeed is
     event RequestedRandomness(uint256 requestId, uint32 numWords);
     event RandomnessReceived(uint256 requestId, uint256[] randomWords);
     event RaceResultFulfilled(bytes32 indexed requestId, uint256[] values);
-
-    // JavaScript source code to fetch race results
-    string private constant SOURCE_CODE = string(
-        abi.encodePacked(
-            "const data = args[0];",
-            "const raceResultRequest = Functions.makeHttpRequest({",
-            "url: 'https://racerback.azurewebsites.net/api/races/data',",
-            "method: 'POST',",
-            "data: { attributes: data }",
-            "});",
-            "const raceResultResponse = await raceResultRequest;",
-            "const raceResult = raceResultResponse.data.result;",
-            "return Functions.encodeUint256Array(raceResult);"
-        )
-    );
 
     constructor(
         address _router,
@@ -100,7 +88,7 @@ abstract contract MockChainlinkFeed is
                 keyHash: KEY_HASH,
                 subId: VRF_SUBSCRIPTION_ID,
                 requestConfirmations: REQUEST_CONFIRMATIONS,
-                callbackGasLimit: CALLBACK_GAS_LIMIT,
+                callbackGasLimit: VRF_GAS_LIMIT,
                 numWords: NUM_WORDS,
                 extraArgs: VRFV2PlusClient._argsToBytes(
                     VRFV2PlusClient.ExtraArgsV1({ nativePayment: false })
@@ -168,15 +156,16 @@ abstract contract MockChainlinkFeed is
 
         requestIdToRaceMode[_requestId] = mode;
         requestIdToRaceId[_requestId] = raceId;
+
+        return _requestId;
     }
 
-    /// @notice Added for testing purposes
-    function fulfillRequest(bytes32 requestId, bytes memory response, bytes memory err) public {
-        _fulfillRequest(requestId, response, err);
+    function _fulfillRequest(bytes32 requestId, bytes memory response, bytes memory err) public {
+        fulfillRequest(requestId, response, err);
     }
 
     /// @notice Receives race result.
-    function _fulfillRequest(
+    function fulfillRequest(
         bytes32 requestId,
         bytes memory response,
         bytes memory
@@ -202,26 +191,6 @@ abstract contract MockChainlinkFeed is
     /*//////////////////////////////////////////////////////////////
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
-
-    function initializeRequest(
-        uint256 circuit,
-        uint256 weather,
-        PlayerAttributes[] memory attributes
-    )
-        public
-        pure
-        returns (FunctionsRequest.Request memory req)
-    {
-        req.initializeRequest(
-            FunctionsRequest.Location.Inline, FunctionsRequest.CodeLanguage.JavaScript, SOURCE_CODE
-        );
-
-        string[] memory args = new string[](1);
-        args[0] = formatFunctionsArgs(circuit, weather, attributes);
-
-        req.setArgs(args);
-        return req;
-    }
 
     function formatFunctionsArgs(
         uint256 circuit,

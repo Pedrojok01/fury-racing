@@ -38,7 +38,7 @@ contract RacingTest is BaseTestSetup {
         uint256[] memory raceResults1 = new uint256[](2);
         raceResults1[0] = 100; // Player 1's time
         raceResults1[1] = 200; // Player 2's time
-        racing.fulfillRequest(functionsRequestId1, abi.encode(raceResults1), "");
+        racing._fulfillRequest(functionsRequestId1, abi.encode(raceResults1), "");
 
         verifyRaceState(requestId, RaceMode.TOURNAMENT, 100, 200);
         verifyELOScores(1203, 1201);
@@ -84,7 +84,7 @@ contract RacingTest is BaseTestSetup {
         uint256[] memory raceResults2 = new uint256[](2);
         raceResults2[0] = 200; // Player 1's time
         raceResults2[1] = 100; // Player 2's time
-        racing.fulfillRequest(functionsRequestId2, abi.encode(raceResults2), "");
+        racing._fulfillRequest(functionsRequestId2, abi.encode(raceResults2), "");
 
         verifyRaceState(requestId, RaceMode.TOURNAMENT, 200, 100);
         verifyELOScores(1201, 1203);

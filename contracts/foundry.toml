@@ -2,19 +2,16 @@
 src = "src"
 out = "out"
 libs = ["lib"]
+optimizer = true
+optimizer_runs = 1_000
 solc = "0.8.24"
 remappings = [
     "@openzeppelin/contracts=lib/openzeppelin-contracts/contracts",
     "@chainlink=lib/chainlink/contracts/src"
 ]
-# fs_permissions = [
-#     { access = "read", path = "./broadcast" },
-#     { access = "read", path = "./reports" },
-# ]
-
 
 [fuzz]
-runs = 1000
+runs = 100000
 max_test_rejects = 65536
 seed = '0x1'
 dictionary_weight = 40
@@ -38,22 +35,13 @@ tab_width = 4
 wrap_comments = true
 sort_imports = true
 
-[etherscan]
-# zksync = no keey needed for zksync
-arbitrum = { key = "${API_KEY_ARBISCAN}" }
-avalanche = { key = "${API_KEY_SNOWTRACE}" }
-bnb_smart_chain = { key = "${API_KEY_BSCSCAN}" }
-gnosis_chain = { key = "${API_KEY_GNOSISSCAN}" }
-goerli = { key = "${API_KEY_ETHERSCAN}" }
-mainnet = { key = "${API_KEY_ETHERSCAN}" }
-optimism = { key = "${API_KEY_OPTIMISTIC_ETHERSCAN}" }
-polygon = { key = "${API_KEY_POLYGONSCAN}" }
-sepolia = { key = "${API_KEY_ETHERSCAN}" }
-
-
 [rpc_endpoints]
-# example:
-# zksync = "https://mainnet.era.zksync.io"
+avalanche = "${AVALANCHE_RPC_URL}"
+avalanche_fuji = "${AVALANCHE_FUJI_RPC_URL}"
+
+[etherscan]
+avalanche = { key = "verifyContract" }
+avalanche_fuji = { key = "verifyContract" }
 
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

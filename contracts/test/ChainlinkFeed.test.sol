@@ -149,7 +149,7 @@ contract ChainlinkFeedTest is BaseTestSetup {
         raceResults[1] = 200;
 
         // Fulfill the request
-        racing.fulfillRequest(requestId, abi.encode(raceResults), "");
+        racing._fulfillRequest(requestId, abi.encode(raceResults), "");
 
         // Verify the function behavior
         FunctionsRequests memory request = racing.getFunctionsRequestFromID(requestId);

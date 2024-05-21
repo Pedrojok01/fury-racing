@@ -1,6 +1,6 @@
 -include .env
 
-.PHONY: all test clean deploy fund help install snapshot format anvil scopefile
+.PHONY: all test clean deploy fund help install snapshot format anvil slither aderyn
 
 DEFAULT_ANVIL_KEY := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
@@ -33,6 +33,10 @@ slither :; slither . --config-file slither.config.json --checklist
 
 aderyn :; aderyn .
 
-scopefile :; @tree ./src/ | sed 's/└/#/g' | awk -F '── ' '!/\.sol$$/ { path[int((length($$0) - length($$2))/2)] = $$2; next } { p = "src"; for(i=2; i<=int((length($$0) - length($$2))/2); i++) if (path[i] != "") p = p "/" path[i]; print p "/" $$2; }' > scope.txt
+deploy :; forge script script/Deployer.s.sol --broadcast --rpc-url avalanche --verifier-url 'https://api.routescan.io/v2/network/mainnet/evm/43114/etherscan' --etherscan-api-key 'verifyContract'
 
-scope :; tree ./src/ | sed 's/└/#/g; s/──/--/g; s/├/#/g; s/│ /|/g; s/│/|/g'
+deployTest :; forge script script/DeployerTestnet.s.sol --broadcast --rpc-url avalanche_fuji --verifier-url 'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan' --etherscan-api-key 'verifyContract'
+
+simulate :; forge script script/DeployerTestnet.s.sol --rpc-url avalanche_fuji
+
+deploySimple :; forge script script/DeployerSimple.s.sol --broadcast --rpc-url avalanche_fuji

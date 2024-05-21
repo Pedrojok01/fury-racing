@@ -15,7 +15,9 @@ contract DeployerTest is Script {
     bytes32 immutable DON_ID = "fun-avalanche-fuji-1"; // AVAX FUJI
 
     function run() public {
-        vm.startBroadcast();
+        uint256 deployer = vm.envUint("PRIVATE_KEY");
+
+        vm.startBroadcast(deployer);
 
         // Deploy Racing:
         Racing racing = new Racing(

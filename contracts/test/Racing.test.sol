@@ -47,7 +47,7 @@ contract RacingTest is BaseTestSetup {
         uint256[] memory raceResults1 = new uint256[](2);
         raceResults1[0] = 100; // Player 1's time
         raceResults1[1] = 200; // Player 2's time
-        racing.fulfillRequest(functionsRequestId1, abi.encode(raceResults1), "");
+        racing._fulfillRequest(functionsRequestId1, abi.encode(raceResults1), "");
 
         verifyRaceState(requestId, RaceMode.SOLO, 100, 200);
         verifyELOScores(1200, 0); // no ELO attribution, only 1 player
@@ -68,7 +68,7 @@ contract RacingTest is BaseTestSetup {
         uint256[] memory raceResults2 = new uint256[](2);
         raceResults2[0] = 200; // Player 1's time
         raceResults2[1] = 100; // Player 2's time
-        racing.fulfillRequest(functionsRequestId2, abi.encode(raceResults2), "");
+        racing._fulfillRequest(functionsRequestId2, abi.encode(raceResults2), "");
 
         verifyRaceState(requestId, RaceMode.SOLO, 200, 100);
 
@@ -88,7 +88,7 @@ contract RacingTest is BaseTestSetup {
         uint256[] memory raceResults3 = new uint256[](2);
         raceResults3[0] = 150; // Player 1's time
         raceResults3[1] = 100; // Player 2's time
-        racing.fulfillRequest(functionsRequestId3, abi.encode(raceResults3), "");
+        racing._fulfillRequest(functionsRequestId3, abi.encode(raceResults3), "");
 
         verifyRaceState(requestId, RaceMode.SOLO, 150, 100);
         assertEq(racing.currentPrizePool(), 0);
@@ -118,7 +118,7 @@ contract RacingTest is BaseTestSetup {
         uint256[] memory raceResults = new uint256[](2);
         raceResults[0] = 100; // Player 1's time
         raceResults[1] = 200; // Player 2's time
-        racing.fulfillRequest(functionsRequestId, abi.encode(raceResults), "");
+        racing._fulfillRequest(functionsRequestId, abi.encode(raceResults), "");
 
         // Verify race state
         Race memory race = racing.getFreeRaceFromRaceID(1);
@@ -147,7 +147,7 @@ contract RacingTest is BaseTestSetup {
         uint256[] memory raceResults1 = new uint256[](2);
         raceResults1[0] = 100; // Player 1's time
         raceResults1[1] = 200; // Player 2's time
-        racing.fulfillRequest(functionsRequestId1, abi.encode(raceResults1), "");
+        racing._fulfillRequest(functionsRequestId1, abi.encode(raceResults1), "");
 
         verifyRaceState(requestId, RaceMode.FREE, 100, 200);
         verifyELOScores(1200, 1200); // no ELO attribution
@@ -171,7 +171,7 @@ contract RacingTest is BaseTestSetup {
         uint256[] memory raceResults2 = new uint256[](2);
         raceResults2[0] = 200; // Player 1's time
         raceResults2[1] = 100; // Player 2's time
-        racing.fulfillRequest(functionsRequestId2, abi.encode(raceResults2), "");
+        racing._fulfillRequest(functionsRequestId2, abi.encode(raceResults2), "");
 
         verifyRaceState(requestId, RaceMode.FREE, 200, 100);
 
@@ -194,7 +194,7 @@ contract RacingTest is BaseTestSetup {
         uint256[] memory raceResults3 = new uint256[](2);
         raceResults3[0] = 150; // Player 1's time
         raceResults3[1] = 100; // Player 2's time
-        racing.fulfillRequest(functionsRequestId3, abi.encode(raceResults3), "");
+        racing._fulfillRequest(functionsRequestId3, abi.encode(raceResults3), "");
 
         verifyRaceState(requestId, RaceMode.FREE, 150, 100);
         assertEq(racing.currentPrizePool(), 0);
@@ -229,7 +229,7 @@ contract RacingTest is BaseTestSetup {
         raceResults[0] = 100; // Player 1's time
         raceResults[1] = 200; // Player 2's time
         uint256 player1InitialBalance = player1.balance;
-        racing.fulfillRequest(functionsRequestId, abi.encode(raceResults), "");
+        racing._fulfillRequest(functionsRequestId, abi.encode(raceResults), "");
 
         // Verify race state
         Race memory race = racing.getRaceFromRaceID(1);
@@ -275,7 +275,7 @@ contract RacingTest is BaseTestSetup {
         uint256[] memory raceResults1 = new uint256[](2);
         raceResults1[0] = 100; // Player 1's time
         raceResults1[1] = 200; // Player 2's time
-        racing.fulfillRequest(functionsRequestId1, abi.encode(raceResults1), "");
+        racing._fulfillRequest(functionsRequestId1, abi.encode(raceResults1), "");
 
         verifyRaceState(requestId, RaceMode.TOURNAMENT, 100, 200);
         verifyELOScores(1203, 1201); // Winner +3, loser +1
@@ -308,7 +308,7 @@ contract RacingTest is BaseTestSetup {
         uint256[] memory raceResults2 = new uint256[](2);
         raceResults2[0] = 200; // Player 1's time
         raceResults2[1] = 100; // Player 2's time
-        racing.fulfillRequest(functionsRequestId2, abi.encode(raceResults2), "");
+        racing._fulfillRequest(functionsRequestId2, abi.encode(raceResults2), "");
 
         verifyRaceState(requestId, RaceMode.TOURNAMENT, 200, 100);
         verifyELOScores(1204, 1204); // Winner +3, loser +1
@@ -341,7 +341,7 @@ contract RacingTest is BaseTestSetup {
         uint256[] memory raceResults3 = new uint256[](2);
         raceResults3[0] = 150; // Player 1's time
         raceResults3[1] = 100; // Player 2's time
-        racing.fulfillRequest(functionsRequestId3, abi.encode(raceResults3), "");
+        racing._fulfillRequest(functionsRequestId3, abi.encode(raceResults3), "");
 
         verifyRaceState(requestId, RaceMode.TOURNAMENT, 150, 100);
         verifyELOScores(1205, 1207); // Winner +3, loser +1

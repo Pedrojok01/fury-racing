@@ -11,7 +11,7 @@ contract DeployerTest is Script {
         4734827867964001365405830055140988844088387107361042566903892685164165989088; // TODO: Fill this
         // in
     uint64 immutable FUNCTIONS_SUBSCRIPTION_ID = 8170; // TODO: Fill this in
-    bytes32 immutable KEY_HASH = 0xea7f56be19583eeb8255aa79f16d8bd8a64cedf68e42fefee1c9ac5372b1a102; // AVAX
+    bytes32 immutable KEY_HASH = 0x84213dcadf1f89e4097eb654e3f284d7d5d5bda2bd4748d8b7fada5b3a6eaa0d; // AVAX
         // MAINNET
     bytes32 immutable DON_ID = "fun-avalanche-mainnet-1"; // AVAX MAINNET
 

@@ -13,7 +13,7 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.s
  * @author @Pedrojok01
  */
 contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
-    address constant AI_PLAYER_ADDRESS = 0x00000000000000000000000000000000000000A1;
+    address private constant AI_PLAYER_ADDRESS = 0x00000000000000000000000000000000000000A1;
     uint256 private constant TOURNAMENT_DURATION = 1 weeks;
     uint256 private constant START_ELO = 1200;
     uint256 private constant MAX_BET_PLAYERS = 200;
@@ -25,7 +25,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     uint256 public tournamentPlayersCounter;
     uint256 public weeklyTournamentCounter = 1;
 
-    mapping(uint256 => Race) public soloRaces;
+    mapping(uint256 => Race) private soloRaces;
     mapping(uint256 => Race) private freeRaces;
     mapping(uint256 => Race) private races;
     uint256 public soloRaceCounter = 1;
@@ -36,8 +36,8 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     mapping(address => Player) public addressToPlayer;
 
     // Additonal mapping related to weekly tournament
-    mapping(uint256 => mapping(uint256 => address)) public weeklyBetPlayerIndex;
-    mapping(uint256 => mapping(address => uint256)) public weeklyBetPlayerAddressToIndex;
+    mapping(uint256 => mapping(uint256 => address)) private weeklyBetPlayerIndex;
+    mapping(uint256 => mapping(address => uint256)) private weeklyBetPlayerAddressToIndex;
     Circuits[] public circuits;
 
     /*//////////////////////////////////////////////////////////////
@@ -365,7 +365,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Create a racing player with the given attributes.
-    function _updateRace(uint256 _circuitId, RaceMode _mode) public returns (bool _ongoing) {
+    function _updateRace(uint256 _circuitId, RaceMode _mode) private returns (bool _ongoing) {
         if (_mode == RaceMode.FREE) {
             if (freeRaces[freeRaceCounter].state == RaceState.NON_EXISTENT) {
                 // Create a free new race
@@ -397,7 +397,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         uint256 _circuitId,
         RaceMode _mode
     )
-        internal
+        private
         view
         returns (Race memory)
     {

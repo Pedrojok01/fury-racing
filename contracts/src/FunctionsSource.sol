@@ -6,8 +6,8 @@ library FunctionsSource {
         return (
             "const attributes = args[0].toString();"
             "const raceResultRequest = await Functions.makeHttpRequest({"
-            "  url: `https://racerback.azurewebsites.net/api/races/data/${attributes}`,"
-            "});" "if (raceResultRequest.error) {" "  throw new Error('Request failed');" "}"
+            "  url: `https://racerback.azurewebsites.net/api/races/data/${attributes}`," "});"
+            "if (raceResultRequest.error) {" "  throw new Error('Request failed');" "}"
             "const combinedResult = BigInt(raceResultRequest.data.combinedResult);"
             "return Functions.encodeUint256(combinedResult);"
         );

@@ -38,5 +38,3 @@ deploy :; forge script script/Deployer.s.sol --broadcast --rpc-url avalanche --v
 deployTest :; forge script script/DeployerTestnet.s.sol --broadcast --rpc-url avalanche_fuji --verifier-url 'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan' --etherscan-api-key 'verifyContract'
 
 simulate :; forge script script/DeployerTestnet.s.sol --rpc-url avalanche_fuji
-
-deploySimple :; forge script script/DeployerSimple.s.sol --broadcast --rpc-url avalanche_fuji

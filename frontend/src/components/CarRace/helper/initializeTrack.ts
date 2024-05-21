@@ -37,7 +37,7 @@ export const initializeTrack = (scene: Scene, track: TrackAnim, gridTileSize: nu
     xmax: gridWidth * gridTileSize,
     zmax: gridHeight * gridTileSize,
     subdivisions: { w: gridWidth, h: gridHeight },
-    precision: { w: 2, h: 2}
+    precision: { w: 2, h: 2 },
   });
 
   const materials = {
@@ -95,8 +95,8 @@ export const initializeTrack = (scene: Scene, track: TrackAnim, gridTileSize: nu
 
   // Completion.
   return {
-    'tiledGround': tiledGround,
-    'gridWidth': gridWidth,
-    'gridHeight': gridHeight
+    tiledGround: tiledGround,
+    gridWidth: gridWidth,
+    gridHeight: gridHeight,
   };
 };

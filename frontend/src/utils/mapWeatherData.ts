@@ -26,9 +26,7 @@ export function mapWeatherData(weatherData: Weather): { weatherFx: WeatherFx; sk
     skybox = "night";
   } else if (conditionText.includes("storm") || conditionText.includes("thunder")) {
     skybox = "storm";
-  } else if (cloudCoverage > 80) {
-    skybox = "cloudy";
-  } else if (cloudCoverage > 20) {
+  } else if (cloudCoverage > 50) {
     skybox = "cloudy";
   } else {
     skybox = "sunny";

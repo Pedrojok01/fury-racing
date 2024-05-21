@@ -6,12 +6,14 @@ import { isMobile } from "react-device-detect";
 
 import { AttributesSelector, CarAnim, CustomBox, Track, Weather } from "@/components";
 import { images, tracks } from "@/data";
+import { useWriteContract } from "@/hooks";
 import { useAnim } from "@/stores/useAnim";
 import { useGame } from "@/stores/useGame";
 
 const SelectionScreen: FC = () => {
   const { setScreen } = useGame();
   const { carData } = useAnim();
+  const { joinSoloRace } = useWriteContract();
 
   return (
     <Center h={"auto"} p={isMobile ? 0 : "2rem"}>
@@ -49,6 +51,7 @@ const SelectionScreen: FC = () => {
               Go
             </Button>
           </Link>
+          <Button onClick={joinSoloRace}>TEST</Button>
         </VStack>
       </Wrap>
     </Center>

@@ -158,6 +158,16 @@ export const RACING_ABI = [
   },
   {
     type: "function",
+    name: "getPlayerAddressForWeeklyTournament",
+    inputs: [
+      { name: "week", type: "uint256", internalType: "uint256" },
+      { name: "index", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [{ name: "", type: "address", internalType: "address" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "getRaceFromRaceID",
     inputs: [{ name: "raceId", type: "uint256", internalType: "uint256" }],
     outputs: [
@@ -215,6 +225,16 @@ export const RACING_ABI = [
           { name: "player2Time", type: "uint40", internalType: "uint40" },
         ],
       },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getWeekAndPlayerAmount",
+    inputs: [],
+    outputs: [
+      { name: "", type: "uint256", internalType: "uint256" },
+      { name: "", type: "uint256", internalType: "uint256" },
     ],
     stateMutability: "view",
   },
@@ -441,8 +461,9 @@ export const RACING_ABI = [
     type: "event",
     name: "FinishedRace",
     inputs: [
-      { name: "raceId", type: "uint256", indexed: false, internalType: "uint256" },
+      { name: "raceId", type: "uint256", indexed: true, internalType: "uint256" },
       { name: "winner", type: "address", indexed: false, internalType: "address" },
+      { name: "loser", type: "address", indexed: false, internalType: "address" },
     ],
     anonymous: false,
   },

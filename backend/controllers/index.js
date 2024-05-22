@@ -51,7 +51,13 @@ const getScores = () => {
     config.AVALANCHE_NODE
   );
   const contractAddress = config.CONTRACT_ADDRESS;
-  const abi = 
+  const contractABI = config.ABI;
+
+  const contract = new Contract(contractAddress, contractABI);
+
+  const call1 = contract.function1();
+  const call2 = contract.function2();
+  const call3 = contract.function3();
 }
 
 module.exports = { submit };

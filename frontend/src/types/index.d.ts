@@ -1,5 +1,3 @@
-type CurrentScreen = "HOME" | "MODE" | "SELECTION" | "RACE" | "ENDED" | "LEADERBOARD";
-
 type WeatherFx = "none" | "fog" | "rain";
 type Sky = "sunny" | "cloudy" | "storm" | "night";
 
@@ -113,3 +111,21 @@ type FetchError = {
 };
 
 type RaceMode = "SOLO" | "FREE" | "TOURNAMENT";
+
+type EventData = {
+  raceId: bigint;
+  winner: `0x${string}`;
+  loser: `0x${string}`;
+};
+
+type RaceState = "WAITING" | "ONGOING" | "FINISHED";
+
+type RaceInfo = {
+  circuit: bigint;
+  mode: RaceMode;
+  state: RaceState;
+  player1: `0x${string}`;
+  player2: `0x${string}`;
+  player1Time: number;
+  player2Time: number;
+};

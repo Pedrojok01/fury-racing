@@ -1,19 +1,28 @@
 import { type FC } from "react";
 
-import { Button, Center, VStack, Link, Wrap, Text } from "@chakra-ui/react";
-import NextLink from "next/link";
+import { Button, Center, VStack, Wrap, Text } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
 import { isMobile } from "react-device-detect";
 
 import { AttributesSelector, CarAnim, CustomBox, Track, Weather } from "@/components";
 import { images, tracks } from "@/data";
 import { useWriteContract } from "@/hooks";
 import { useAnim } from "@/stores/useAnim";
-import { useGame } from "@/stores/useGame";
+import { useContract } from "@/stores/useContract";
 
 const SelectionScreen: FC = () => {
-  const { setScreen } = useGame();
   const { carData } = useAnim();
   const { joinSoloRace } = useWriteContract();
+  const { loading } = useContract();
+  const router = useRouter();
+
+  const handleRaceStart = async () => {
+    const res = await joinSoloRace();
+
+    if (res.success) {
+      router.push("/race");
+    }
+  };
 
   return (
     <Center h={"auto"} p={isMobile ? 0 : "2rem"}>
@@ -34,24 +43,18 @@ const SelectionScreen: FC = () => {
           <Weather />
           <Track map={images.track} data={tracks[0]} />
 
-          <Link
-            as={NextLink}
-            href="/race"
-            style={{ textDecoration: "none" }}
-            onClick={() => setScreen("RACE")}
+          <Button
+            mt={"2rem"}
+            paddingBlock={"2.5rem"}
+            paddingInline={"5rem"}
+            fontSize={"2rem"}
+            fontWeight={"bold"}
+            className="custom-button"
+            isLoading={loading}
+            onClick={handleRaceStart}
           >
-            <Button
-              mt={"2rem"}
-              paddingBlock={"2.5rem"}
-              paddingInline={"5rem"}
-              fontSize={"2rem"}
-              fontWeight={"bold"}
-              className="custom-button"
-            >
-              Go
-            </Button>
-          </Link>
-          <Button onClick={joinSoloRace}>TEST</Button>
+            Go
+          </Button>
         </VStack>
       </Wrap>
     </Center>

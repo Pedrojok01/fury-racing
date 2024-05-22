@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { getContract } from "viem";
-import { useWalletClient } from "wagmi";
+import { usePublicClient, useWalletClient, useWatchContractEvent } from "wagmi";
 
 import { RACING_CONTRACT } from "@/data";
 import { useAnim } from "@/stores/useAnim";
@@ -10,16 +10,16 @@ import { logError } from "@/utils/errorUtil";
 import { generateRandomAttributes } from "@/utils/generateCarAttributes";
 
 import { useNotify } from ".";
-import useTransactionReceipt from "./useTransactionReceipt";
 
 export const useWriteContract = () => {
-  const { notifyError } = useNotify();
+  const publicClient = usePublicClient();
   const client = useWalletClient()?.data;
-  const { awaitTransactionReceipt } = useTransactionReceipt();
-  const { setLoading } = useContract();
+  const { setLoading, setTransactionHash } = useContract();
   const { carData } = useAnim();
+  const { notifyError } = useNotify();
+  const { setRaceId } = useContract();
 
-  const rancingInstance = useMemo(
+  const racingInstance = useMemo(
     () =>
       client
         ? getContract({ address: RACING_CONTRACT.address, abi: RACING_CONTRACT.ABI, client })
@@ -27,26 +27,70 @@ export const useWriteContract = () => {
     [client],
   );
 
+  // useWatchContractEvent({
+  //   address: RACING_CONTRACT.address,
+  //   abi: RACING_CONTRACT.ABI,
+  //   eventName: "FinishedRace",
+  //   onLogs(logs) {
+  //     console.log("FinishedRace!", logs);
+  //     if (logs.length > 0) {
+  //       const event = logs[0];
+  //       console.log("Event:", event);
+  //       // const args = event.args as EventData;
+  //       setEventData(event);
+  //     }
+  //   },
+  // });
+
+  useWatchContractEvent({
+    address: RACING_CONTRACT.address,
+    abi: RACING_CONTRACT.ABI,
+    eventName: "RandomnessReceived",
+    onLogs(logs) {
+      console.log("RandomnessReceived!", logs);
+    },
+  });
+
   /* Join Solo Race:
    ******************/
-
-  const joinSoloRace = async (): Promise<void> => {
-    if (!rancingInstance?.write.joinSoloRace) return;
+  const joinSoloRace = async (): Promise<any> => {
+    if (!racingInstance?.write.joinSoloRace || !publicClient) return;
 
     setLoading(true);
     try {
-      const hash: `0x${string}` = await rancingInstance.write.joinSoloRace([
+      const raceId = (await racingInstance.read.soloRaceCounter()) as bigint;
+      setRaceId(raceId);
+
+      // Simulate transaction
+      await publicClient.simulateContract({
+        address: RACING_CONTRACT.address,
+        abi: RACING_CONTRACT.ABI,
+        functionName: "joinSoloRace",
+        args: [carData.attributes, generateRandomAttributes(), 1],
+      });
+
+      // Run transaction
+      const hash: `0x${string}` = await racingInstance.write.joinSoloRace([
         carData.attributes,
         generateRandomAttributes(),
         1,
       ]);
-      await awaitTransactionReceipt({ hash });
+
+      setTransactionHash(hash);
+
+      const receipt = await publicClient.waitForTransactionReceipt({
+        confirmations: 1,
+        hash,
+        retryCount: 2,
+      });
+
+      return { success: true, data: receipt, error: null };
     } catch (error: unknown) {
+      const msg = logError(error);
       notifyError({
         title: "An error occured.",
-        message: `Something went wrong while launching the solo race. Please, try again later.`,
+        message: `Something went wrong while launching the solo race: ${msg}`,
       });
-      logError(error);
     } finally {
       setLoading(false);
     }

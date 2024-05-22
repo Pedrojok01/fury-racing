@@ -5,14 +5,19 @@ import Image from "next/image";
 import NextLink from "next/link";
 import { useAccount } from "wagmi";
 
+import { SoundManager } from "@/components";
 import { images } from "@/data/images";
-import { useGame } from "@/stores/useGame";
+import { useAudio } from "@/stores/useAudio";
 
 import styles from "./home.module.css";
 
 const HomeScreen: FC = () => {
   const { isConnected } = useAccount();
-  const { setScreen } = useGame();
+  const { setAudio } = useAudio();
+
+  const handlePlayClick = () => {
+    setAudio(true);
+  };
 
   return (
     <Center h={"100%"} className={styles.container} gap={5}>
@@ -26,12 +31,7 @@ const HomeScreen: FC = () => {
         </Text>
 
         {isConnected && (
-          <Link
-            as={NextLink}
-            href="/mode"
-            style={{ textDecoration: "none" }}
-            onClick={() => setScreen("MODE")}
-          >
+          <Link as={NextLink} href="/mode" style={{ textDecoration: "none" }}>
             <Button
               mt={"2rem"}
               paddingBlock={"2.5rem"}
@@ -39,6 +39,7 @@ const HomeScreen: FC = () => {
               fontSize={"2rem"}
               fontWeight={"bold"}
               className="custom-button"
+              onClick={handlePlayClick}
             >
               Play
             </Button>
@@ -49,6 +50,7 @@ const HomeScreen: FC = () => {
       <Box className={styles.subContainer}>
         <Image src={images.homeCar.src} alt="car background" width={600} height={700} />
       </Box>
+      <SoundManager />
     </Center>
   );
 };

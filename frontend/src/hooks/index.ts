@@ -7,4 +7,3 @@ export * from "./useLeaderboard";
 export * from "./useWeather";
 export * from "./useReadContract";
 export * from "./useWriteContract";
-export * from "./useTransactionReceipt";

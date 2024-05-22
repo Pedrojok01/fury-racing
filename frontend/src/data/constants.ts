@@ -1,3 +1,5 @@
+import type { Abi } from "viem";
+
 import { RACING_ABI } from "./abi";
 
 export const TITLE = "Fury Racing";
@@ -14,6 +16,6 @@ export const LINK_TOKEN = {
 };
 
 export const RACING_CONTRACT = {
-  address: "0xa649ECe2e669e4A38E8384a3BD6Ed87BD24287aD" as `0x${string}`,
-  ABI: RACING_ABI,
+  address: "0xa1940Ac51C7bF051dD63edC1Fcb01c05a1E65c5A" as `0x${string}`,
+  ABI: RACING_ABI as Abi,
 };

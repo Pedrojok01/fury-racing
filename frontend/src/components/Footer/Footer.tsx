@@ -2,6 +2,7 @@
 import { type FC } from "react";
 
 import { Flex, HStack, Text } from "@chakra-ui/react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { GITHUB_REPO } from "@/data/constants";
@@ -24,7 +25,7 @@ const Footer: FC = () => {
 
         <Link href="https://chain.link/" target="_blank" rel="noopener noreferrer">
           <HStack>
-            <img src={images.chainlinkLogo.src} alt="logo" width={25} height={25} />
+            <Image src={images.chainlinkLogo.src} alt="logo" width={25} height={25} />
             <Text fontWeight={800}>Chainlink</Text>
           </HStack>
         </Link>
@@ -32,7 +33,7 @@ const Footer: FC = () => {
         <Text> and </Text>
         <Link href="https://www.avax.network/" target="_blank" rel="noopener noreferrer">
           <HStack>
-            <img src={images.avaxLogo.src} alt="logo" width={25} height={25} />
+            <Image src={images.avaxLogo.src} alt="logo" width={25} height={25} />
             <Text fontWeight={800}>Avalanche</Text>
           </HStack>
         </Link>

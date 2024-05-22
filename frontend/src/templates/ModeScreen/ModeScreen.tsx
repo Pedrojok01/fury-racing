@@ -4,8 +4,7 @@ import { Button, Center, Flex, HStack, Link, Text, VStack } from "@chakra-ui/rea
 import NextLink from "next/link";
 import { formatEther } from "viem";
 
-import { CustomBox } from "@/components";
-import { CustomToolTip } from "@/components/CustomToolTip";
+import { CustomBox, CustomToolTip } from "@/components";
 import { useReadContract } from "@/hooks";
 import { useContract } from "@/stores/useContract";
 import { useGame } from "@/stores/useGame";
@@ -51,11 +50,11 @@ const ModeScreen: FC = () => {
           <Center flexDirection={"column"}>
             <Flex w={"50%"} justifyContent="space-between" minW={280}>
               <Text>Current bet amount:</Text>{" "}
-              <Text fontWeight={700}>{formatEther(betAmount)} AVAX</Text>
+              <Text fontWeight={700}>{formatEther(betAmount) ?? " loading..."} AVAX</Text>
             </Flex>
             <Flex w={"50%"} justifyContent="space-between" minW={280}>
               <Text>Current prize pool: </Text>{" "}
-              <Text fontWeight={700}>{formatEther(prizePool)} AVAX</Text>
+              <Text fontWeight={700}>{formatEther(prizePool) ?? " loading..."} AVAX</Text>
             </Flex>
           </Center>
         </CustomBox>
@@ -73,10 +72,9 @@ interface ButtonModeProps {
 }
 
 const ButtonMode: FC<ButtonModeProps> = ({ text, label, mode }) => {
-  const { setScreen, setRaceMode } = useGame();
+  const { setRaceMode } = useGame();
 
   const handleClick = () => {
-    setScreen("SELECTION");
     setRaceMode(mode);
   };
 

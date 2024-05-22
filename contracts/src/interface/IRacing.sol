@@ -140,5 +140,5 @@ interface IRacing {
     event SoloRaceStarted(address indexed player, uint256 raceId);
     event FreeRaceStarted(uint256 raceId);
     event RaceStarted(uint256 raceId);
-    event FinishedRace(uint256 raceId, address winner);
+    event FinishedRace(uint256 indexed raceId, address winner, address loser);
 }

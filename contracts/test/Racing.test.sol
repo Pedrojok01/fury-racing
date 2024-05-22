@@ -30,6 +30,49 @@ contract RacingTest is BaseTestSetup {
         vm.stopPrank();
     }
 
+    function testGetWeekAndPlayerAmount() public {
+        (uint256 week, uint256 playerAmount) = racing.getWeekAndPlayerAmount();
+        assertEq(week, 1); // Assuming the initial value of weeklyTournamentCounter is 1
+        assertEq(playerAmount, 0); // Assuming the initial value of tournamentPlayersCounter is 0
+
+        // Simulate adding players to the tournament
+        vm.prank(player1);
+        racing.joinRace{ value: 0.1 ether }(attributes1, circuitId);
+
+        vm.prank(player2);
+        racing.joinRace{ value: 0.1 ether }(attributes2, circuitId);
+
+        // Check the values after adding players
+        (week, playerAmount) = racing.getWeekAndPlayerAmount();
+        assertEq(week, 1); // Weekly tournament counter should remain the same
+        assertEq(playerAmount, 2); // Two players have joined
+
+        // Move forward in time by one week and trigger prize pool distribution
+        vm.warp(block.timestamp + 1 weeks + 1000);
+        vm.prank(owner);
+        racing.updateWeatherDataForCircuit(1, 75);
+
+        // Check the values after a week and distribution
+        (week, playerAmount) = racing.getWeekAndPlayerAmount();
+        assertEq(week, 2); // Weekly tournament counter should increment
+        assertEq(playerAmount, 0); // Player counter should reset
+    }
+
+    function testGetPlayerAddressForWeeklyTournament() public {
+        vm.prank(player1);
+        racing.joinRace{ value: 0.1 ether }(attributes1, circuitId);
+        vm.prank(player2);
+        racing.joinRace{ value: 0.1 ether }(attributes2, circuitId);
+
+        // Get the player addresses for week 1
+        address playerAddress1 = racing.getPlayerAddressForWeeklyTournament(1, 1);
+        address playerAddress2 = racing.getPlayerAddressForWeeklyTournament(1, 2);
+
+        // Verify the player addresses
+        assertEq(playerAddress1, player1);
+        assertEq(playerAddress2, player2);
+    }
+
     function testThreeSoloRacesInARow() public {
         uint256 requestId = 1;
         uint256[] memory randomWords = new uint256[](2);

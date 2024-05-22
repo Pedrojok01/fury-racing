@@ -192,9 +192,10 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
 
         // take the lowest value as the winner
         address winner = race.player1Time <= race.player2Time ? race.player1 : race.player2;
+        address loser = race.player1 == winner ? race.player2 : race.player1;
 
         race.state = RaceState.FINISHED;
-        emit FinishedRace(_raceId, winner);
+        emit FinishedRace(_raceId, winner, loser);
 
         if (_mode == RaceMode.SOLO) {
             soloRaces[_raceId] = race;
@@ -226,6 +227,21 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
 
     function getFreeRaceFromRaceID(uint256 raceId) public view returns (Race memory) {
         return freeRaces[raceId];
+    }
+
+    function getWeekAndPlayerAmount() public view returns (uint256, uint256) {
+        return (weeklyTournamentCounter, tournamentPlayersCounter);
+    }
+
+    function getPlayerAddressForWeeklyTournament(
+        uint256 week,
+        uint256 index
+    )
+        public
+        view
+        returns (address)
+    {
+        return weeklyBetPlayerIndex[week][index];
     }
 
     /*//////////////////////////////////////////////////////////////

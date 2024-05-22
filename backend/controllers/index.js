@@ -1,5 +1,7 @@
 const HttpError = require("../models/http-error");
 const { validationResult } = require("express-validator");
+const config = require('../config');
+const { Contract, Provider } = require('ethers-multicall');
 
 const submit = async (req, res, next) => {
   const errors = validationResult(req);
@@ -42,6 +44,20 @@ function combineToUint256(player1Result, player2Result) {
   const combinedResult = (player1BigInt << 128n) | player2BigInt;
 
   return combinedResult;
+}
+
+const getScores = () => {
+  const provider = new ethers.providers.JsonRpcProvider(
+    config.AVALANCHE_NODE
+  );
+  const contractAddress = config.CONTRACT_ADDRESS;
+  const contractABI = config.ABI;
+
+  const contract = new Contract(contractAddress, contractABI);
+
+  const call1 = contract.function1();
+  const call2 = contract.function2();
+  const call3 = contract.function3();
 }
 
 module.exports = { submit };

@@ -34,14 +34,20 @@ const SelectionScreen: FC = () => {
 
     if (mode === "SOLO") {
       res = await joinSoloRace();
+      if (res.success) {
+        router.push("/race");
+      }
     } else if (mode === "FREE") {
       res = await joinFreeRace();
+      if (res.success) {
+        return;
+      }
     } else {
       res = await joinSoloRace(); // TODO: Implement tournament mode
-    }
-
-    if (res.success) {
-      router.push("/race");
+      if (res.success) {
+        router.push("/race");
+      }
+      console.log("res", res);
     }
   };
 

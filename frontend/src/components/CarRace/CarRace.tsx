@@ -268,7 +268,7 @@ const CarRace: FC = () => {
     <Box w={"70vw"}>
       {isLoading && (
         <Center position="absolute" top="0" left="0" right="0" bottom="0" zIndex="10">
-          <VStack h="100%" spacing={4}>
+          <VStack spacing={4}>
             <Text fontSize="xl">Loading...</Text>
             <Spinner
               size="xl"

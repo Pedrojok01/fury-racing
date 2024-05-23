@@ -9,13 +9,15 @@ import { useGameStates } from "@/stores/useGameStates";
 import { logError } from "@/utils/errorUtil";
 import { generateRandomAttributes } from "@/utils/generateCarAttributes";
 
-import { useNotify } from ".";
+import { useNotify, useReadContract } from ".";
 
 type ContractCallResponse = {
   success: boolean;
   data: TransactionReceipt | null;
   error: string | null;
 };
+
+const circuitId = 1;
 
 export const useWriteContract = () => {
   const publicClient = usePublicClient();
@@ -24,6 +26,7 @@ export const useWriteContract = () => {
   const { carData } = useAnim();
   const { notifyError } = useNotify();
   const { setRaceId } = useGameStates();
+  const { getSoloRaceCount, getFreeRaceCount } = useReadContract();
 
   const racingInstance = useMemo(
     () =>
@@ -66,7 +69,7 @@ export const useWriteContract = () => {
 
     setLoading(true);
     try {
-      const raceId = (await racingInstance.read.soloRaceCounter()) as bigint;
+      const raceId = await getSoloRaceCount();
       setRaceId(raceId);
 
       // Simulate transaction
@@ -74,14 +77,14 @@ export const useWriteContract = () => {
         address: RACING_CONTRACT.address,
         abi: RACING_CONTRACT.ABI,
         functionName: "joinSoloRace",
-        args: [carData.attributes, generateRandomAttributes(), 1],
+        args: [carData.attributes, generateRandomAttributes(), circuitId],
       });
 
       // Run transaction
       const hash: `0x${string}` = await racingInstance.write.joinSoloRace([
         carData.attributes,
         generateRandomAttributes(),
-        1,
+        circuitId,
       ]);
 
       setTransactionHash(hash);
@@ -108,28 +111,32 @@ export const useWriteContract = () => {
   /* Join Free Race (1v1):
    **************************/
   const joinFreeRace = async (): Promise<ContractCallResponse> => {
-    if (!racingInstance?.write.joinFreeRace || !publicClient) {
+    if (!racingInstance || !publicClient) {
       return { success: false, data: null, error: "The contract instance is missing." };
     }
 
     setLoading(true);
     try {
-      const raceId = (await racingInstance.read.freeRaceCounter()) as bigint;
+      const raceId = await getFreeRaceCount();
       setRaceId(raceId);
+
+      // await getRaceInfo(raceId);
 
       // Simulate transaction
       await publicClient.simulateContract({
         address: RACING_CONTRACT.address,
         abi: RACING_CONTRACT.ABI,
         functionName: "joinFreeRace",
-        args: [carData.attributes],
+        args: [carData.attributes, circuitId],
       });
 
       // Run transaction
-      const hash: `0x${string}` = await racingInstance.write.joinFreeRace([carData.attributes]);
+      const hash: `0x${string}` = await racingInstance.write.joinFreeRace([
+        carData.attributes,
+        circuitId,
+      ]);
 
       setTransactionHash(hash);
-      setIsWaiting(true); // Set waiting state for Player 1
 
       const receipt = await publicClient.waitForTransactionReceipt({
         confirmations: 1,
@@ -137,6 +144,10 @@ export const useWriteContract = () => {
         retryCount: 2,
       });
 
+      // console.log("raceInfo", raceInfo);
+      // if (raceInfo?.player1 === zeroAddress) {
+      setIsWaiting(true);
+      // }
       return { success: true, data: receipt, error: null };
     } catch (error: unknown) {
       const msg = logError(error);

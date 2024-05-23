@@ -33,7 +33,7 @@ export const useReadContract = () => {
     }
   }, [racingInstance, setBetAmount]);
 
-  /* Get current bet amount :
+  /* Get current prize pool :
    ***************************/
   const getCurrentPrizePool = useCallback(async (): Promise<void> => {
     if (!racingInstance) return;
@@ -47,8 +47,50 @@ export const useReadContract = () => {
     }
   }, [racingInstance, setPrizePool]);
 
-  /* Get current bet amount :
-   ***************************/
+  /* Get current solo race count :
+   ********************************/
+  const getSoloRaceCount = useCallback(async (): Promise<bigint> => {
+    if (!racingInstance) return 0n;
+
+    try {
+      const soloCount = (await racingInstance.read.soloRaceCounter()) as bigint;
+      return soloCount;
+    } catch (error: unknown) {
+      logError(error);
+      return 0n;
+    }
+  }, [racingInstance]);
+
+  /* Get current free race count :
+   *********************************/
+  const getFreeRaceCount = useCallback(async (): Promise<bigint> => {
+    if (!racingInstance) return 0n;
+
+    try {
+      const freeCount = (await racingInstance.read.freeRaceCounter()) as bigint;
+      return freeCount;
+    } catch (error: unknown) {
+      logError(error);
+      return 0n;
+    }
+  }, [racingInstance]);
+
+  /* Get current tournament race count :
+   ******************************************/
+  const getTournamentRaceCount = useCallback(async (): Promise<bigint> => {
+    if (!racingInstance) return 0n;
+
+    try {
+      const betCount = (await racingInstance.read.raceCounter()) as bigint;
+      return betCount;
+    } catch (error: unknown) {
+      logError(error);
+      return 0n;
+    }
+  }, [racingInstance]);
+
+  /* Get race info for raceId :
+   *****************************/
   const getRaceInfo = useCallback(
     async (raceId: bigint): Promise<void> => {
       if (!racingInstance) return;
@@ -69,6 +111,9 @@ export const useReadContract = () => {
   return {
     getBetAmount,
     getCurrentPrizePool,
+    getSoloRaceCount,
+    getFreeRaceCount,
+    getTournamentRaceCount,
     getRaceInfo,
   };
 };

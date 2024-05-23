@@ -23,26 +23,25 @@ const SoundManager: FC = () => {
     if (!audioElement) {
       sound = new Audio(songs[songIndex]);
       setAudioElement(sound);
+      const handleEnded = () => {
+        setSongIndex((prevIndex) => (prevIndex + 1) % songs.length);
+      };
+
+      sound.addEventListener("ended", handleEnded);
+
+      return () => {
+        sound.removeEventListener("ended", handleEnded);
+      };
     } else {
       sound = audioElement;
     }
 
-    const handleEnded = () => {
-      setSongIndex((prevIndex) => (prevIndex + 1) % songs.length);
-    };
-
-    sound.addEventListener("ended", handleEnded);
-
     if (audio) {
       sound.volume = 0.1;
-      sound.play();
+      sound.play().catch((error) => console.error("Failed to play audio:", error));
     } else {
       sound.pause();
     }
-
-    return () => {
-      sound.removeEventListener("ended", handleEnded);
-    };
   }, [audio, audioElement, setAudioElement, setSongIndex, songIndex]);
 
   useEffect(() => {
@@ -51,9 +50,7 @@ const SoundManager: FC = () => {
       audioElement.src = songs[songIndex];
       audioElement.load();
       if (audio) {
-        audioElement.play().catch((error) => {
-          console.error("Failed to play audio:", error);
-        });
+        audioElement.play().catch((error) => console.error("Failed to play audio:", error));
       }
     }
   }, [songIndex, audio, audioElement]);

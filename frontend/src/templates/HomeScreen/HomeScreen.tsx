@@ -5,7 +5,6 @@ import Image from "next/image";
 import NextLink from "next/link";
 import { useAccount } from "wagmi";
 
-import { SoundManager } from "@/components";
 import { images } from "@/data/images";
 import { useAudio } from "@/stores/useAudio";
 import { useContract } from "@/stores/useContract";
@@ -53,7 +52,6 @@ const HomeScreen: FC = () => {
       <Box className={styles.subContainer}>
         <Image src={images.homeCar.src} alt="car background" width={600} height={700} />
       </Box>
-      <SoundManager />
     </Center>
   );
 };

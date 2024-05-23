@@ -25,8 +25,6 @@ import { useWindowSize } from "@/hooks";
 import { useContract } from "@/stores/useContract";
 import { getEllipsisTxt } from "@/utils/formatters";
 
-import { CustomDivider } from "../CustomDivider";
-
 interface ResultModalProps {
   raceInfo: RaceInfo;
   isWinner: boolean;
@@ -73,8 +71,6 @@ const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner }) => {
             <Text fontSize="lg" textAlign="center" mb={5}>
               {isWinner ? "Congrats! You won the race!" : "Better luck next time!"}
 
-              <CustomDivider />
-
               <VStack justifyContent={"center"}>
                 <Text>
                   Winner: {winner === zeroAddress ? "Computer" : getEllipsisTxt(winner, 8)}
@@ -82,8 +78,6 @@ const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner }) => {
                 <Text>Loser: {loser === zeroAddress ? "Computer" : getEllipsisTxt(loser, 8)}</Text>
               </VStack>
             </Text>
-
-            <CustomDivider />
 
             <Center>
               <HStack mt={6} mb={0} gap={5}>

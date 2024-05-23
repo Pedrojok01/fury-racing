@@ -12,3 +12,4 @@ export * from "./CustomBox";
 export * from "./Weather";
 export * from "./SoundManager";
 export * from "./ResultModal";
+export * from "./WaitingScreen";

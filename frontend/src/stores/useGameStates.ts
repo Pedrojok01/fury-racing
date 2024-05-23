@@ -4,6 +4,8 @@ import { create } from "zustand";
 type GameStates = {
   mode: RaceMode | undefined;
   setRaceMode: (mode: RaceMode) => void;
+  isWaiting: boolean;
+  setIsWaiting: (isWaiting: boolean) => void;
   betAmount: bigint;
   setBetAmount: (betAmount: bigint) => void;
   loading: boolean;
@@ -24,6 +26,8 @@ type GameStates = {
 const useGameStates = create<GameStates>((set) => ({
   mode: undefined,
   setRaceMode: (mode: RaceMode) => set({ mode }),
+  isWaiting: false,
+  setIsWaiting: (isWaiting) => set({ isWaiting }),
   betAmount: 0n,
   setBetAmount: (betAmount) => set({ betAmount }),
   loading: false,

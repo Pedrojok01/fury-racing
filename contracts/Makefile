@@ -35,10 +35,8 @@ aderyn :; aderyn .
 
 deploy :; forge script script/Deployer.s.sol --broadcast --rpc-url avalanche --verifier-url 'https://api.routescan.io/v2/network/mainnet/evm/43114/etherscan' --etherscan-api-key 'verifyContract'
 
-deployTest :; forge script script/DeployerTestnet.s.sol --broadcast --rpc-url avalanche_fuji --verifier-url 'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan' --etherscan-api-key 'verifyContract'
+deployTest :; forge script script/DeployerTestnet.s.sol --broadcast --rpc-url avalancheFuji --verifier-url 'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan' --etherscan-api-key 'verifyContract'
 
-simulate :; forge script script/DeployerTestnet.s.sol --rpc-url avalanche_fuji
+simulate :; forge script script/DeployerTestnet.s.sol --rpc-url avalancheFuji
 
-catapulta :; npx catapulta script scripts/DeployerTestnet.s.sol --network avalanche_fuji
-
-verify :; forge verify-contract 0xa1940Ac51C7bF051dD63edC1Fcb01c05a1E65c5A src/Racing.sol:Racing --chain-id 43113 --verifier-url 'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan' --etherscan-api-key 'verifyContract' --num-of-optimizations 1000 --compiler-version 0.8.24 --constructor-args $(cast abi-encode 'constructor( address _router, address _vrfCoordinator, uint256 _vrfSubscriptionId, uint64 _functionSubscriptionId, bytes32 _keyHash, bytes32 _donID)' 0xA9d587a00A31A52Ed70D6026794a8FC5E2F5dCb0 0x5C210eF41CD1a72de73bF76eC39637bB0d3d7BEE 4734827867964001365405830055140988844088387107361042566903892685164165989088 8170 0xc799bd1e3bd4d1a41cd4968997a4e03dfd2a3c7c04b695881138580163f42887 'fun-avalanche-fuji-1')
+catapulta :; npx catapulta script script/DeployerTestnet.s.sol --network avalancheFuji --skip-git

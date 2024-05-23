@@ -37,11 +37,11 @@ sort_imports = true
 
 [rpc_endpoints]
 avalanche = "${AVALANCHE_RPC_URL}"
-avalanche_fuji = "${AVALANCHE_FUJI_RPC_URL}"
+avalancheFuji = "${AVALANCHE_FUJI_RPC_URL}"
 
 [etherscan]
 avalanche = { key = "verifyContract" }
-avalanche_fuji = { key = "verifyContract" }
+avalancheFuji = { key = "verifyContract" }
 
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

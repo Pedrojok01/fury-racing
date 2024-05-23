@@ -8,12 +8,12 @@ import { AttributesSelector, CarAnim, CustomBox, Track, Weather } from "@/compon
 import { images, tracks } from "@/data";
 import { useWriteContract } from "@/hooks";
 import { useAnim } from "@/stores/useAnim";
-import { useContract } from "@/stores/useContract";
+import { useGameStates } from "@/stores/useGameStates";
 
 const SelectionScreen: FC = () => {
   const { carData } = useAnim();
   const { joinSoloRace } = useWriteContract();
-  const { loading } = useContract();
+  const { loading } = useGameStates();
   const router = useRouter();
 
   const handleRaceStart = async () => {

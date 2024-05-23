@@ -6,12 +6,11 @@ import { formatEther } from "viem";
 
 import { CustomBox, CustomToolTip } from "@/components";
 import { useReadContract } from "@/hooks";
-import { useContract } from "@/stores/useContract";
-import { useGame } from "@/stores/useGame";
+import { useGameStates } from "@/stores/useGameStates";
 
 const ModeScreen: FC = () => {
   const { getBetAmount, getCurrentPrizePool } = useReadContract();
-  const { betAmount, prizePool } = useContract();
+  const { betAmount, prizePool } = useGameStates();
 
   useEffect(() => {
     getBetAmount();
@@ -72,7 +71,7 @@ interface ButtonModeProps {
 }
 
 const ButtonMode: FC<ButtonModeProps> = ({ text, label, mode }) => {
-  const { setRaceMode } = useGame();
+  const { setRaceMode } = useGameStates();
 
   const handleClick = () => {
     setRaceMode(mode);

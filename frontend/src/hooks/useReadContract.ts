@@ -4,11 +4,11 @@ import { getContract } from "viem";
 import { usePublicClient } from "wagmi";
 
 import { RACING_CONTRACT } from "@/data";
-import { useContract } from "@/stores/useContract";
+import { useGameStates } from "@/stores/useGameStates";
 import { logError } from "@/utils/errorUtil";
 
 export const useReadContract = () => {
-  const { setBetAmount, setPrizePool, setRaceInfo } = useContract();
+  const { setBetAmount, setPrizePool, setRaceInfo } = useGameStates();
   const client = usePublicClient();
 
   const racingInstance = useMemo(

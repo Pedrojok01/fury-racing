@@ -10,7 +10,7 @@ import { useAccount } from "wagmi";
 import { images } from "@/data";
 import { useWindowSize } from "@/hooks";
 import { useAudio } from "@/stores/useAudio";
-import { useContract } from "@/stores/useContract";
+import { useGameStates } from "@/stores/useGameStates";
 
 import styles from "./header.module.css";
 import { DarkModeButton } from "../DarkModeButton";
@@ -19,7 +19,7 @@ const Header: FC = () => {
   const { isSmallScreen } = useWindowSize();
   const { isConnected } = useAccount();
   const { colorMode } = useColorMode();
-  const { reset } = useContract();
+  const { reset } = useGameStates();
   const { setAudio } = useAudio();
 
   const handlePlayClick = () => {

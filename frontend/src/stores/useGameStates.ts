@@ -1,7 +1,9 @@
 import type { Log } from "viem";
 import { create } from "zustand";
 
-type ContractState = {
+type GameStates = {
+  mode: RaceMode | undefined;
+  setRaceMode: (mode: RaceMode) => void;
   betAmount: bigint;
   setBetAmount: (betAmount: bigint) => void;
   loading: boolean;
@@ -19,7 +21,9 @@ type ContractState = {
   reset: () => void;
 };
 
-const useContract = create<ContractState>((set) => ({
+const useGameStates = create<GameStates>((set) => ({
+  mode: undefined,
+  setRaceMode: (mode: RaceMode) => set({ mode }),
   betAmount: 0n,
   setBetAmount: (betAmount) => set({ betAmount }),
   loading: false,
@@ -44,4 +48,4 @@ const useContract = create<ContractState>((set) => ({
     }),
 }));
 
-export { useContract };
+export { useGameStates };

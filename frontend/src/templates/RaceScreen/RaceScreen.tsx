@@ -5,11 +5,11 @@ import { useAccount } from "wagmi";
 
 import { CarRace, ResultModal } from "@/components";
 import { useReadContract } from "@/hooks";
-import { useContract } from "@/stores/useContract";
+import { useGameStates } from "@/stores/useGameStates";
 
 const RaceScreen: FC = () => {
   const { address } = useAccount();
-  const { raceId, raceInfo } = useContract();
+  const { raceId, raceInfo } = useGameStates();
   const { getRaceInfo } = useReadContract();
 
   useEffect(() => {
@@ -33,7 +33,6 @@ const RaceScreen: FC = () => {
     <>
       <Center h={"100%"}>
         <VStack align="center" justify="center">
-          <>THE RACE IS ON!</>
           <CarRace />
         </VStack>
       </Center>

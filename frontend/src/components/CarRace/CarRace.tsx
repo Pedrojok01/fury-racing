@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo, type FC } from "react";
+import React, { useRef, useEffect, useMemo, type FC, useState } from "react";
 
 import {
   AbstractMesh,
@@ -16,7 +16,7 @@ import {
   TransformNode,
   Vector3,
 } from "@babylonjs/core";
-import { Box } from "@chakra-ui/react";
+import { Box, Center, Spinner } from "@chakra-ui/react";
 
 import { tracks } from "@/data";
 import "@babylonjs/loaders/glTF";
@@ -33,6 +33,8 @@ const CarRace: FC = () => {
   const { carIdx, carData, skybox, weatherFx } = useAnim();
   const track = tracks[0].animData;
   const isKeyboardControlEnabled = false;
+
+  const [isLoading, setIsLoading] = useState(true);
 
   const controlState = useMemo(() => ({ up: false, down: false, left: false, right: false }), []);
 
@@ -201,6 +203,8 @@ const CarRace: FC = () => {
         container.meshes.forEach((mesh) => shadowGenerator.addShadowCaster(mesh));
         shadowGenerator.useExponentialShadowMap = true;
         trackInfo["tiledGround"].receiveShadows = true;
+
+        setIsLoading(false);
       },
     );
 
@@ -262,6 +266,18 @@ const CarRace: FC = () => {
 
   return (
     <Box w={"70vw"}>
+      {isLoading && (
+        <Center position="absolute" top="0" left="0" right="0" bottom="0" zIndex="10">
+          <Spinner
+            size="xl"
+            color={"var(--primary-color)"}
+            thickness="4px"
+            emptyColor="gray.200"
+            speed="0.65s"
+            label="Loading..."
+          />
+        </Center>
+      )}
       <canvas ref={ref} style={{ width: "100%", height: "100%" }} />
     </Box>
   );

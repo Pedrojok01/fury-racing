@@ -7,14 +7,14 @@ import { useAccount } from "wagmi";
 
 import { images } from "@/data/images";
 import { useAudio } from "@/stores/useAudio";
-import { useContract } from "@/stores/useContract";
+import { useGameStates } from "@/stores/useGameStates";
 
 import styles from "./home.module.css";
 
 const HomeScreen: FC = () => {
   const { isConnected } = useAccount();
   const { setAudio } = useAudio();
-  const { reset } = useContract();
+  const { reset } = useGameStates();
 
   const handlePlayClick = () => {
     reset();

@@ -5,7 +5,7 @@ import { usePublicClient, useWalletClient, useWatchContractEvent } from "wagmi";
 
 import { RACING_CONTRACT } from "@/data";
 import { useAnim } from "@/stores/useAnim";
-import { useContract } from "@/stores/useContract";
+import { useGameStates } from "@/stores/useGameStates";
 import { logError } from "@/utils/errorUtil";
 import { generateRandomAttributes } from "@/utils/generateCarAttributes";
 
@@ -14,10 +14,10 @@ import { useNotify } from ".";
 export const useWriteContract = () => {
   const publicClient = usePublicClient();
   const client = useWalletClient()?.data;
-  const { setLoading, setTransactionHash } = useContract();
+  const { setLoading, setTransactionHash } = useGameStates();
   const { carData } = useAnim();
   const { notifyError } = useNotify();
-  const { setRaceId } = useContract();
+  const { setRaceId } = useGameStates();
 
   const racingInstance = useMemo(
     () =>

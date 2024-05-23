@@ -22,7 +22,7 @@ import Confetti from "react-confetti";
 import { zeroAddress } from "viem";
 
 import { useWindowSize } from "@/hooks";
-import { useContract } from "@/stores/useContract";
+import { useGameStates } from "@/stores/useGameStates";
 import { getEllipsisTxt } from "@/utils/formatters";
 
 interface ResultModalProps {
@@ -33,7 +33,7 @@ interface ResultModalProps {
 const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner }) => {
   const { width, height } = useWindowSize();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { reset } = useContract();
+  const { reset } = useGameStates();
 
   const winner = raceInfo.player1Time < raceInfo.player2Time ? raceInfo.player1 : raceInfo.player2;
   const loser = raceInfo.player1Time > raceInfo.player2Time ? raceInfo.player1 : raceInfo.player2;
@@ -70,14 +70,11 @@ const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner }) => {
           <ModalBody>
             <Text fontSize="lg" textAlign="center" mb={5}>
               {isWinner ? "Congrats! You won the race!" : "Better luck next time!"}
-
-              <VStack justifyContent={"center"}>
-                <Text>
-                  Winner: {winner === zeroAddress ? "Computer" : getEllipsisTxt(winner, 8)}
-                </Text>
-                <Text>Loser: {loser === zeroAddress ? "Computer" : getEllipsisTxt(loser, 8)}</Text>
-              </VStack>
             </Text>
+            <VStack justifyContent={"center"}>
+              <Text>Winner: {winner === zeroAddress ? "Computer" : getEllipsisTxt(winner, 8)}</Text>
+              <Text>Loser: {loser === zeroAddress ? "Computer" : getEllipsisTxt(loser, 8)}</Text>
+            </VStack>
 
             <Center>
               <HStack mt={6} mb={0} gap={5}>

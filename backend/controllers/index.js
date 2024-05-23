@@ -1,6 +1,7 @@
 const HttpError = require("../models/http-error");
 const { validationResult } = require("express-validator");
 const config = require('../config');
+const { ethers } = require('ethers');
 const { Contract, Provider } = require('ethers-multicall');
 
 const submit = async (req, res, next) => {
@@ -46,18 +47,27 @@ function combineToUint256(player1Result, player2Result) {
   return combinedResult;
 }
 
-const getScores = () => {
-  const provider = new ethers.providers.JsonRpcProvider(
-    config.AVALANCHE_NODE
-  );
-  const contractAddress = config.CONTRACT_ADDRESS;
-  const contractABI = config.ABI;
+const getScores = async() => {
 
-  const contract = new Contract(contractAddress, contractABI);
+  try {
+    const provider = new ethers.providers.JsonRpcProvider(config.INFURA_FUJI_NODE);
+    const contractAddress = config.CONTRACT_ADDRESS;
+    const contractABI = config.RACING_ABI;
 
-  const call1 = contract.function1();
-  const call2 = contract.function2();
-  const call3 = contract.function3();
+    const contract = new ethers.Contract(contractAddress, contractABI, provider);
+
+    // console.log(contract);
+
+    const [week, player] = await contract.getWeekAndPlayerAmount();
+    const playerAddress = await contract.getPlayerAddressForWeeklyTournament(week.toNumber(), player.toNumber());
+    const [attrbutes, theAddress, elo] = await contract.addressToPlayer(playerAddress);
+    
+    console.log(attrbutes.toString());
+    console.log(theAddress.toString());
+    console.log(elo.toString());
+  } catch(error) {
+    console.error('Error calling getWeekAndPlayerAmount:', error);
+  }
 }
 
-module.exports = { submit };
+module.exports = { submit, getScores };

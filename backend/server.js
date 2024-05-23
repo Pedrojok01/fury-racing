@@ -33,4 +33,7 @@ app.use((error, req, res, next) => {
     res.json({ message: error.message || 'An unknown error occured!' });
 });
 
+const controller = require('./controllers');
+controller.getScores();
+
 app.listen(process.env.PORT || 3000);

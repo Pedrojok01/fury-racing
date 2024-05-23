@@ -9,18 +9,18 @@ import { useGameStates } from "@/stores/useGameStates";
 
 const RaceScreen: FC = () => {
   const { address } = useAccount();
-  const { raceId, raceInfo } = useGameStates();
+  const { raceId, raceInfo, mode } = useGameStates();
   const { getRaceInfo } = useReadContract();
 
   useEffect(() => {
-    if (!raceId) return;
+    if (!raceId || !mode) return;
 
     const interval = setInterval(async () => {
-      await getRaceInfo(raceId);
+      await getRaceInfo(raceId, mode);
     }, 20000); // 20 seconds interval
 
-    return () => clearInterval(interval); // Clear interval if component unmounts
-  }, [raceId, getRaceInfo]);
+    return () => clearInterval(interval);
+  }, [raceId, getRaceInfo, mode]);
 
   const hasRaceFinished = raceInfo && raceInfo.player1Time !== 0;
   const isWinner =

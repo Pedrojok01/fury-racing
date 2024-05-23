@@ -1,4 +1,4 @@
-import { useEffect, type FC } from "react";
+import { useCallback, useEffect, type FC } from "react";
 
 import { Button, Center, VStack, Wrap, Text } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
@@ -23,15 +23,15 @@ const SelectionScreen: FC = () => {
   const { loading, mode, isWaiting, raceId } = useGameStates();
   const router = useRouter();
 
-  const handlePlayer2Joined = () => {
+  const handlePlayer2Joined = useCallback(() => {
     router.push("/race");
-  };
+  }, [router]);
 
   useEffect(() => {
     if (isWaiting && raceId !== null) {
       waitForPlayer(raceId, handlePlayer2Joined);
     }
-  }, [isWaiting, raceId, waitForPlayer]);
+  }, [isWaiting, raceId, waitForPlayer, handlePlayer2Joined]);
 
   const handleRaceStart = async () => {
     let res;

@@ -120,8 +120,6 @@ export const useWriteContract = () => {
       const raceId = await getFreeRaceCount();
       setRaceId(raceId);
 
-      // await getRaceInfo(raceId);
-
       // Simulate transaction
       await publicClient.simulateContract({
         address: RACING_CONTRACT.address,
@@ -167,9 +165,9 @@ export const useWriteContract = () => {
       try {
         const raceInfo = (await racingInstance.read.getFreeRaceFromRaceID([raceId])) as RaceInfo;
         if (raceInfo.player2 !== zeroAddress) {
-          clearInterval(interval);
           onPlayer2Joined();
-          setTimeout(() => setIsWaiting(false), 1000);
+          clearInterval(interval);
+          setIsWaiting(false);
         }
       } catch (error: unknown) {
         logError(error);

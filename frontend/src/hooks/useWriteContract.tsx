@@ -144,10 +144,7 @@ export const useWriteContract = () => {
         retryCount: 2,
       });
 
-      // console.log("raceInfo", raceInfo);
-      // if (raceInfo?.player1 === zeroAddress) {
       setIsWaiting(true);
-      // }
       return { success: true, data: receipt, error: null };
     } catch (error: unknown) {
       const msg = logError(error);
@@ -163,20 +160,21 @@ export const useWriteContract = () => {
 
   /* Wait for Player 2:
    **********************/
-  const waitForPlayer = (raceId: bigint): void => {
+  const waitForPlayer = (raceId: bigint, onPlayer2Joined: () => void): void => {
     if (!racingInstance || !publicClient) return;
 
     const interval = setInterval(async () => {
       try {
         const raceInfo = (await racingInstance.read.getFreeRaceFromRaceID([raceId])) as RaceInfo;
         if (raceInfo.player2 !== zeroAddress) {
-          setIsWaiting(false); // Player 2 has joined, stop waiting
           clearInterval(interval);
+          onPlayer2Joined();
+          setTimeout(() => setIsWaiting(false), 1000);
         }
       } catch (error: unknown) {
         logError(error);
       }
-    }, 5000); // Check every 5 seconds
+    }, 2000); // Check every 2 seconds
   };
 
   return {

@@ -23,9 +23,13 @@ const SelectionScreen: FC = () => {
   const { loading, mode, isWaiting, raceId } = useGameStates();
   const router = useRouter();
 
+  const handlePlayer2Joined = () => {
+    router.push("/race");
+  };
+
   useEffect(() => {
     if (isWaiting && raceId !== null) {
-      waitForPlayer(raceId);
+      waitForPlayer(raceId, handlePlayer2Joined);
     }
   }, [isWaiting, raceId, waitForPlayer]);
 
@@ -47,12 +51,11 @@ const SelectionScreen: FC = () => {
       if (res.success) {
         router.push("/race");
       }
-      console.log("res", res);
     }
   };
 
   return (
-    <Center h={"100%"} p={isMobile ? 0 : "2rem"}>
+    <Center p={isMobile ? 0 : "2rem"} h={isWaiting ? "100%" : "auto"}>
       <Wrap w={"100%"} direction="row" justify="space-between" gap={0}>
         {isWaiting ? (
           <WaitingScreen />

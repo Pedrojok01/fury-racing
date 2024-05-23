@@ -380,6 +380,9 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
                 Race memory _race = _createNewRace(_circuitId, _mode);
                 freeRaces[freeRaceCounter] = _race;
             } else {
+                if (msg.sender == freeRaces[freeRaceCounter].player1) {
+                    revert Racing__PlayerAlreadyJoined();
+                }
                 // Update the current free race
                 Race storage currentRace = freeRaces[freeRaceCounter];
                 currentRace.state = RaceState.ONGOING;
@@ -392,6 +395,9 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
                 Race memory _race = _createNewRace(_circuitId, _mode);
                 races[raceCounter] = _race;
             } else {
+                if (msg.sender == freeRaces[freeRaceCounter].player1) {
+                    revert Racing__PlayerAlreadyJoined();
+                }
                 // Update the current bet race
                 Race storage currentRace = races[raceCounter];
                 currentRace.state = RaceState.ONGOING;

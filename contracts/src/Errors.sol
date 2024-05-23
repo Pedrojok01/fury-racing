@@ -7,6 +7,7 @@ error ChainlinkFeed__InvalidFunctionRequestId();
 error ChainlinkFeed__InvalidCircuitIndex();
 
 // Racing errors
+error Racing__PlayerAlreadyJoined();
 error Racing__InvalidAttributesSum();
 error Racing__InvalidAttribute();
 error Racing__InvalidBetAmount();

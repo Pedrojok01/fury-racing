@@ -16,6 +16,7 @@ type ContractState = {
   setTransactionHash: (hash: string) => void;
   eventData: Log | null;
   setEventData: (data: Log) => void;
+  reset: () => void;
 };
 
 const useContract = create<ContractState>((set) => ({
@@ -33,6 +34,14 @@ const useContract = create<ContractState>((set) => ({
   setTransactionHash: (hash) => set({ transactionHash: hash }),
   eventData: null,
   setEventData: (data) => set({ eventData: data }),
+  reset: () =>
+    set({
+      loading: false,
+      raceId: null,
+      raceInfo: null,
+      transactionHash: null,
+      eventData: null,
+    }),
 }));
 
 export { useContract };

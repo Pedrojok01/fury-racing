@@ -9,6 +9,8 @@ import { useAccount } from "wagmi";
 
 import { images } from "@/data";
 import { useWindowSize } from "@/hooks";
+import { useAudio } from "@/stores/useAudio";
+import { useContract } from "@/stores/useContract";
 
 import styles from "./header.module.css";
 import { DarkModeButton } from "../DarkModeButton";
@@ -17,10 +19,17 @@ const Header: FC = () => {
   const { isSmallScreen } = useWindowSize();
   const { isConnected } = useAccount();
   const { colorMode } = useColorMode();
+  const { reset } = useContract();
+  const { setAudio } = useAudio();
+
+  const handlePlayClick = () => {
+    reset();
+    setAudio(true);
+  };
 
   const menuIems = (
     <Center gap={3}>
-      <Link as={NextLink} href="/mode" className={styles.menuItems}>
+      <Link as={NextLink} href="/mode" className={styles.menuItems} onClick={handlePlayClick}>
         <Box>New Game</Box>
       </Link>
       <Link as={NextLink} href="/leaderboard" className={styles.menuItems}>
@@ -40,10 +49,6 @@ const Header: FC = () => {
               width={180}
               height={81}
             />
-
-            {/* <Heading as="h1" fontSize={"1.5rem"} pb={"0.3rem"} className="text-shadow">
-              {TITLE}
-            </Heading> */}
           </HStack>
         </Link>
 

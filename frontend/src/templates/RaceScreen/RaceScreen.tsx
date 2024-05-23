@@ -1,10 +1,9 @@
 import { useEffect, type FC } from "react";
 
-import { Button, Center, HStack, VStack, Link } from "@chakra-ui/react";
-import NextLink from "next/link";
+import { Center, VStack } from "@chakra-ui/react";
 import { useAccount } from "wagmi";
 
-import { CarRace, LoserModal, WinnerModal } from "@/components";
+import { CarRace, ResultModal } from "@/components";
 import { useReadContract } from "@/hooks";
 import { useContract } from "@/stores/useContract";
 
@@ -36,20 +35,10 @@ const RaceScreen: FC = () => {
         <VStack align="center" justify="center">
           <>THE RACE IS ON!</>
           <CarRace />
-          <HStack>
-            <Link as={NextLink} href="/leaderboard" m={"auto"} style={{ textDecoration: "none" }}>
-              <Button className="custom-button">Leaderboard</Button>
-            </Link>
-
-            <Link as={NextLink} href="/" m={"auto"} style={{ textDecoration: "none" }}>
-              <Button className="custom-button">Home</Button>
-            </Link>
-          </HStack>
         </VStack>
       </Center>
 
-      {hasRaceFinished &&
-        (isWinner ? <WinnerModal raceInfo={raceInfo} /> : <LoserModal raceInfo={raceInfo} />)}
+      {hasRaceFinished && <ResultModal raceInfo={raceInfo} isWinner={!!isWinner} />}
     </>
   );
 };

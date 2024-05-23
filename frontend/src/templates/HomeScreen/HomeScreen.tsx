@@ -8,14 +8,17 @@ import { useAccount } from "wagmi";
 import { SoundManager } from "@/components";
 import { images } from "@/data/images";
 import { useAudio } from "@/stores/useAudio";
+import { useContract } from "@/stores/useContract";
 
 import styles from "./home.module.css";
 
 const HomeScreen: FC = () => {
   const { isConnected } = useAccount();
   const { setAudio } = useAudio();
+  const { reset } = useContract();
 
   const handlePlayClick = () => {
+    reset();
     setAudio(true);
   };
 

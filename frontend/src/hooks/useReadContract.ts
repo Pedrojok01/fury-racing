@@ -89,7 +89,7 @@ export const useReadContract = () => {
   /* Get race info for raceId :
    *****************************/
   const getRaceInfo = useCallback(
-    async (raceId: bigint, mode: string): Promise<void> => {
+    async (raceId: bigint, mode: RaceMode): Promise<void> => {
       if (!racingInstance) return;
 
       try {
@@ -103,11 +103,13 @@ export const useReadContract = () => {
             race = (await racingInstance.read.getFreeRaceFromRaceID([raceId])) as RaceInfo;
             break;
           case "TOURNAMENT":
-            race = (await racingInstance.read.getTournamentRaceFromRaceID([raceId])) as RaceInfo;
+            race = (await racingInstance.read.getRaceFromRaceID([raceId])) as RaceInfo;
             break;
           default:
             throw new Error(`Unsupported race mode: ${mode}`);
         }
+
+        console.log("raceInfo", race);
 
         if (race && (race.player1Time !== 0 || race.player2Time !== 0)) {
           setRaceInfo(race);

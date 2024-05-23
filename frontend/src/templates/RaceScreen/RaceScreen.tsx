@@ -17,17 +17,20 @@ const RaceScreen: FC = () => {
 
     const interval = setInterval(async () => {
       await getRaceInfo(raceId, mode);
-    }, 20000); // 20 seconds interval
+    }, 30000); // 30 seconds interval
 
     return () => clearInterval(interval);
   }, [raceId, getRaceInfo, mode]);
 
-  const hasRaceFinished = raceInfo && raceInfo.player1Time !== 0;
+  const hasRaceFinished = raceInfo && raceInfo.player1Time !== 0 && raceInfo.player2Time !== 0;
   const isWinner =
     address &&
     hasRaceFinished &&
     ((address === raceInfo.player1 && raceInfo.player1Time < raceInfo.player2Time) ||
       (address === raceInfo.player2 && raceInfo.player2Time < raceInfo.player1Time));
+
+  console.log("isWinner", isWinner);
+  console.log("hasRaceFinished", hasRaceFinished);
 
   return (
     <>

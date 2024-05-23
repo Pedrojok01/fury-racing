@@ -71,6 +71,10 @@ a {
   /* background-color: black; */
 }
 
+.menu-button {
+  background-color: var(--primary-color) !important;
+}
+
 @media (width < 1200px) {
   .game-container {
     width: 98%;

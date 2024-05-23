@@ -1,11 +1,12 @@
 .container {
+  display: flex;
   width: 80%;
   justify-content: space-between;
   margin: auto;
 }
 
 .subContainer {
-  width: 60%;
+  flex: 1;
   min-width: 400px;
   align-items: center;
   justify-content: center;
@@ -39,8 +40,7 @@
 
 @media (width < 950px) {
   .container {
-    width: 90%;
-    flex-wrap: wrap;
+    width: 100%;
     text-align: center;
   }
   .subContainer {
@@ -52,8 +52,7 @@
   .title {
     background-color: var(--text-bg-color-light);
     padding: 10px;
-    /* text-align: left; */
-    font-size: 40px;
+    font-size: 25px;
   }
 
   .subtitle {
@@ -64,9 +63,6 @@
 }
 
 @media (width < 650px) {
-  .container {
-    width: 95%;
-  }
   .subContainer {
     min-width: 330px;
   }
@@ -74,7 +70,7 @@
     padding-inline: 50px;
   }
   .title {
-    font-size: 35px;
+    font-size: 25px;
     font-weight: 900;
   }
   .subtitle {

@@ -1,5 +1,4 @@
 export * from "./CustomLayout";
-export * from "./EndedScreen";
 export * from "./HomeScreen";
 export * from "./LeaderboardScreen";
 export * from "./ModeScreen";

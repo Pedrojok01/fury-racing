@@ -2,6 +2,7 @@ import { useEffect, type FC } from "react";
 
 import { Button, Center, Flex, HStack, Link, Text, VStack } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { isMobile } from "react-device-detect";
 import { formatEther } from "viem";
 
 import { CustomBox, CustomToolTip } from "@/components";
@@ -19,8 +20,8 @@ const ModeScreen: FC = () => {
 
   return (
     <Center h={"100%"} width={"100%"} justifyContent={"center"}>
-      <VStack spacing={10}>
-        <Text fontSize={"3rem"} fontWeight={"bold"} color={"var(--primary-color)"}>
+      <VStack h={isMobile ? "100%" : "auto"} spacing={isMobile ? 5 : 10}>
+        <Text fontSize={isMobile ? "1.2rem" : "3rem"} fontWeight={"bold"} color={"var(--primary-color)"}>
           Select a mode
         </Text>
 
@@ -72,10 +73,10 @@ const ButtonMode: FC<ButtonModeProps> = ({ text, label, mode }) => {
   return (
     <Link as={NextLink} href="/selection" style={{ textDecoration: "none" }} onClick={handleClick}>
       <Button
-        w={"330px"}
-        paddingBlock={"6rem"}
+        w={isMobile ? "220px" : "330px"}
+        paddingBlock={isMobile ? "3.5rem" : "6rem"}
         paddingInline={"5rem"}
-        fontSize={"2.5rem"}
+        fontSize={isMobile ? "1.5rem" : "2.5rem"}
         fontWeight={"bold"}
         className="custom-button"
       >

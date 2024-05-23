@@ -1,11 +1,4 @@
-import {
-  MeshBuilder,
-  MultiMaterial,
-  StandardMaterial,
-  SubMesh,
-  Texture,
-  type Scene,
-} from "@babylonjs/core";
+import { MeshBuilder, MultiMaterial, StandardMaterial, SubMesh, Texture, type Scene } from "@babylonjs/core";
 
 /**
  * Helper function to create a StandardMaterial with a texture.
@@ -86,9 +79,7 @@ export const initializeTrack = (scene: Scene, track: TrackAnim, gridTileSize: nu
       const tileChar = tileRow[col];
       const materialIndex = materialIndexMap[tileChar] || 0;
 
-      tiledGround.subMeshes.push(
-        new SubMesh(materialIndex, 0, verticesCount, base, tileIndicesLength, tiledGround),
-      );
+      tiledGround.subMeshes.push(new SubMesh(materialIndex, 0, verticesCount, base, tileIndicesLength, tiledGround));
       base += tileIndicesLength;
     }
   }

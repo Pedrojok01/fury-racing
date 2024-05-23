@@ -8,17 +8,9 @@ export function mapWeatherData(weatherData: Weather): { weatherFx: WeatherFx; sk
   const cloudCoverage = current.cloud;
   const isDay = current.is_day === 1;
 
-  if (
-    conditionText.includes("rain") ||
-    conditionText.includes("shower") ||
-    conditionText.includes("drizzle")
-  ) {
+  if (conditionText.includes("rain") || conditionText.includes("shower") || conditionText.includes("drizzle")) {
     weatherFx = "rain";
-  } else if (
-    conditionText.includes("fog") ||
-    conditionText.includes("mist") ||
-    conditionText.includes("haze")
-  ) {
+  } else if (conditionText.includes("fog") || conditionText.includes("mist") || conditionText.includes("haze")) {
     weatherFx = "fog";
   }
 

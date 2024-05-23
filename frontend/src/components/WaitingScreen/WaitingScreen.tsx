@@ -21,8 +21,8 @@ const WaitingScreen: FC = () => {
           />
 
           <Text fontSize="xs" mt={10}>
-            * You do not have to wait if it takes too long. You will miss the race, but your result
-            will be updated as soon as the race is over!
+            * You do not have to wait if it takes too long. You will miss the race, but your result will be updated as
+            soon as the race is over!
           </Text>
         </VStack>
       </CustomBox>

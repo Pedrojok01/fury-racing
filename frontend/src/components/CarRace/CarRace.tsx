@@ -90,123 +90,116 @@ const CarRace: FC = () => {
     // Load and place the car model.
     const target = new TransformNode("target");
     const car = new TransformNode("car");
-    SceneLoader.LoadAssetContainer(
-      `./assets/${carData.path}/`,
-      "scene.gltf",
-      scene,
-      (container) => {
-        // Adjust the loaded meshes.
-        container.meshes.forEach((mesh) => {
-          mesh.position.x += carData.offset.x;
-          mesh.position.y += carData.offset.y;
-          mesh.position.z += carData.offset.z;
+    SceneLoader.LoadAssetContainer(`./assets/${carData.path}/`, "scene.gltf", scene, (container) => {
+      // Adjust the loaded meshes.
+      container.meshes.forEach((mesh) => {
+        mesh.position.x += carData.offset.x;
+        mesh.position.y += carData.offset.y;
+        mesh.position.z += carData.offset.z;
 
-          if (!mesh.parent) {
-            mesh.parent = car;
-          }
-        });
-
-        car.scaling = new Vector3(carData.scale, carData.scale, carData.scale);
-        car.position.y += 1.3; // Lift the car so that it sits on the road.
-
-        // Group the adjusted car within a camera target object.
-        car.parent = target;
-
-        // Place the car on the track.
-        target.position.x += track.startPosition.x * gridTileSize;
-        target.position.z += track.startPosition.y * gridTileSize;
-        switch (track.startPosition.direction) {
-          case "north":
-            target.position.x += gridTileSize / 2;
-            break;
-
-          case "south":
-            target.position.x += gridTileSize / 2;
-            target.rotation.y += Math.PI;
-            break;
-
-          case "west":
-            target.position.x += gridTileSize;
-            target.position.z += gridTileSize / 2;
-            target.rotation.y += 1.5 * Math.PI;
-            break;
-
-          case "east":
-            target.position.z += gridTileSize / 2;
-            target.rotation.y += 0.5 * Math.PI;
-            break;
+        if (!mesh.parent) {
+          mesh.parent = car;
         }
+      });
 
-        // Collect the handle for that node.
-        targetNodeRef.current = target;
+      car.scaling = new Vector3(carData.scale, carData.scale, carData.scale);
+      car.position.y += 1.3; // Lift the car so that it sits on the road.
 
-        // Add the node to the scene.
-        container.addAllToScene();
+      // Group the adjusted car within a camera target object.
+      car.parent = target;
 
-        // Update camera target.
-        const cameraTarget = new AbstractMesh("cameraTarget", scene);
-        cameraTarget.parent = target;
-        cameraTarget.position.y = 5; // Have the camera aim a bit higher than the car.
-        camera.lockedTarget = cameraTarget;
+      // Place the car on the track.
+      target.position.x += track.startPosition.x * gridTileSize;
+      target.position.z += track.startPosition.y * gridTileSize;
+      switch (track.startPosition.direction) {
+        case "north":
+          target.position.x += gridTileSize / 2;
+          break;
 
-        if (!isKeyboardControlEnabled) {
-          // Trigger animation process.
-          triggerCurrentTileAnim(scene, track, target);
-        }
+        case "south":
+          target.position.x += gridTileSize / 2;
+          target.rotation.y += Math.PI;
+          break;
 
-        // Initialize the weather effect.
-        switch (weatherFx) {
-          case "fog":
-            scene.fogMode = Scene.FOGMODE_EXP;
-            scene.fogColor = new Color3(0.5, 0.5, 0.6);
-            scene.fogDensity = 0.0125;
-            break;
+        case "west":
+          target.position.x += gridTileSize;
+          target.position.z += gridTileSize / 2;
+          target.rotation.y += 1.5 * Math.PI;
+          break;
 
-          case "rain":
-            const particleSystem = new ParticleSystem("rain", 4000, scene);
+        case "east":
+          target.position.z += gridTileSize / 2;
+          target.rotation.y += 0.5 * Math.PI;
+          break;
+      }
 
-            particleSystem.particleTexture = new Texture("/assets/particle-rain.png");
-            particleSystem.emitter = new Vector3(0, 0, 0);
-            particleSystem.createCylinderEmitter(15, 0, 1, 0);
-            particleSystem.emitRate = 400;
-            particleSystem.updateSpeed = 0.05;
-            particleSystem.minLifeTime = 4;
-            particleSystem.maxLifeTime = 4;
-            particleSystem.gravity = new Vector3(0, -20, 0);
+      // Collect the handle for that node.
+      targetNodeRef.current = target;
 
-            particleSystem.minSize = 0.35;
-            particleSystem.maxSize = 0.4;
+      // Add the node to the scene.
+      container.addAllToScene();
 
-            particleSystem.minScaleX = 0.1;
-            particleSystem.maxScaleX = 0.15;
+      // Update camera target.
+      const cameraTarget = new AbstractMesh("cameraTarget", scene);
+      cameraTarget.parent = target;
+      cameraTarget.position.y = 5; // Have the camera aim a bit higher than the car.
+      camera.lockedTarget = cameraTarget;
 
-            particleSystem.minScaleY = 1;
-            particleSystem.maxScaleY = 1;
+      if (!isKeyboardControlEnabled) {
+        // Trigger animation process.
+        triggerCurrentTileAnim(scene, track, target);
+      }
 
-            particleSystem.start();
+      // Initialize the weather effect.
+      switch (weatherFx) {
+        case "fog":
+          scene.fogMode = Scene.FOGMODE_EXP;
+          scene.fogColor = new Color3(0.5, 0.5, 0.6);
+          scene.fogDensity = 0.0125;
+          break;
 
-            scene.onBeforeRenderObservable.add(() => {
-              // Make the emitter follow the camera.
-              if (particleSystem.emitter instanceof Vector3) {
-                particleSystem.emitter.x =
-                  camera.position.x + 0.6 * (target.position.x - camera.position.x);
-                particleSystem.emitter.y = camera.position.y + 14;
-                particleSystem.emitter.z =
-                  camera.position.z + 0.6 * (target.position.z - camera.position.z);
-              }
-            });
-            break;
-        }
+        case "rain":
+          const particleSystem = new ParticleSystem("rain", 4000, scene);
 
-        // Initialize shadows.
-        const shadowGenerator = new ShadowGenerator(1024, lightForShadows);
-        container.meshes.forEach((mesh) => shadowGenerator.addShadowCaster(mesh));
-        shadowGenerator.useExponentialShadowMap = true;
-        trackInfo["tiledGround"].receiveShadows = true;
+          particleSystem.particleTexture = new Texture("/assets/particle-rain.png");
+          particleSystem.emitter = new Vector3(0, 0, 0);
+          particleSystem.createCylinderEmitter(15, 0, 1, 0);
+          particleSystem.emitRate = 400;
+          particleSystem.updateSpeed = 0.05;
+          particleSystem.minLifeTime = 4;
+          particleSystem.maxLifeTime = 4;
+          particleSystem.gravity = new Vector3(0, -20, 0);
 
-        setIsLoading(false);
-      },
-    );
+          particleSystem.minSize = 0.35;
+          particleSystem.maxSize = 0.4;
+
+          particleSystem.minScaleX = 0.1;
+          particleSystem.maxScaleX = 0.15;
+
+          particleSystem.minScaleY = 1;
+          particleSystem.maxScaleY = 1;
+
+          particleSystem.start();
+
+          scene.onBeforeRenderObservable.add(() => {
+            // Make the emitter follow the camera.
+            if (particleSystem.emitter instanceof Vector3) {
+              particleSystem.emitter.x = camera.position.x + 0.6 * (target.position.x - camera.position.x);
+              particleSystem.emitter.y = camera.position.y + 14;
+              particleSystem.emitter.z = camera.position.z + 0.6 * (target.position.z - camera.position.z);
+            }
+          });
+          break;
+      }
+
+      // Initialize shadows.
+      const shadowGenerator = new ShadowGenerator(1024, lightForShadows);
+      container.meshes.forEach((mesh) => shadowGenerator.addShadowCaster(mesh));
+      shadowGenerator.useExponentialShadowMap = true;
+      trackInfo["tiledGround"].receiveShadows = true;
+
+      setIsLoading(false);
+    });
 
     // Implement keyboard input logic (to drive car).
     scene.onKeyboardObservable.add((kbInfo) => {
@@ -270,13 +263,7 @@ const CarRace: FC = () => {
         <Center position="absolute" top="0" left="0" right="0" bottom="0" zIndex="10">
           <VStack spacing={4}>
             <Text fontSize="xl">Loading...</Text>
-            <Spinner
-              size="xl"
-              color={"var(--primary-color)"}
-              thickness="4px"
-              emptyColor="gray.200"
-              speed="0.85s"
-            />
+            <Spinner size="xl" color={"var(--primary-color)"} thickness="4px" emptyColor="gray.200" speed="0.85s" />
           </VStack>
         </Center>
       )}

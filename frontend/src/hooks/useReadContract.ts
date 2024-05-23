@@ -12,10 +12,7 @@ export const useReadContract = () => {
   const client = usePublicClient();
 
   const racingInstance = useMemo(
-    () =>
-      client
-        ? getContract({ address: RACING_CONTRACT.address, abi: RACING_CONTRACT.ABI, client })
-        : null,
+    () => (client ? getContract({ address: RACING_CONTRACT.address, abi: RACING_CONTRACT.ABI, client }) : null),
     [client],
   );
 

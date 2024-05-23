@@ -20,8 +20,7 @@ const ScoreItem: FC<ScoreItemProps> = ({ user_address, score, index, image }) =>
   const { colorMode } = useColorMode();
   const { chainId } = useAccount();
 
-  const backgroundColor =
-    colorMode === "light" ? "var(--background-light)" : "var(--background-dark)";
+  const backgroundColor = colorMode === "light" ? "var(--background-light)" : "var(--background-dark)";
 
   return (
     <Box className={styles.scoreItem} style={{ backgroundColor: backgroundColor }}>

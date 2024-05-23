@@ -19,9 +19,7 @@ import { TITLE } from "./data/constants";
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
 
 if (!walletConnectProjectId) {
-  throw new Error(
-    "WalletConnect project ID is not defined. Please check your environment variables.",
-  );
+  throw new Error("WalletConnect project ID is not defined. Please check your environment variables.");
 }
 
 const connectors = connectorsForWallets(

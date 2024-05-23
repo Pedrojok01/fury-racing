@@ -78,10 +78,7 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes }) 
             <Box key={key}>
               <Stat>
                 <HStack>
-                  <CustomToolTip
-                    label={attributeLabels[key as keyof CarAttributes]}
-                    size="1.1rem"
-                  />
+                  <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} size="1.1rem" />
                   <StatLabel>{key.charAt(0).toUpperCase() + key.slice(1)}:</StatLabel>
                   <StatNumber fontSize="large">{value}</StatNumber>
                 </HStack>

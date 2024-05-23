@@ -23,9 +23,7 @@ export const generateRandomAttributes = (): CarAttributes => {
     const maxForThisAttribute = Math.min(max, remainingPoints - (numAttributes - index - 1) * min);
     const minForThisAttribute = Math.max(min, remainingPoints - (numAttributes - index - 1) * max);
 
-    attributes[key] =
-      Math.floor(Math.random() * (maxForThisAttribute - minForThisAttribute + 1)) +
-      minForThisAttribute;
+    attributes[key] = Math.floor(Math.random() * (maxForThisAttribute - minForThisAttribute + 1)) + minForThisAttribute;
     remainingPoints -= attributes[key];
   });
 

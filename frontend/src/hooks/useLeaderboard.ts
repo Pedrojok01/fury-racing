@@ -14,10 +14,7 @@ const fetcher = async (url: string): Promise<LeaderboardResponse> => {
 };
 
 function useLeaderboard() {
-  const { data, error, mutate } = useSWR<LeaderboardResponse, FetchError>(
-    "/api/getLeaderboard",
-    fetcher,
-  );
+  const { data, error, mutate } = useSWR<LeaderboardResponse, FetchError>("/api/getLeaderboard", fetcher);
 
   return {
     leaderboard: data?.data ?? [],

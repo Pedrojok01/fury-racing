@@ -45,22 +45,12 @@ const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner }) => {
   return (
     <Box w="100vw" h="100vh">
       {isWinner && (
-        <Confetti
-          numberOfPieces={1000}
-          recycle={false}
-          tweenDuration={50000}
-          width={width}
-          height={height}
-        />
+        <Confetti numberOfPieces={1000} recycle={false} tweenDuration={50000} width={width} height={height} />
       )}
 
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
-        <ModalContent
-          pt={2}
-          pb={5}
-          bg={isWinner ? "rgba(144, 238, 144, 0.7)" : "rgba(255, 182, 193, 0.7)"}
-        >
+        <ModalContent pt={2} pb={5} bg={isWinner ? "rgba(144, 238, 144, 0.7)" : "rgba(255, 182, 193, 0.7)"}>
           <ModalHeader>
             <Heading as="h2" size="xl" textAlign="center" mb={4}>
               {isWinner ? "🎉 You won! 🎉" : "😢 You Lost!"}
@@ -83,12 +73,7 @@ const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner }) => {
                     Play Again
                   </Button>
                 </Link>
-                <Link
-                  as={NextLink}
-                  href="/leaderboard"
-                  m={"auto"}
-                  style={{ textDecoration: "none" }}
-                >
+                <Link as={NextLink} href="/leaderboard" m={"auto"} style={{ textDecoration: "none" }}>
                   <Button w={150} className="custom-button">
                     Leaderboard
                   </Button>

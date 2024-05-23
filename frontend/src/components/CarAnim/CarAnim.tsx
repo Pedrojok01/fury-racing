@@ -78,9 +78,7 @@ const CarAnim: FC = () => {
           // Sort the array at the end, to ensure order is preserved, as loading
           // assets is performed asynchronously and some models will load faster
           // than others.
-          carNodesRef.current.sort((firstNode, secondNode) =>
-            firstNode.name.localeCompare(secondNode.name),
-          );
+          carNodesRef.current.sort((firstNode, secondNode) => firstNode.name.localeCompare(secondNode.name));
 
           // Start engine/scene rendering process.
           engine.runRenderLoop(() => scene.render());

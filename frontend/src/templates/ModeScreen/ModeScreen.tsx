@@ -25,16 +25,8 @@ const ModeScreen: FC = () => {
         </Text>
 
         <HStack spacing={5} wrap={"wrap"} justifyContent={"center"}>
-          <ButtonMode
-            text="Training"
-            label="Play a quick solo race for free against an AI. No pressure."
-            mode="SOLO"
-          />
-          <ButtonMode
-            text="Free Play"
-            label="Play a 1v1 race for free against against another player."
-            mode="FREE"
-          />
+          <ButtonMode text="Training" label="Play a quick solo race for free against an AI. No pressure." mode="SOLO" />
+          <ButtonMode text="Free Play" label="Play a 1v1 race for free against against another player." mode="FREE" />
           <ButtonMode
             text="Tournament"
             label="Double or nothing: Play and try to double up your bet against another player! Climb up the leaderboard and grab the weekly prize pool!"

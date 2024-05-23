@@ -11,8 +11,7 @@ import styles from "./leaderboard.module.css";
 
 const LeaderboardScreen: FC = () => {
   const { leaderboard } = useLeaderboard();
-  const { currentData, currentPage, pageCount, changePage, nextPage, prevPage, setDataset } =
-    usePagination([], 10);
+  const { currentData, currentPage, pageCount, changePage, nextPage, prevPage, setDataset } = usePagination([], 10);
 
   useEffect(() => {
     if (leaderboard && leaderboard.length > 0) {
@@ -39,12 +38,7 @@ const LeaderboardScreen: FC = () => {
             Prev
           </Button>
           {Array.from({ length: pageCount }, (_, index) => (
-            <Button
-              key={index}
-              onClick={() => changePage(index + 1)}
-              disabled={currentPage === index + 1}
-              size="sm"
-            >
+            <Button key={index} onClick={() => changePage(index + 1)} disabled={currentPage === index + 1} size="sm">
               {index + 1}
             </Button>
           ))}

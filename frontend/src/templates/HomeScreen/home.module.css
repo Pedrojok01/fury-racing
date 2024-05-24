@@ -7,7 +7,7 @@
 
 .subContainer {
   flex: 1;
-  min-width: 400px;
+  min-width: 280px;
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -51,7 +51,7 @@
   }
   .title {
     background-color: var(--text-bg-color-light);
-    padding: 10px;
+    padding: 5px;
     font-size: 25px;
   }
 

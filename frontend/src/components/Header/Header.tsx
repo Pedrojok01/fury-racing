@@ -2,7 +2,7 @@
 import { type FC } from "react";
 
 import { HamburgerIcon } from "@chakra-ui/icons";
-import { Box, Center, HStack, IconButton, Link, Menu, MenuButton, MenuList, useColorMode } from "@chakra-ui/react";
+import { Box, HStack, IconButton, Link, Menu, MenuButton, MenuList, useColorMode } from "@chakra-ui/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import NextLink from "next/link";
@@ -17,7 +17,6 @@ import styles from "./header.module.css";
 import { DarkModeButton } from "../DarkModeButton";
 
 const Header: FC = () => {
-  // const { isMobile } = useWindowSize();
   const { isConnected } = useAccount();
   const { colorMode } = useColorMode();
   const { reset } = useGameStates();
@@ -29,14 +28,14 @@ const Header: FC = () => {
   };
 
   const menuIems = (
-    <Center gap={3}>
-      <Link as={NextLink} href="/mode" className={styles.menuItems} onClick={handlePlayClick}>
+    <>
+      <NextLink href="/mode" className={styles.menuItems} onClick={handlePlayClick}>
         <Box>New Game</Box>
-      </Link>
-      <Link as={NextLink} href="/leaderboard" className={styles.menuItems}>
+      </NextLink>
+      <NextLink href="/leaderboard" className={styles.menuItems}>
         <Box>Leaderboard</Box>
-      </Link>
-    </Center>
+      </NextLink>
+    </>
   );
 
   return (
@@ -55,7 +54,7 @@ const Header: FC = () => {
           </Link>
 
           {isConnected && (
-            <HStack justifyContent={"center"} w={"100%"}>
+            <HStack justifyContent={"center"} w={"100%"} gap={3}>
               {menuIems}{" "}
             </HStack>
           )}
@@ -70,14 +69,12 @@ const Header: FC = () => {
       {isMobile && (
         <HStack paddingInline={"1rem"} position="sticky" top={0} zIndex={10} justifyContent={"left"}>
           <Link as={NextLink} href="/" textDecoration={"none"} w={"100%"} justifyContent={"left"}>
-            <HStack>
-              <Image
-                src={colorMode === "light" ? images.logo.src : images.logo_black.src}
-                alt="logo"
-                width={140}
-                height={63}
-              />
-            </HStack>
+            <Image
+              src={colorMode === "light" ? images.logo.src : images.logo_black.src}
+              alt="logo"
+              width={120}
+              height={54}
+            />
           </Link>
 
           {isConnected && (
@@ -103,7 +100,7 @@ const Header: FC = () => {
                   borderRadius={"12px"}
                 />
                 <MenuList p={2}>
-                  <HStack gap={10} justify="center" marginBlock={3}>
+                  <HStack gap={10} justify="center" marginBlock={1}>
                     <ConnectButton /> <DarkModeButton />
                   </HStack>
                 </MenuList>

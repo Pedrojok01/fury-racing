@@ -73,7 +73,7 @@ const ButtonMode: FC<ButtonModeProps> = ({ text, label, mode }) => {
   return (
     <Link as={NextLink} href="/selection" style={{ textDecoration: "none" }} onClick={handleClick}>
       <Button
-        w={isMobile ? "220px" : "330px"}
+        w={isMobile ? "200px" : "330px"}
         paddingBlock={isMobile ? "3.5rem" : "6rem"}
         paddingInline={"5rem"}
         fontSize={isMobile ? "1.5rem" : "2.5rem"}

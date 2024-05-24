@@ -81,6 +81,12 @@ a {
   }
 }
 
+@media (width < 1000px) {
+  .game-container {
+    height: calc(100vh - 77px - 1rem);
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;

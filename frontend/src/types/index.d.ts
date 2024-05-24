@@ -129,3 +129,9 @@ type RaceInfo = {
   player1Time: number;
   player2Time: number;
 };
+
+type PlayerInfo = {
+  attributes: CarAttributes;
+  playerAddress: `0x${string}`;
+  ELO: number;
+};

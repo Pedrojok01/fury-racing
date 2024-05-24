@@ -1,5 +1,5 @@
 // components/ResultModal.tsx
-import { useEffect, type FC } from "react";
+import { useEffect, useState, type FC } from "react";
 
 import {
   Center,
@@ -20,20 +20,39 @@ import {
 import NextLink from "next/link";
 import Confetti from "react-confetti";
 import { zeroAddress } from "viem";
+import { useAccount } from "wagmi";
 
-import { useWindowSize } from "@/hooks";
+import { useReadContract, useWindowSize } from "@/hooks";
 import { useGameStates } from "@/stores/useGameStates";
 import { getEllipsisTxt } from "@/utils/formatters";
 
 interface ResultModalProps {
   raceInfo: RaceInfo;
   isWinner: boolean;
+  mode: RaceMode;
 }
 
-const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner }) => {
+const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner, mode }) => {
   const { width, height } = useWindowSize();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { reset } = useGameStates();
+  const { address } = useAccount();
+  const { getPlayerInfo } = useReadContract();
+  const [playerScore, setPlayerScore] = useState<number | null>(null);
+  const isTournament = mode === "TOURNAMENT";
+
+  useEffect(() => {
+    const getScore = async () => {
+      if (isTournament && address) {
+        const score = await getPlayerInfo(address);
+        if (score === null) return;
+
+        setPlayerScore(score.ELO);
+      }
+    };
+
+    getScore();
+  }, [address, isTournament, getPlayerInfo, setPlayerScore]);
 
   const winner = raceInfo.player1Time < raceInfo.player2Time ? raceInfo.player1 : raceInfo.player2;
   const loser = raceInfo.player1Time > raceInfo.player2Time ? raceInfo.player1 : raceInfo.player2;
@@ -41,6 +60,19 @@ const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner }) => {
   useEffect(() => {
     onOpen();
   }, [onOpen]);
+
+  const pointsUpdate = (
+    <Center textAlign={"center"} marginBlock={5} fontWeight={700}>
+      {isTournament ? (
+        <VStack>
+          {winner ? <Text fontSize={"2rem"}>+3 Points !</Text> : <Text fontSize={"2rem"}>+1 Points !</Text>}
+          <Text>{playerScore ?? ""}</Text>
+        </VStack>
+      ) : (
+        <Text>Play in Tournament Mode to gain points and climb the leaderboard!</Text>
+      )}
+    </Center>
+  );
 
   return (
     <Box w="100vw" h="100vh">
@@ -64,6 +96,7 @@ const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner }) => {
             <VStack justifyContent={"center"}>
               <Text>Winner: {winner === zeroAddress ? "Computer" : getEllipsisTxt(winner, 8)}</Text>
               <Text>Loser: {loser === zeroAddress ? "Computer" : getEllipsisTxt(loser, 8)}</Text>
+              {pointsUpdate}
             </VStack>
 
             <Center>

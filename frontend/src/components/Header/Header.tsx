@@ -10,6 +10,7 @@ import { isMobile } from "react-device-detect";
 import { useAccount } from "wagmi";
 
 import { images } from "@/data";
+import { useWindowSize } from "@/hooks";
 import { useAudio } from "@/stores/useAudio";
 import { useGameStates } from "@/stores/useGameStates";
 
@@ -21,6 +22,7 @@ const Header: FC = () => {
   const { colorMode } = useColorMode();
   const { reset } = useGameStates();
   const { setAudio } = useAudio();
+  const { width } = useWindowSize();
 
   const handlePlayClick = () => {
     reset();
@@ -47,8 +49,8 @@ const Header: FC = () => {
               <Image
                 src={colorMode === "light" ? images.logo.src : images.logo_black.src}
                 alt="logo"
-                width={180}
-                height={81}
+                width={width < 1200 ? 160 : 180}
+                height={width < 1200 ? 72 : 81}
               />
             </HStack>
           </Link>

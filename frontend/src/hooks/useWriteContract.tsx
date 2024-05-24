@@ -11,6 +11,11 @@ import { generateRandomAttributes } from "@/utils/generateCarAttributes";
 
 import { useNotify, useReadContract } from ".";
 
+type JoinSoloRaceArgs = [CarAttributes, CarAttributes, number];
+type JoinOtherRaces = [CarAttributes, number];
+
+type MethodArgs = JoinSoloRaceArgs | JoinOtherRaces;
+
 type ContractCallResponse = {
   success: boolean;
   data: TransactionReceipt | null;
@@ -25,7 +30,7 @@ export const useWriteContract = () => {
   const { setLoading, setIsWaiting, setTransactionHash } = useGameStates();
   const { carData } = useAnim();
   const { notifyError } = useNotify();
-  const { mode, setRaceId } = useGameStates();
+  const { mode, betAmount, setRaceId } = useGameStates();
   const { getSoloRaceCount, getFreeRaceCount, getTournamentRaceCount } = useReadContract();
 
   const racingInstance = useMemo(() => {
@@ -44,7 +49,13 @@ export const useWriteContract = () => {
   /* Join Race Handler:
    *********************/
   const handleTransaction = useCallback(
-    async (methodName: string, getCount: () => Promise<bigint>, setWaiting: boolean, ...args: any[]) => {
+    async (
+      methodName: string,
+      getCount: () => Promise<bigint>,
+      setWaiting: boolean,
+      value?: bigint,
+      ...args: MethodArgs
+    ) => {
       if (!racingInstance || !publicClient) {
         return { success: false, data: null, error: "The contract instance is missing." };
       }
@@ -60,10 +71,11 @@ export const useWriteContract = () => {
           abi: RACING_CONTRACT.ABI,
           functionName: methodName,
           args,
+          value: value ?? undefined,
         });
 
         // Run transaction
-        const hash: `0x${string}` = await racingInstance.write[methodName](args);
+        const hash: `0x${string}` = await racingInstance.write[methodName](args, { value: value ?? undefined });
 
         setTransactionHash(hash);
 
@@ -99,6 +111,7 @@ export const useWriteContract = () => {
       "joinSoloRace",
       getSoloRaceCount,
       false,
+      undefined,
       carData.attributes,
       generateRandomAttributes(),
       circuitId,
@@ -108,14 +121,14 @@ export const useWriteContract = () => {
   /* Join Free Race (1v1):
    **************************/
   const joinFreeRace = useCallback(async (): Promise<ContractCallResponse> => {
-    return await handleTransaction("joinFreeRace", getFreeRaceCount, true, carData.attributes, circuitId);
+    return await handleTransaction("joinFreeRace", getFreeRaceCount, true, undefined, carData.attributes, circuitId);
   }, [handleTransaction, getFreeRaceCount, carData]);
 
   /* Join Tournament Race (1v1):
    ******************************/
   const joinTournamentRace = useCallback(async (): Promise<ContractCallResponse> => {
-    return await handleTransaction("joinRace", getTournamentRaceCount, true, carData.attributes, circuitId);
-  }, [handleTransaction, getTournamentRaceCount, carData]);
+    return await handleTransaction("joinRace", getTournamentRaceCount, true, betAmount, carData.attributes, circuitId);
+  }, [handleTransaction, getTournamentRaceCount, carData, betAmount]);
 
   /* Wait for Player:
    *******************/
@@ -130,7 +143,7 @@ export const useWriteContract = () => {
           if (mode === "FREE") {
             raceInfo = (await racingInstance.read.getFreeRaceFromRaceID([raceId])) as RaceInfo;
           } else {
-            raceInfo = (await racingInstance.read.getTournamentRaceFromRaceID([raceId])) as RaceInfo;
+            raceInfo = (await racingInstance.read.getRaceFromRaceID([raceId])) as RaceInfo;
           }
 
           if (raceInfo.player2 !== zeroAddress) {

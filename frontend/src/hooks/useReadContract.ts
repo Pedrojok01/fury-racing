@@ -86,6 +86,23 @@ export const useReadContract = () => {
     }
   }, [racingInstance]);
 
+  /* Get player info for address :
+   *******************************/
+  const getPlayerInfo = useCallback(
+    async (address: `0x${string}`): Promise<PlayerInfo | null> => {
+      if (!racingInstance) return null;
+
+      try {
+        const playerInfo = (await racingInstance.read.addressToPlayer([address])) as PlayerInfo;
+        return playerInfo;
+      } catch (error: unknown) {
+        logError(error);
+        return null;
+      }
+    },
+    [racingInstance],
+  );
+
   /* Get race info for raceId :
    *****************************/
   const getRaceInfo = useCallback(
@@ -128,6 +145,7 @@ export const useReadContract = () => {
     getSoloRaceCount,
     getFreeRaceCount,
     getTournamentRaceCount,
+    getPlayerInfo,
     getRaceInfo,
   };
 };

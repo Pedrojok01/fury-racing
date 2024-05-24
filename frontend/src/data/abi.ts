@@ -13,13 +13,7 @@ export const RACING_ABI = [
   },
   { type: "fallback", stateMutability: "payable" },
   { type: "receive", stateMutability: "payable" },
-  {
-    type: "function",
-    name: "acceptOwnership",
-    inputs: [],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
+  { type: "function", name: "acceptOwnership", inputs: [], outputs: [], stateMutability: "nonpayable" },
   {
     type: "function",
     name: "addCircuit",
@@ -102,13 +96,7 @@ export const RACING_ABI = [
     outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view",
   },
-  {
-    type: "function",
-    name: "emergencyWithdraw",
-    inputs: [],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
+  { type: "function", name: "emergencyWithdraw", inputs: [], outputs: [], stateMutability: "nonpayable" },
   {
     type: "function",
     name: "freeRaceCounter",
@@ -622,6 +610,7 @@ export const RACING_ABI = [
   { type: "error", name: "Racing__InvalidAttribute", inputs: [] },
   { type: "error", name: "Racing__InvalidAttributesSum", inputs: [] },
   { type: "error", name: "Racing__InvalidBetAmount", inputs: [] },
+  { type: "error", name: "Racing__PlayerAlreadyJoined", inputs: [] },
   { type: "error", name: "Racing__WeeklyPaymentFailed", inputs: [] },
   { type: "error", name: "Racing__WeeklyPaymentInsufficientBalance", inputs: [] },
   { type: "error", name: "Racing__WinnerPaymentFailed", inputs: [] },

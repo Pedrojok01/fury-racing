@@ -40,7 +40,7 @@ const RaceScreen: FC = () => {
         </VStack>
       </Center>
 
-      {hasRaceFinished && <ResultModal raceInfo={raceInfo} isWinner={!!isWinner} />}
+      {hasRaceFinished && <ResultModal raceInfo={raceInfo} isWinner={!!isWinner} mode={mode ?? "SOLO"} />}
     </>
   );
 };

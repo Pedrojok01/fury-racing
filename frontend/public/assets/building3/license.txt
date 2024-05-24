@@ -1,0 +1,11 @@
+Model Information:
+* title:	Modern building 05
+* source:	https://sketchfab.com/3d-models/modern-building-05-7fc1d3bd4bde4be7ab4eee80771fbef1
+* author:	burunduk (https://sketchfab.com/burunduk)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Modern building 05" (https://sketchfab.com/3d-models/modern-building-05-7fc1d3bd4bde4be7ab4eee80771fbef1) by burunduk (https://sketchfab.com/burunduk) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

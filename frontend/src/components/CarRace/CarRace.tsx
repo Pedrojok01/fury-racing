@@ -1,24 +1,28 @@
 import React, { useRef, useEffect, useMemo, type FC, useState } from "react";
 
 import {
+  AbstractAssetTask,
   AbstractMesh,
+  AssetsManager,
+  AssetTaskState,
   Color3,
-  CubeTexture,
   DirectionalLight,
   Engine,
   HemisphericLight,
   KeyboardEventTypes,
+  Mesh,
+  MeshAssetTask,
   ParticleSystem,
   Scene,
-  SceneLoader,
   ShadowGenerator,
   Texture,
+  TextureAssetTask,
   TransformNode,
   Vector3,
 } from "@babylonjs/core";
-import { Box, Center, Spinner, Text, VStack } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 
-import { tracks } from "@/data";
+import { decorations, tracks } from "@/data";
 import "@babylonjs/loaders/glTF";
 import { useAnim } from "@/stores/useAnim";
 
@@ -33,8 +37,6 @@ const CarRace: FC = () => {
   const { carIdx, carData, skybox, weatherFx } = useAnim();
   const track = tracks[0].animData;
   const isKeyboardControlEnabled = false;
-
-  const [isLoading, setIsLoading] = useState(true);
 
   const controlState = useMemo(() => ({ up: false, down: false, left: false, right: false }), []);
 
@@ -51,48 +53,138 @@ const CarRace: FC = () => {
     const scene = new Scene(engine);
     sceneRef.current = scene;
 
-    // Initialize the camera.
-    const camera = initializeCamera(scene, track, gridTileSize);
+    // Load all the assets in one go.
+    const assetTasks: Record<string, AbstractAssetTask> = {};
+    const assetsManager = new AssetsManager(scene);
 
-    // Initialize the sky box.
-    const skyTexture = new CubeTexture(`/assets/skybox_${skybox}/skybox`, scene);
-    scene.createDefaultSkybox(skyTexture, true, 10000);
+    // -- Track materials.
+    assetTasks['texture_grid_empty'] = assetsManager.addTextureTask(`task_texture_grid_empty`, "assets/texture-grass-alt.svg");
+    assetTasks['texture_grid_road_en'] = assetsManager.addTextureTask(`task_texture_grid_road_en`, "assets/texture-road-en-alt.svg");
+    assetTasks['texture_grid_road_es'] = assetsManager.addTextureTask(`task_texture_grid_road_es`, "assets/texture-road-es-alt.svg");
+    assetTasks['texture_grid_road_ew'] = assetsManager.addTextureTask(`task_texture_grid_road_ew`, "assets/texture-road-ew-alt.svg");
+    assetTasks['texture_grid_road_ns'] = assetsManager.addTextureTask(`task_texture_grid_road_ns`, "assets/texture-road-ns-alt.svg");
+    assetTasks['texture_grid_road_nw'] = assetsManager.addTextureTask(`task_texture_grid_road_nw`, "assets/texture-road-nw-alt.svg");
+    assetTasks['texture_grid_road_sw'] = assetsManager.addTextureTask(`task_texture_grid_road_sw`, "assets/texture-road-sw-alt.svg");
 
-    // Initialize the track.
-    const trackInfo = initializeTrack(scene, track, gridTileSize);
+    // -- Car.
+    assetTasks['mesh_car'] = assetsManager.addMeshTask(
+      `task_mesh_car`, '', 
+      `./assets/${carData.path}/`, 
+      "scene.gltf");
 
-    // Initialize lighting.
-    const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
-    switch (skybox) {
-      default:
-        light.intensity = 0.6;
-        break;
-      case "cloudy":
-        light.intensity = 0.5;
-        break;
-      case "storm":
-        light.intensity = 0.3;
-        break;
-      case "night":
-        light.intensity = 0.1;
-        break;
-    }
+    // -- Decorations.
+    decorations.forEach(decoration => {
+      assetTasks[`mesh_${decoration.path}`] = assetsManager.addMeshTask(
+        `task_mesh_${decoration.path}`, '',
+        `./assets/${decoration.path}/`,
+        "scene.gltf");
+    });
 
-    const lightForShadows = new DirectionalLight("dir01", new Vector3(-1, -2, -1), scene);
-    lightForShadows.position = new Vector3(
-      (trackInfo["gridWidth"] * gridTileSize) / 2,
-      40, // High in the sky.
-      (trackInfo["gridHeight"] * gridTileSize) / 2,
-    );
+    // -- Skybox texture.
+    assetTasks['cube_texture_skybox'] = assetsManager.addCubeTextureTask(
+      `task_cube_texture_${skybox}`, 
+      `/assets/skybox_${skybox}/skybox`);
 
-    lightForShadows.intensity = 0.3;
+    // -- Rain particle texture.
+    assetTasks['texture_rain'] = assetsManager.addTextureTask(
+      `task_texture_rain`,
+      "/assets/particle-rain.png");
 
-    // Load and place the car model.
-    const target = new TransformNode("target");
-    const car = new TransformNode("car");
-    SceneLoader.LoadAssetContainer(`./assets/${carData.path}/`, "scene.gltf", scene, (container) => {
-      // Adjust the loaded meshes.
-      container.meshes.forEach((mesh) => {
+    assetsManager.onTasksDoneObservable.add(function (tasks) {
+      // Abort immediately if any error occurred.
+      const errors = tasks.filter(function (task) {
+        return task.taskState === AssetTaskState.ERROR;
+      });
+
+      if (errors.length > 0) {
+        errors.forEach(error => console.error('error', error));
+        return;
+      }
+
+      // Initialize the sky box.
+      const skyTexture = (assetTasks['cube_texture_skybox'] as TextureAssetTask).texture;
+      scene.createDefaultSkybox(skyTexture, true, 10000);
+
+      // Prepare track decorations.
+      const decorationMeshes: Record<string, Mesh[]> = {};
+      decorations.forEach(decoration => {
+        // Initialize our own parent mesh for this decoration.
+        const decorationParentMesh = new Mesh(`${decoration.path}`, scene);
+
+        // Process each loaded mesh...
+        const meshTask = assetTasks[`mesh_${decoration.path}`] as MeshAssetTask;
+        meshTask.loadedMeshes.forEach(mesh => {
+          // If the mesh is a root mesh...
+          if (!mesh.parent) {
+            // Apply the offset.
+            mesh.position.x += decoration.offset.x;
+            mesh.position.y += decoration.offset.y;
+            mesh.position.z += decoration.offset.z;
+
+            // Anchor to our own parent mesh.
+            mesh.parent = decorationParentMesh;          
+          }          
+        });
+
+        // Set the scaling and rotation on the whole object.
+        decorationParentMesh.scaling = new Vector3(decoration.scale, decoration.scale, decoration.scale);
+        decorationParentMesh.rotation.y = decoration.rotation.y;
+
+        // Store reference to mesh array.
+        decorationMeshes[decoration.path] = [
+          decorationParentMesh,
+          ...(meshTask.loadedMeshes as Mesh[])
+        ];        
+      });
+
+      // Initialize the track.
+      const gridTextures = [
+        (assetTasks['texture_grid_empty'] as TextureAssetTask).texture,
+        (assetTasks['texture_grid_road_en'] as TextureAssetTask).texture,
+        (assetTasks['texture_grid_road_es'] as TextureAssetTask).texture,
+        (assetTasks['texture_grid_road_ew'] as TextureAssetTask).texture,
+        (assetTasks['texture_grid_road_ns'] as TextureAssetTask).texture,
+        (assetTasks['texture_grid_road_nw'] as TextureAssetTask).texture,
+        (assetTasks['texture_grid_road_sw'] as TextureAssetTask).texture,
+      ];
+
+      const trackInfo = initializeTrack(scene, track, gridTileSize, gridTextures, decorationMeshes);
+      for (var key in decorationMeshes) {
+        decorationMeshes[key].forEach(mesh => mesh.isVisible = false);
+      }
+
+      // Initialize lighting.
+      // -- Global lighting.
+      const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
+      switch (skybox) {
+        default:
+          light.intensity = 0.6;
+          break;
+        case "cloudy":
+          light.intensity = 0.5;
+          break;
+        case "storm":
+          light.intensity = 0.3;
+          break;
+        case "night":
+          light.intensity = 0.1;
+          break;
+      }
+
+      // -- Light for shadows.
+      const lightForShadows = new DirectionalLight("dir01", new Vector3(-1, -2, -1), scene);
+      lightForShadows.position = new Vector3(
+        (trackInfo["gridWidth"] * gridTileSize) / 2,
+        400, // High in the sky.
+        (trackInfo["gridHeight"] * gridTileSize) / 2,
+      );
+
+      lightForShadows.intensity = 0.3;
+
+      // Initialize the car.
+      const target = new TransformNode("target");
+      const car = new TransformNode("car");
+      (assetTasks['mesh_car'] as MeshAssetTask).loadedMeshes.forEach(mesh => {
         mesh.position.x += carData.offset.x;
         mesh.position.y += carData.offset.y;
         mesh.position.z += carData.offset.z;
@@ -101,14 +193,14 @@ const CarRace: FC = () => {
           mesh.parent = car;
         }
       });
-
+      
       car.scaling = new Vector3(carData.scale, carData.scale, carData.scale);
       car.position.y += 1.3; // Lift the car so that it sits on the road.
 
-      // Group the adjusted car within a camera target object.
+      // -- Group the adjusted car within a target object (for the camera).
       car.parent = target;
 
-      // Place the car on the track.
+      // -- Place the car on the track.
       target.position.x += track.startPosition.x * gridTileSize;
       target.position.z += track.startPosition.y * gridTileSize;
       switch (track.startPosition.direction) {
@@ -133,29 +225,22 @@ const CarRace: FC = () => {
           break;
       }
 
-      // Collect the handle for that node.
+      // -- Collect the handle for that node.
       targetNodeRef.current = target;
 
-      // Add the node to the scene.
-      container.addAllToScene();
-
-      // Update camera target.
+      // Initialize the camera.
+      const camera = initializeCamera(scene, track, gridTileSize);
       const cameraTarget = new AbstractMesh("cameraTarget", scene);
       cameraTarget.parent = target;
       cameraTarget.position.y = 5; // Have the camera aim a bit higher than the car.
       camera.lockedTarget = cameraTarget;
-
-      if (!isKeyboardControlEnabled) {
-        // Trigger animation process.
-        triggerCurrentTileAnim(scene, track, target);
-      }
 
       // Initialize the weather effect.
       switch (weatherFx) {
         case "fog":
           scene.fogMode = Scene.FOGMODE_EXP;
           scene.fogColor = new Color3(0.5, 0.5, 0.6);
-          scene.fogDensity = 0.0125;
+          scene.fogDensity = 0.0100;
           break;
 
         case "rain":
@@ -184,9 +269,11 @@ const CarRace: FC = () => {
           scene.onBeforeRenderObservable.add(() => {
             // Make the emitter follow the camera.
             if (particleSystem.emitter instanceof Vector3) {
-              particleSystem.emitter.x = camera.position.x + 0.6 * (target.position.x - camera.position.x);
+              particleSystem.emitter.x =
+                camera.position.x + 0.6 * (target.position.x - camera.position.x);
               particleSystem.emitter.y = camera.position.y + 14;
-              particleSystem.emitter.z = camera.position.z + 0.6 * (target.position.z - camera.position.z);
+              particleSystem.emitter.z =
+                camera.position.z + 0.6 * (target.position.z - camera.position.z);
             }
           });
           break;
@@ -194,60 +281,78 @@ const CarRace: FC = () => {
 
       // Initialize shadows.
       const shadowGenerator = new ShadowGenerator(1024, lightForShadows);
-      container.meshes.forEach((mesh) => shadowGenerator.addShadowCaster(mesh));
+      
+      // -- Car shadow.
+      (assetTasks['mesh_car'] as MeshAssetTask).loadedMeshes.forEach(mesh => {
+        shadowGenerator.addShadowCaster(mesh);
+      });
+
+      // -- Decoration shadows.
+      trackInfo.decoCloneMeshes.forEach(mesh => {
+        // Disabled for now. Costs too much performance.
+        //shadowGenerator.addShadowCaster(mesh);
+      });
+
       shadowGenerator.useExponentialShadowMap = true;
       trackInfo["tiledGround"].receiveShadows = true;
+  
+      // Implement keyboard input logic (to drive car).
+      scene.onKeyboardObservable.add((kbInfo) => {
+        switch (kbInfo.type) {
+          case KeyboardEventTypes.KEYDOWN:
+            if (kbInfo.event.key === "ArrowLeft") controlState.left = true;
+            if (kbInfo.event.key === "ArrowRight") controlState.right = true;
+            if (kbInfo.event.key === "ArrowUp") controlState.up = true;
+            if (kbInfo.event.key === "ArrowDown") controlState.down = true;
+            break;
+          case KeyboardEventTypes.KEYUP:
+            if (kbInfo.event.key === "ArrowLeft") controlState.left = false;
+            if (kbInfo.event.key === "ArrowRight") controlState.right = false;
+            if (kbInfo.event.key === "ArrowUp") controlState.up = false;
+            if (kbInfo.event.key === "ArrowDown") controlState.down = false;
+            break;
+        }
+      });
 
-      setIsLoading(false);
+      scene.onBeforeRenderObservable.add(() => {
+        // Modify the car's position based on keyboard controls.
+        if (!isKeyboardControlEnabled || !targetNodeRef.current) return;
+
+        const target = targetNodeRef.current;
+
+        // -- Rotation.
+        const isRotatingLeft = controlState.left && !controlState.right;
+        const isRotatingRight = controlState.right && !controlState.left;
+        if (isRotatingLeft) {
+          target.rotation.y += -carRotateFactor;
+        } else if (isRotatingRight) {
+          target.rotation.y += carRotateFactor;
+        }
+
+        // -- Throttle.
+        const isThrottlingForward = controlState.up && !controlState.down;
+        const isThrottlingBackward = controlState.down && !controlState.up;
+        if (isThrottlingForward) {
+          target.position.x += Math.sin(target.rotation.y) * carThrottleFactor;
+          target.position.z += Math.cos(target.rotation.y) * carThrottleFactor;
+        } else if (isThrottlingBackward) {
+          target.position.x += Math.sin(target.rotation.y) * -carThrottleFactor;
+          target.position.z += Math.cos(target.rotation.y) * -carThrottleFactor;
+        }
+      });
+
+      // Trigger animation process, if applicable.
+      if (!isKeyboardControlEnabled) {
+        setTimeout(() => triggerCurrentTileAnim(scene, track, target),
+          4000); // How long to wait before the car starts moving.
+      }
+
+      // Start engine/scene rendering process.
+      engine.runRenderLoop(() => scene.render());
     });
 
-    // Implement keyboard input logic (to drive car).
-    scene.onKeyboardObservable.add((kbInfo) => {
-      switch (kbInfo.type) {
-        case KeyboardEventTypes.KEYDOWN:
-          if (kbInfo.event.key === "ArrowLeft") controlState.left = true;
-          if (kbInfo.event.key === "ArrowRight") controlState.right = true;
-          if (kbInfo.event.key === "ArrowUp") controlState.up = true;
-          if (kbInfo.event.key === "ArrowDown") controlState.down = true;
-          break;
-        case KeyboardEventTypes.KEYUP:
-          if (kbInfo.event.key === "ArrowLeft") controlState.left = false;
-          if (kbInfo.event.key === "ArrowRight") controlState.right = false;
-          if (kbInfo.event.key === "ArrowUp") controlState.up = false;
-          if (kbInfo.event.key === "ArrowDown") controlState.down = false;
-          break;
-      }
-    });
-
-    scene.onBeforeRenderObservable.add(() => {
-      // Modify the car's position based on keyboard controls.
-      if (!isKeyboardControlEnabled || !targetNodeRef.current) return;
-
-      const target = targetNodeRef.current;
-
-      // -- Rotation.
-      const isRotatingLeft = controlState.left && !controlState.right;
-      const isRotatingRight = controlState.right && !controlState.left;
-      if (isRotatingLeft) {
-        target.rotation.y += -carRotateFactor;
-      } else if (isRotatingRight) {
-        target.rotation.y += carRotateFactor;
-      }
-
-      // -- Throttle.
-      const isThrottlingForward = controlState.up && !controlState.down;
-      const isThrottlingBackward = controlState.down && !controlState.up;
-      if (isThrottlingForward) {
-        target.position.x += Math.sin(target.rotation.y) * carThrottleFactor;
-        target.position.z += Math.cos(target.rotation.y) * carThrottleFactor;
-      } else if (isThrottlingBackward) {
-        target.position.x += Math.sin(target.rotation.y) * -carThrottleFactor;
-        target.position.z += Math.cos(target.rotation.y) * -carThrottleFactor;
-      }
-    });
-
-    // Start engine/scene rendering process.
-    engine.runRenderLoop(() => scene.render());
+    // Begin the loading process.
+    assetsManager.load();
 
     // Cleanup when component unmounts.
     return () => {
@@ -259,14 +364,6 @@ const CarRace: FC = () => {
 
   return (
     <Box w={"70vw"}>
-      {isLoading && (
-        <Center position="absolute" top="0" left="0" right="0" bottom="0" zIndex="10">
-          <VStack spacing={4}>
-            <Text fontSize="xl">Loading...</Text>
-            <Spinner size="xl" color={"var(--primary-color)"} thickness="4px" emptyColor="gray.200" speed="0.85s" />
-          </VStack>
-        </Center>
-      )}
       <canvas ref={ref} style={{ width: "100%", height: "100%" }} />
     </Box>
   );

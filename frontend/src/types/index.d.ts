@@ -63,6 +63,19 @@ type CarMetadata = {
   description: string;
 };
 
+type DecorationMetadata = {
+  path: string;
+  scale: number;
+  offset: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  rotation: {
+    y: number;
+  }
+};
+
 interface Weather {
   location: {
     name: string;

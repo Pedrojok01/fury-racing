@@ -1,0 +1,11 @@
+Model Information:
+* title:	Low Poly Tree 2
+* source:	https://sketchfab.com/3d-models/low-poly-tree-2-73eb8c73bd6c4a8db4e02dbb6bfcffcf
+* author:	Render Zing (https://sketchfab.com/RenderZing)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Low Poly Tree 2" (https://sketchfab.com/3d-models/low-poly-tree-2-73eb8c73bd6c4a8db4e02dbb6bfcffcf) by Render Zing (https://sketchfab.com/RenderZing) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

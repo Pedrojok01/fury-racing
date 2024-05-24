@@ -1,4 +1,12 @@
-import { MeshBuilder, MultiMaterial, StandardMaterial, SubMesh, Texture, type Scene } from "@babylonjs/core";
+import {
+  Mesh,
+  MeshBuilder,
+  MultiMaterial,
+  StandardMaterial,
+  SubMesh,
+  Texture,
+  type Scene,
+} from "@babylonjs/core";
 
 /**
  * Helper function to create a StandardMaterial with a texture.
@@ -7,9 +15,9 @@ import { MeshBuilder, MultiMaterial, StandardMaterial, SubMesh, Texture, type Sc
  * @param scene - The Babylon.js scene.
  * @returns The created StandardMaterial.
  */
-const createMaterial = (name: string, texturePath: string, scene: Scene): StandardMaterial => {
+const createMaterial = (name: string, texture: Texture, scene: Scene): StandardMaterial => {
   const material = new StandardMaterial(name, scene);
-  material.diffuseTexture = new Texture(texturePath, scene);
+  material.diffuseTexture = texture;
   return material;
 };
 
@@ -18,8 +26,15 @@ const createMaterial = (name: string, texturePath: string, scene: Scene): Standa
  * @param scene - The Babylon.js scene.
  * @param track - The track configuration.
  * @param gridTileSize - The size of each grid tile.
+ * @param gridTextures - The textures for ground tiles.
+ * @param decorationMeshes - The map of track decoration meshes.
  */
-export const initializeTrack = (scene: Scene, track: TrackAnim, gridTileSize: number) => {
+export const initializeTrack = (
+  scene: Scene, 
+  track: TrackAnim, 
+  gridTileSize: number, 
+  gridTextures: Texture[], 
+  decorationMeshes: Record<string, Mesh[]>) => {
   const tileRows = track.tiles.trim().split(/\r?\n|\r|\n/g);
   const gridWidth = track.tiles.trim().split(/\r?\n|\r|\n/g)[0].length;
   const gridHeight = track.tiles.trim().split(/\r?\n|\r|\n/g).length;
@@ -34,13 +49,13 @@ export const initializeTrack = (scene: Scene, track: TrackAnim, gridTileSize: nu
   });
 
   const materials = {
-    empty: createMaterial("empty", "assets/texture-grass-alt.svg", scene),
-    roadEn: createMaterial("roadEn", "assets/texture-road-en-alt.svg", scene),
-    roadEs: createMaterial("roadEs", "assets/texture-road-es-alt.svg", scene),
-    roadEw: createMaterial("roadEw", "assets/texture-road-ew-alt.svg", scene),
-    roadNs: createMaterial("roadNs", "assets/texture-road-ns-alt.svg", scene),
-    roadNw: createMaterial("roadNw", "assets/texture-road-nw-alt.svg", scene),
-    roadSw: createMaterial("roadSw", "assets/texture-road-sw-alt.svg", scene),
+    empty: createMaterial("empty", gridTextures[0], scene),
+    roadEn: createMaterial("roadEn", gridTextures[1], scene),
+    roadEs: createMaterial("roadEs", gridTextures[2], scene),
+    roadEw: createMaterial("roadEw", gridTextures[3], scene),
+    roadNs: createMaterial("roadNs", gridTextures[4], scene),
+    roadNw: createMaterial("roadNw", gridTextures[5], scene),
+    roadSw: createMaterial("roadSw", gridTextures[6], scene),
   };
 
   const multimat = new MultiMaterial("multi", scene);
@@ -79,8 +94,99 @@ export const initializeTrack = (scene: Scene, track: TrackAnim, gridTileSize: nu
       const tileChar = tileRow[col];
       const materialIndex = materialIndexMap[tileChar] || 0;
 
-      tiledGround.subMeshes.push(new SubMesh(materialIndex, 0, verticesCount, base, tileIndicesLength, tiledGround));
+      tiledGround.subMeshes.push(
+        new SubMesh(materialIndex, 0, verticesCount, base, tileIndicesLength, tiledGround),
+      );
+
       base += tileIndicesLength;
+    }
+  }
+
+  const createdClones: Mesh[] = [];
+  let cityIndex = 0;
+  let houseIndex = 0;
+  let treeIndex = 0;
+  for (let row = gridHeight - 1; row >= 0; row--) {
+    const tileRow = tileRows[row].trim();
+    for (let col = 0; col < tileRow.length; col++) {
+      const tileChar = tileRow[col];
+      
+      // Add decorations, where applicable.
+      let decoName;
+      let rotationY = 0;
+      switch (tileChar) {
+        // Billboard.
+        case 'B': 
+        case '˼':
+        case '˻':
+        case '˹':
+        case '˺':        
+          decoName = `billboard`;
+
+          switch (tileChar) {
+            case '˻': rotationY = (Math.PI / 2); break;
+            case '˹': rotationY = Math.PI; break;
+            case '˺': rotationY = -(Math.PI / 2); break;
+          }
+
+          break;
+
+        // Buildings.
+        case 'C':    
+        case '╠':
+        case '╦':
+        case '╣':
+        case '╩':        
+          decoName = `building${cityIndex + 1}`;
+
+          switch (tileChar) {
+            case '╦': rotationY = (Math.PI / 2); break;
+            case '╣': rotationY = Math.PI; break;
+            case '╩': rotationY = -(Math.PI / 2); break;       
+          }
+
+          // Increment index.
+          cityIndex++;
+          cityIndex %= 3;
+          break;
+
+        // House.
+        case 'H':
+        case '├':
+        case '┬':
+        case '┤':
+        case '┴':          
+          decoName = `house${houseIndex + 1}`;
+
+          switch (tileChar) {
+            case '┬': rotationY = (Math.PI / 2); break;
+            case '┤': rotationY = Math.PI; break;
+            case '┴': rotationY = -(Math.PI / 2); break;       
+          }
+
+          // Increment index.
+          houseIndex++;
+          houseIndex %= 3;
+          break;
+
+        // Trees.
+        case 'V': 
+          decoName = `tree${treeIndex + 1}`;
+
+          // Increment index.
+          treeIndex++;
+          treeIndex %= 3;
+          break;
+      }
+
+      if (decoName) {          
+          const currClone = decorationMeshes[decoName][0].clone();
+          currClone.position.x = (col * gridTileSize) + (gridTileSize / 2);
+          currClone.position.z = ((gridHeight - 1 - row) * gridTileSize) + (gridTileSize / 2);
+          currClone.rotation.y += rotationY;
+
+          createdClones.push(currClone);
+      }
     }
   }
 
@@ -89,5 +195,6 @@ export const initializeTrack = (scene: Scene, track: TrackAnim, gridTileSize: nu
     tiledGround: tiledGround,
     gridWidth: gridWidth,
     gridHeight: gridHeight,
+    decoCloneMeshes: createdClones
   };
 };

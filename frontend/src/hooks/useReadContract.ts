@@ -93,7 +93,12 @@ export const useReadContract = () => {
       if (!racingInstance) return null;
 
       try {
-        const playerInfo = (await racingInstance.read.addressToPlayer([address])) as PlayerInfo;
+        const info = (await racingInstance.read.addressToPlayer([address])) as [CarAttributes, `0x${string}`, number];
+        const playerInfo = {
+          attributes: info[0],
+          playerAddress: info[1],
+          ELO: info[2],
+        };
         return playerInfo;
       } catch (error: unknown) {
         logError(error);
@@ -125,8 +130,6 @@ export const useReadContract = () => {
           default:
             throw new Error(`Unsupported race mode: ${mode}`);
         }
-
-        console.log("raceInfo", race);
 
         if (race && (race.player1Time !== 0 || race.player2Time !== 0)) {
           setRaceInfo(race);

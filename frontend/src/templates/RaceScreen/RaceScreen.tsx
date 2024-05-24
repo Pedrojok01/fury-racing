@@ -29,9 +29,6 @@ const RaceScreen: FC = () => {
     ((address === raceInfo.player1 && raceInfo.player1Time < raceInfo.player2Time) ||
       (address === raceInfo.player2 && raceInfo.player2Time < raceInfo.player1Time));
 
-  console.log("isWinner", isWinner);
-  console.log("hasRaceFinished", hasRaceFinished);
-
   return (
     <>
       <Center h={"100%"}>

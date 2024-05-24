@@ -208,6 +208,10 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
+    function sponsorWeeklyPrizePool() public payable {
+        currentPrizePool += msg.value;
+    }
+
     function getSoloRaceFromRaceID(uint256 raceId) public view returns (Race memory) {
         return soloRaces[raceId];
     }

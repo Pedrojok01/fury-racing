@@ -74,7 +74,6 @@ abstract contract MockChainlinkFeed is
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Random Number Request
-    // TODO: Fund subscription on both testnet and Mainnet.
     function requestRandomNumber(
         uint256 raceId,
         RaceMode mode

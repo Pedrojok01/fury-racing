@@ -217,6 +217,13 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
+    /**
+     * @notice Allows to sponsorize the weekly prize pool with an arbitrary amount.
+     */
+    function sponsorWeeklyPrizePool() public payable {
+        currentPrizePool += msg.value;
+    }
+
     function getSoloRaceFromRaceID(uint256 raceId) public view returns (Race memory) {
         return soloRaces[raceId];
     }
@@ -279,7 +286,10 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         _unpause();
     }
 
-    /// @notice Allows to withdraws funds from the contract if needed.
+    /**
+     * @notice Allows to withdraws funds from the contract if needed.
+     * @notice Ideally placed behind a multisig with a timelock.
+     */
     function emergencyWithdraw() external onlyOwner {
         if (address(this).balance > 0) {
             (bool success,) = payable(owner()).call{ value: address(this).balance }("");

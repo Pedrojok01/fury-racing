@@ -33,10 +33,8 @@ slither :; slither . --config-file slither.config.json --checklist
 
 aderyn :; aderyn .
 
-deploy :; forge script script/Deployer.s.sol --broadcast --rpc-url avalanche --verifier-url 'https://api.routescan.io/v2/network/mainnet/evm/43114/etherscan' --etherscan-api-key 'verifyContract'
-
-deployTest :; forge script script/DeployerTestnet.s.sol --broadcast --rpc-url avalancheFuji --verifier-url 'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan' --etherscan-api-key 'verifyContract'
-
 simulate :; forge script script/DeployerTestnet.s.sol --rpc-url avalancheFuji
 
-catapulta :; npx catapulta script script/DeployerTestnet.s.sol --network avalancheFuji --skip-git
+catapulta :; npx catapulta script script/Deployer.s.sol --network avalanche --skip-git
+
+catapulTest :; npx catapulta script script/DeployerTestnet.s.sol --network avalancheFuji --skip-git

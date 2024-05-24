@@ -20,7 +20,6 @@ const HomeScreen: FC = () => {
   const handlePlayClick = () => {
     reset();
     setAudio(true);
-    console.log("Audio set to true");
   };
 
   return (

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo, type FC, useState } from "react";
+import React, { useRef, useEffect, useMemo, type FC } from "react";
 
 import {
   AbstractAssetTask,
@@ -58,37 +58,56 @@ const CarRace: FC = () => {
     const assetsManager = new AssetsManager(scene);
 
     // -- Track materials.
-    assetTasks['texture_grid_empty'] = assetsManager.addTextureTask(`task_texture_grid_empty`, "assets/texture-grass-alt.svg");
-    assetTasks['texture_grid_road_en'] = assetsManager.addTextureTask(`task_texture_grid_road_en`, "assets/texture-road-en-alt.svg");
-    assetTasks['texture_grid_road_es'] = assetsManager.addTextureTask(`task_texture_grid_road_es`, "assets/texture-road-es-alt.svg");
-    assetTasks['texture_grid_road_ew'] = assetsManager.addTextureTask(`task_texture_grid_road_ew`, "assets/texture-road-ew-alt.svg");
-    assetTasks['texture_grid_road_ns'] = assetsManager.addTextureTask(`task_texture_grid_road_ns`, "assets/texture-road-ns-alt.svg");
-    assetTasks['texture_grid_road_nw'] = assetsManager.addTextureTask(`task_texture_grid_road_nw`, "assets/texture-road-nw-alt.svg");
-    assetTasks['texture_grid_road_sw'] = assetsManager.addTextureTask(`task_texture_grid_road_sw`, "assets/texture-road-sw-alt.svg");
+    assetTasks["texture_grid_empty"] = assetsManager.addTextureTask(
+      `task_texture_grid_empty`,
+      "assets/texture-grass-alt.svg",
+    );
+    assetTasks["texture_grid_road_en"] = assetsManager.addTextureTask(
+      `task_texture_grid_road_en`,
+      "assets/texture-road-en-alt.svg",
+    );
+    assetTasks["texture_grid_road_es"] = assetsManager.addTextureTask(
+      `task_texture_grid_road_es`,
+      "assets/texture-road-es-alt.svg",
+    );
+    assetTasks["texture_grid_road_ew"] = assetsManager.addTextureTask(
+      `task_texture_grid_road_ew`,
+      "assets/texture-road-ew-alt.svg",
+    );
+    assetTasks["texture_grid_road_ns"] = assetsManager.addTextureTask(
+      `task_texture_grid_road_ns`,
+      "assets/texture-road-ns-alt.svg",
+    );
+    assetTasks["texture_grid_road_nw"] = assetsManager.addTextureTask(
+      `task_texture_grid_road_nw`,
+      "assets/texture-road-nw-alt.svg",
+    );
+    assetTasks["texture_grid_road_sw"] = assetsManager.addTextureTask(
+      `task_texture_grid_road_sw`,
+      "assets/texture-road-sw-alt.svg",
+    );
 
     // -- Car.
-    assetTasks['mesh_car'] = assetsManager.addMeshTask(
-      `task_mesh_car`, '', 
-      `./assets/${carData.path}/`, 
-      "scene.gltf");
+    assetTasks["mesh_car"] = assetsManager.addMeshTask(`task_mesh_car`, "", `./assets/${carData.path}/`, "scene.gltf");
 
     // -- Decorations.
-    decorations.forEach(decoration => {
+    decorations.forEach((decoration) => {
       assetTasks[`mesh_${decoration.path}`] = assetsManager.addMeshTask(
-        `task_mesh_${decoration.path}`, '',
+        `task_mesh_${decoration.path}`,
+        "",
         `./assets/${decoration.path}/`,
-        "scene.gltf");
+        "scene.gltf",
+      );
     });
 
     // -- Skybox texture.
-    assetTasks['cube_texture_skybox'] = assetsManager.addCubeTextureTask(
-      `task_cube_texture_${skybox}`, 
-      `/assets/skybox_${skybox}/skybox`);
+    assetTasks["cube_texture_skybox"] = assetsManager.addCubeTextureTask(
+      `task_cube_texture_${skybox}`,
+      `/assets/skybox_${skybox}/skybox`,
+    );
 
     // -- Rain particle texture.
-    assetTasks['texture_rain'] = assetsManager.addTextureTask(
-      `task_texture_rain`,
-      "/assets/particle-rain.png");
+    assetTasks["texture_rain"] = assetsManager.addTextureTask(`task_texture_rain`, "/assets/particle-rain.png");
 
     assetsManager.onTasksDoneObservable.add(function (tasks) {
       // Abort immediately if any error occurred.
@@ -97,23 +116,23 @@ const CarRace: FC = () => {
       });
 
       if (errors.length > 0) {
-        errors.forEach(error => console.error('error', error));
+        errors.forEach((error) => console.error("error", error));
         return;
       }
 
       // Initialize the sky box.
-      const skyTexture = (assetTasks['cube_texture_skybox'] as TextureAssetTask).texture;
+      const skyTexture = (assetTasks["cube_texture_skybox"] as TextureAssetTask).texture;
       scene.createDefaultSkybox(skyTexture, true, 10000);
 
       // Prepare track decorations.
       const decorationMeshes: Record<string, Mesh[]> = {};
-      decorations.forEach(decoration => {
+      decorations.forEach((decoration) => {
         // Initialize our own parent mesh for this decoration.
         const decorationParentMesh = new Mesh(`${decoration.path}`, scene);
 
         // Process each loaded mesh...
         const meshTask = assetTasks[`mesh_${decoration.path}`] as MeshAssetTask;
-        meshTask.loadedMeshes.forEach(mesh => {
+        meshTask.loadedMeshes.forEach((mesh) => {
           // If the mesh is a root mesh...
           if (!mesh.parent) {
             // Apply the offset.
@@ -122,8 +141,8 @@ const CarRace: FC = () => {
             mesh.position.z += decoration.offset.z;
 
             // Anchor to our own parent mesh.
-            mesh.parent = decorationParentMesh;          
-          }          
+            mesh.parent = decorationParentMesh;
+          }
         });
 
         // Set the scaling and rotation on the whole object.
@@ -131,26 +150,23 @@ const CarRace: FC = () => {
         decorationParentMesh.rotation.y = decoration.rotation.y;
 
         // Store reference to mesh array.
-        decorationMeshes[decoration.path] = [
-          decorationParentMesh,
-          ...(meshTask.loadedMeshes as Mesh[])
-        ];        
+        decorationMeshes[decoration.path] = [decorationParentMesh, ...(meshTask.loadedMeshes as Mesh[])];
       });
 
       // Initialize the track.
       const gridTextures = [
-        (assetTasks['texture_grid_empty'] as TextureAssetTask).texture,
-        (assetTasks['texture_grid_road_en'] as TextureAssetTask).texture,
-        (assetTasks['texture_grid_road_es'] as TextureAssetTask).texture,
-        (assetTasks['texture_grid_road_ew'] as TextureAssetTask).texture,
-        (assetTasks['texture_grid_road_ns'] as TextureAssetTask).texture,
-        (assetTasks['texture_grid_road_nw'] as TextureAssetTask).texture,
-        (assetTasks['texture_grid_road_sw'] as TextureAssetTask).texture,
+        (assetTasks["texture_grid_empty"] as TextureAssetTask).texture,
+        (assetTasks["texture_grid_road_en"] as TextureAssetTask).texture,
+        (assetTasks["texture_grid_road_es"] as TextureAssetTask).texture,
+        (assetTasks["texture_grid_road_ew"] as TextureAssetTask).texture,
+        (assetTasks["texture_grid_road_ns"] as TextureAssetTask).texture,
+        (assetTasks["texture_grid_road_nw"] as TextureAssetTask).texture,
+        (assetTasks["texture_grid_road_sw"] as TextureAssetTask).texture,
       ];
 
       const trackInfo = initializeTrack(scene, track, gridTileSize, gridTextures, decorationMeshes);
-      for (var key in decorationMeshes) {
-        decorationMeshes[key].forEach(mesh => mesh.isVisible = false);
+      for (const key in decorationMeshes) {
+        decorationMeshes[key].forEach((mesh) => (mesh.isVisible = false));
       }
 
       // Initialize lighting.
@@ -184,7 +200,7 @@ const CarRace: FC = () => {
       // Initialize the car.
       const target = new TransformNode("target");
       const car = new TransformNode("car");
-      (assetTasks['mesh_car'] as MeshAssetTask).loadedMeshes.forEach(mesh => {
+      (assetTasks["mesh_car"] as MeshAssetTask).loadedMeshes.forEach((mesh) => {
         mesh.position.x += carData.offset.x;
         mesh.position.y += carData.offset.y;
         mesh.position.z += carData.offset.z;
@@ -193,7 +209,7 @@ const CarRace: FC = () => {
           mesh.parent = car;
         }
       });
-      
+
       car.scaling = new Vector3(carData.scale, carData.scale, carData.scale);
       car.position.y += 1.3; // Lift the car so that it sits on the road.
 
@@ -240,7 +256,7 @@ const CarRace: FC = () => {
         case "fog":
           scene.fogMode = Scene.FOGMODE_EXP;
           scene.fogColor = new Color3(0.5, 0.5, 0.6);
-          scene.fogDensity = 0.0100;
+          scene.fogDensity = 0.01;
           break;
 
         case "rain":
@@ -269,11 +285,9 @@ const CarRace: FC = () => {
           scene.onBeforeRenderObservable.add(() => {
             // Make the emitter follow the camera.
             if (particleSystem.emitter instanceof Vector3) {
-              particleSystem.emitter.x =
-                camera.position.x + 0.6 * (target.position.x - camera.position.x);
+              particleSystem.emitter.x = camera.position.x + 0.6 * (target.position.x - camera.position.x);
               particleSystem.emitter.y = camera.position.y + 14;
-              particleSystem.emitter.z =
-                camera.position.z + 0.6 * (target.position.z - camera.position.z);
+              particleSystem.emitter.z = camera.position.z + 0.6 * (target.position.z - camera.position.z);
             }
           });
           break;
@@ -281,21 +295,22 @@ const CarRace: FC = () => {
 
       // Initialize shadows.
       const shadowGenerator = new ShadowGenerator(1024, lightForShadows);
-      
+
       // -- Car shadow.
-      (assetTasks['mesh_car'] as MeshAssetTask).loadedMeshes.forEach(mesh => {
+      (assetTasks["mesh_car"] as MeshAssetTask).loadedMeshes.forEach((mesh) => {
         shadowGenerator.addShadowCaster(mesh);
       });
 
       // -- Decoration shadows.
-      trackInfo.decoCloneMeshes.forEach(mesh => {
+      trackInfo.decoCloneMeshes.forEach(() => {
         // Disabled for now. Costs too much performance.
+        // Re-add "mesh" as argument to enable.
         //shadowGenerator.addShadowCaster(mesh);
       });
 
       shadowGenerator.useExponentialShadowMap = true;
       trackInfo["tiledGround"].receiveShadows = true;
-  
+
       // Implement keyboard input logic (to drive car).
       scene.onKeyboardObservable.add((kbInfo) => {
         switch (kbInfo.type) {
@@ -343,8 +358,7 @@ const CarRace: FC = () => {
 
       // Trigger animation process, if applicable.
       if (!isKeyboardControlEnabled) {
-        setTimeout(() => triggerCurrentTileAnim(scene, track, target),
-          4000); // How long to wait before the car starts moving.
+        setTimeout(() => triggerCurrentTileAnim(scene, track, target), 4000); // How long to wait before the car starts moving.
       }
 
       // Start engine/scene rendering process.

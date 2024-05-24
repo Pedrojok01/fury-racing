@@ -10,8 +10,7 @@ import { isMobile } from "react-device-detect";
 import { useAccount } from "wagmi";
 
 import { images } from "@/data";
-import { useWindowSize } from "@/hooks";
-import { useAudio } from "@/stores/useAudio";
+import { useAudio, useWindowSize } from "@/hooks";
 import { useGameStates } from "@/stores/useGameStates";
 
 import styles from "./header.module.css";
@@ -21,12 +20,14 @@ const Header: FC = () => {
   const { isConnected } = useAccount();
   const { colorMode } = useColorMode();
   const { reset } = useGameStates();
-  const { setAudio } = useAudio();
+  const { audio, setAudio } = useAudio();
   const { width } = useWindowSize();
 
   const handlePlayClick = () => {
     reset();
-    setAudio(true);
+    if (!audio) {
+      setAudio(true);
+    }
   };
 
   const menuIems = (

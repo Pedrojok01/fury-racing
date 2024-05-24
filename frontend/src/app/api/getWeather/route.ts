@@ -41,7 +41,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     const weatherApiUrl = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=no`;
 
-    const weatherResponse = await fetch(weatherApiUrl);
+    const weatherResponse = await fetch(weatherApiUrl, {
+      cache: "no-cache",
+    });
     if (!weatherResponse.ok) {
       const errorResponse: WeatherResponse = {
         success: false,

@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import merge from "lodash.merge";
 import { WagmiProvider } from "wagmi";
 
+import { AudioProvider } from "@/hooks/useAudioContext";
 import { wagmiConfig } from "@/wagmi";
 
 export function Providers({ children }: Readonly<{ children: ReactNode }>) {
@@ -39,7 +40,7 @@ export function Providers({ children }: Readonly<{ children: ReactNode }>) {
         <CacheProvider>
           <ChakraProvider resetCSS theme={theme}>
             <RainbowKitProvider coolMode appInfo={appInfo} theme={customTheme}>
-              {mounted && children}
+              <AudioProvider>{mounted && children}</AudioProvider>
             </RainbowKitProvider>
           </ChakraProvider>
         </CacheProvider>

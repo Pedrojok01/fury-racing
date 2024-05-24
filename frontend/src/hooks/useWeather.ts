@@ -27,6 +27,10 @@ function useWeather(city: string) {
   const { data, error, mutate } = useSWR<WeatherResponse, FetchError>(
     city ? `/api/getWeather?city=${city}` : null,
     fetcher,
+    {
+      revalidateOnFocus: true, // Revalidate when window is focused
+      refreshInterval: 3600000, // Refresh every hour
+    },
   );
 
   const { setWeather, setSky } = useAnim();

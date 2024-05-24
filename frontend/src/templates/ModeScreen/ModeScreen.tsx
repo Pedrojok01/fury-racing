@@ -41,7 +41,7 @@ const ModeScreen: FC = () => {
           </Text>
           <Center flexDirection={"column"}>
             <Flex w={"50%"} justifyContent="space-between" minW={280}>
-              <Text>Current bet amount:</Text>{" "}
+              <Text>Current entry fee:</Text>{" "}
               <Text fontWeight={700}>{formatEther(betAmount) ?? " loading..."} AVAX</Text>
             </Flex>
             <Flex w={"50%"} justifyContent="space-between" minW={280}>

@@ -7,7 +7,7 @@ import { isMobile } from "react-device-detect";
 import { useAccount } from "wagmi";
 
 import { images } from "@/data/images";
-import { useAudio } from "@/stores/useAudio";
+import { useAudio } from "@/hooks";
 import { useGameStates } from "@/stores/useGameStates";
 
 import styles from "./home.module.css";
@@ -20,6 +20,7 @@ const HomeScreen: FC = () => {
   const handlePlayClick = () => {
     reset();
     setAudio(true);
+    console.log("Audio set to true");
   };
 
   return (

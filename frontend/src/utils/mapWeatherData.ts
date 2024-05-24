@@ -7,6 +7,7 @@ export function mapWeatherData(weatherData: Weather): { weatherFx: WeatherFx; sk
   const conditionText = current.condition.text.toLowerCase();
   const cloudCoverage = current.cloud;
   const isDay = current.is_day === 1;
+  // const isDay = true;
 
   if (conditionText.includes("rain") || conditionText.includes("shower") || conditionText.includes("drizzle")) {
     weatherFx = "rain";

@@ -35,17 +35,18 @@ export const AudioProvider: FC<AudioProviderProps> = ({ children }) => {
   useEffect(() => {
     if (!audioElementRef.current) {
       audioElementRef.current = new Audio(songs[songIndex]);
-
-      const handleEnded = () => {
-        setSongIndex((prevIndex) => (prevIndex + 1) % songs.length);
-      };
-
-      audioElementRef.current.addEventListener("ended", handleEnded);
-
-      return () => {
-        audioElementRef.current?.removeEventListener("ended", handleEnded);
-      };
     }
+    const sound = audioElementRef.current;
+
+    const handleEnded = () => {
+      setSongIndex((prevIndex) => (prevIndex + 1) % songs.length);
+    };
+
+    sound.addEventListener("ended", handleEnded);
+
+    return () => {
+      sound.removeEventListener("ended", handleEnded);
+    };
   }, [songIndex]);
 
   useEffect(() => {

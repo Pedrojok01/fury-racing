@@ -8,7 +8,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import merge from "lodash.merge";
 import { WagmiProvider } from "wagmi";
 
-import { AudioProvider } from "@/hooks/useAudioContext";
+import { AudioProvider, WalkthroughProvider } from "@/context";
+import { TITLE } from "@/data";
 import { wagmiConfig } from "@/wagmi";
 
 export function Providers({ children }: Readonly<{ children: ReactNode }>) {
@@ -31,8 +32,10 @@ export function Providers({ children }: Readonly<{ children: ReactNode }>) {
   } as Theme);
 
   const appInfo = {
-    appName: "Next-Web3-Boilerplate",
+    appName: TITLE,
   };
+
+  if (!mounted) return null;
 
   return (
     <WagmiProvider config={wagmiConfig}>
@@ -40,7 +43,9 @@ export function Providers({ children }: Readonly<{ children: ReactNode }>) {
         <CacheProvider>
           <ChakraProvider resetCSS theme={theme}>
             <RainbowKitProvider coolMode appInfo={appInfo} theme={customTheme}>
-              <AudioProvider>{mounted && children}</AudioProvider>
+              <AudioProvider>
+                <WalkthroughProvider>{mounted && children}</WalkthroughProvider>
+              </AudioProvider>
             </RainbowKitProvider>
           </ChakraProvider>
         </CacheProvider>

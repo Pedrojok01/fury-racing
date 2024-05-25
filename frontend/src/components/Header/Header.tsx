@@ -9,15 +9,16 @@ import NextLink from "next/link";
 import { isMobile } from "react-device-detect";
 import { useAccount } from "wagmi";
 
+import { useAudio } from "@/context";
 import { images } from "@/data";
-import { useAudio, useWindowSize } from "@/hooks";
+import { useWindowSize } from "@/hooks";
 import { useGameStates } from "@/stores";
 
 import styles from "./header.module.css";
 import { DarkModeButton } from "../DarkModeButton";
 
 const Header: FC = () => {
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const { colorMode } = useColorMode();
   const { reset } = useGameStates();
   const { audio, setAudio } = useAudio();
@@ -35,7 +36,7 @@ const Header: FC = () => {
       <NextLink href="/mode" className={styles.menuItems} onClick={handlePlayClick}>
         <Box>New Game</Box>
       </NextLink>
-      <NextLink href="/leaderboard" className={styles.menuItems}>
+      <NextLink href="/leaderboard" className={`${styles.menuItems} leaderboard`}>
         <Box>Leaderboard</Box>
       </NextLink>
     </>
@@ -63,6 +64,7 @@ const Header: FC = () => {
           )}
 
           <HStack justifyContent={"right"} w={"100%"}>
+            {!isConnected && !address && <Box h={0} className="connect-wallet" />}
             <ConnectButton />
             <DarkModeButton />
           </HStack>

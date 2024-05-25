@@ -6,8 +6,8 @@ import NextLink from "next/link";
 import { isMobile } from "react-device-detect";
 import { useAccount } from "wagmi";
 
+import { useAudio } from "@/context";
 import { images } from "@/data/images";
-import { useAudio } from "@/hooks";
 import { useGameStates } from "@/stores";
 
 import styles from "./home.module.css";
@@ -34,7 +34,7 @@ const HomeScreen: FC = () => {
         </Text>
 
         {isConnected && (
-          <Link as={NextLink} href="/mode" style={{ textDecoration: "none" }}>
+          <Link as={NextLink} href="/mode" style={{ textDecoration: "none" }} className="play">
             <Button
               mt={isMobile ? "0.5rem" : "2rem"}
               paddingBlock={isMobile ? "2.2rem" : "2.5rem"}

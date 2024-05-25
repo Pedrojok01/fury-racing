@@ -33,7 +33,7 @@ const ModeScreen: FC = () => {
         </Text>
 
         <HStack spacing={5} wrap={"wrap"} justifyContent={"center"}>
-          <ButtonMode text="Training" label={descriptionText.SOLO} mode="SOLO" />
+          <ButtonMode text="Training" label={descriptionText.SOLO} mode="SOLO" walkthrough="select-mode" />
           <ButtonMode text="Free Play" label={descriptionText.FREE} mode="FREE" />
           <ButtonMode text="Tournament" label={descriptionText.TOURNAMENT} mode="TOURNAMENT" />
         </HStack>
@@ -64,9 +64,10 @@ interface ButtonModeProps {
   text: string;
   label: string;
   mode: RaceMode;
+  walkthrough?: string;
 }
 
-const ButtonMode: FC<ButtonModeProps> = ({ text, label, mode }) => {
+const ButtonMode: FC<ButtonModeProps> = ({ text, label, mode, walkthrough }) => {
   const { setRaceMode } = useGameStates();
 
   const handleClick = () => {
@@ -74,7 +75,13 @@ const ButtonMode: FC<ButtonModeProps> = ({ text, label, mode }) => {
   };
 
   return (
-    <Link as={NextLink} href="/selection" style={{ textDecoration: "none" }} onClick={handleClick}>
+    <Link
+      as={NextLink}
+      href="/selection"
+      style={{ textDecoration: "none" }}
+      onClick={handleClick}
+      className={walkthrough}
+    >
       <Button
         w={isMobile ? "200px" : "330px"}
         paddingBlock={isMobile ? "3.5rem" : "6rem"}

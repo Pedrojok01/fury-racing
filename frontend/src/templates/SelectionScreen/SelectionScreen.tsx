@@ -51,14 +51,17 @@ const SelectionScreen: FC = () => {
       <>
         <VStack flex="1" align="center" justify="center" spacing={4} minW={330}>
           <CustomBox>
-            <VStack alignItems={"flex-start"}>
+            <VStack alignItems={"flex-start"} className="select-car">
               <Text textAlign={"left"} className="subtitle">
                 1. Choose Your Car
               </Text>
               <CarAnim />
             </VStack>
           </CustomBox>
-          <AttributesSelector defaultAttributes={carData.attributes} />
+          <AttributesSelector
+            defaultAttributes={carData.attributes}
+            walktrough={{ attributes: "select-attributes", luck: "select-luck" }}
+          />
         </VStack>
 
         <VStack flex="1" minW={330}>
@@ -70,7 +73,7 @@ const SelectionScreen: FC = () => {
             paddingInline={"5rem"}
             fontSize={"2rem"}
             fontWeight={"bold"}
-            className="custom-button"
+            className="custom-button start-race"
             isLoading={loading}
             onClick={handleRaceStart}
           >

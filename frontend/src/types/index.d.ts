@@ -73,7 +73,7 @@ type DecorationMetadata = {
   };
   rotation: {
     y: number;
-  }
+  };
 };
 
 interface Weather {

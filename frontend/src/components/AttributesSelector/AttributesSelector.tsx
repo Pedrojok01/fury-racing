@@ -33,9 +33,10 @@ const totalPoints = 40;
 
 interface AttributesSelectorProps {
   defaultAttributes: CarAttributes;
+  walktrough?: { attributes: string; luck: string };
 }
 
-const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes }) => {
+const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, walktrough }) => {
   const [attributes, setAttributes] = useState<CarAttributes>(defaultAttributes);
   const [remainingPoints, setRemainingPoints] = useState<number>(totalPoints);
 
@@ -73,9 +74,9 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes }) 
           <Text>Remaining: {remainingPoints}</Text>
         </HStack>
 
-        <SimpleGrid columns={2} gap={1} w="full">
+        <SimpleGrid columns={2} gap={1} w="full" className={walktrough?.attributes}>
           {Object.entries(attributes).map(([key, value]) => (
-            <Box key={key}>
+            <Box key={key} className={attributeLabels[key as keyof CarAttributes] === "luck" ? walktrough?.luck : ""}>
               <Stat>
                 <HStack>
                   <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} size="1.1rem" />

@@ -1,12 +1,4 @@
-import {
-  Mesh,
-  MeshBuilder,
-  MultiMaterial,
-  StandardMaterial,
-  SubMesh,
-  Texture,
-  type Scene,
-} from "@babylonjs/core";
+import { Mesh, MeshBuilder, MultiMaterial, StandardMaterial, SubMesh, Texture, type Scene } from "@babylonjs/core";
 
 /**
  * Helper function to create a StandardMaterial with a texture.
@@ -30,11 +22,12 @@ const createMaterial = (name: string, texture: Texture, scene: Scene): StandardM
  * @param decorationMeshes - The map of track decoration meshes.
  */
 export const initializeTrack = (
-  scene: Scene, 
-  track: TrackAnim, 
-  gridTileSize: number, 
-  gridTextures: Texture[], 
-  decorationMeshes: Record<string, Mesh[]>) => {
+  scene: Scene,
+  track: TrackAnim,
+  gridTileSize: number,
+  gridTextures: Texture[],
+  decorationMeshes: Record<string, Mesh[]>,
+) => {
   const tileRows = track.tiles.trim().split(/\r?\n|\r|\n/g);
   const gridWidth = track.tiles.trim().split(/\r?\n|\r|\n/g)[0].length;
   const gridHeight = track.tiles.trim().split(/\r?\n|\r|\n/g).length;
@@ -94,9 +87,7 @@ export const initializeTrack = (
       const tileChar = tileRow[col];
       const materialIndex = materialIndexMap[tileChar] || 0;
 
-      tiledGround.subMeshes.push(
-        new SubMesh(materialIndex, 0, verticesCount, base, tileIndicesLength, tiledGround),
-      );
+      tiledGround.subMeshes.push(new SubMesh(materialIndex, 0, verticesCount, base, tileIndicesLength, tiledGround));
 
       base += tileIndicesLength;
     }
@@ -110,39 +101,51 @@ export const initializeTrack = (
     const tileRow = tileRows[row].trim();
     for (let col = 0; col < tileRow.length; col++) {
       const tileChar = tileRow[col];
-      
+
       // Add decorations, where applicable.
       let decoName;
       let rotationY = 0;
       switch (tileChar) {
         // Billboard.
-        case 'B': 
-        case '˼':
-        case '˻':
-        case '˹':
-        case '˺':        
+        case "B":
+        case "˼":
+        case "˻":
+        case "˹":
+        case "˺":
           decoName = `billboard`;
 
           switch (tileChar) {
-            case '˻': rotationY = (Math.PI / 2); break;
-            case '˹': rotationY = Math.PI; break;
-            case '˺': rotationY = -(Math.PI / 2); break;
+            case "˻":
+              rotationY = Math.PI / 2;
+              break;
+            case "˹":
+              rotationY = Math.PI;
+              break;
+            case "˺":
+              rotationY = -(Math.PI / 2);
+              break;
           }
 
           break;
 
         // Buildings.
-        case 'C':    
-        case '╠':
-        case '╦':
-        case '╣':
-        case '╩':        
+        case "C":
+        case "╠":
+        case "╦":
+        case "╣":
+        case "╩":
           decoName = `building${cityIndex + 1}`;
 
           switch (tileChar) {
-            case '╦': rotationY = (Math.PI / 2); break;
-            case '╣': rotationY = Math.PI; break;
-            case '╩': rotationY = -(Math.PI / 2); break;       
+            case "╦":
+              rotationY = Math.PI / 2;
+              break;
+            case "╣":
+              rotationY = Math.PI;
+              break;
+            case "╩":
+              rotationY = -(Math.PI / 2);
+              break;
           }
 
           // Increment index.
@@ -151,17 +154,23 @@ export const initializeTrack = (
           break;
 
         // House.
-        case 'H':
-        case '├':
-        case '┬':
-        case '┤':
-        case '┴':          
+        case "H":
+        case "├":
+        case "┬":
+        case "┤":
+        case "┴":
           decoName = `house${houseIndex + 1}`;
 
           switch (tileChar) {
-            case '┬': rotationY = (Math.PI / 2); break;
-            case '┤': rotationY = Math.PI; break;
-            case '┴': rotationY = -(Math.PI / 2); break;       
+            case "┬":
+              rotationY = Math.PI / 2;
+              break;
+            case "┤":
+              rotationY = Math.PI;
+              break;
+            case "┴":
+              rotationY = -(Math.PI / 2);
+              break;
           }
 
           // Increment index.
@@ -170,7 +179,7 @@ export const initializeTrack = (
           break;
 
         // Trees.
-        case 'V': 
+        case "V":
           decoName = `tree${treeIndex + 1}`;
 
           // Increment index.
@@ -179,13 +188,13 @@ export const initializeTrack = (
           break;
       }
 
-      if (decoName) {          
-          const currClone = decorationMeshes[decoName][0].clone();
-          currClone.position.x = (col * gridTileSize) + (gridTileSize / 2);
-          currClone.position.z = ((gridHeight - 1 - row) * gridTileSize) + (gridTileSize / 2);
-          currClone.rotation.y += rotationY;
+      if (decoName) {
+        const currClone = decorationMeshes[decoName][0].clone();
+        currClone.position.x = col * gridTileSize + gridTileSize / 2;
+        currClone.position.z = (gridHeight - 1 - row) * gridTileSize + gridTileSize / 2;
+        currClone.rotation.y += rotationY;
 
-          createdClones.push(currClone);
+        createdClones.push(currClone);
       }
     }
   }
@@ -195,6 +204,6 @@ export const initializeTrack = (
     tiledGround: tiledGround,
     gridWidth: gridWidth,
     gridHeight: gridHeight,
-    decoCloneMeshes: createdClones
+    decoCloneMeshes: createdClones,
   };
 };

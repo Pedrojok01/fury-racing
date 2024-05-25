@@ -55,8 +55,6 @@ const getScores = async() => {
 
     const contract = new ethers.Contract(contractAddress, contractABI, provider);
 
-    // console.log(contract);
-
     const [week, players] = await contract.getWeekAndPlayerAmount();
     console.log(`week: ${week}, players: ${players}`);
 
@@ -75,8 +73,6 @@ const getScores = async() => {
       console.log(theAddress.toString());
       console.log(elo);
       
-      
-
       return { players: [playerAddress], scores: [elo.toString()] };
     } else {
 
@@ -89,6 +85,15 @@ const getScores = async() => {
 
       const playerAddresses = await Promise.all(calls)
       console.log(playerAddresses);
+
+      // retunr all players' scores
+      calls = [];
+      for (let i=0; i<totalPlayers; i++) {
+        calls[i] = contract.addressToPlayer(playerAddresses[i]);
+      }
+
+      const results = await Promise.all(calls)
+      console.log(results);
     }
   } catch(error) {
     console.error('Error calling getWeekAndPlayerAmount:', error);

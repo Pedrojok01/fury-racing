@@ -398,6 +398,7 @@ export const RACING_ABI = [
     outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view",
   },
+  { type: "function", name: "sponsorWeeklyPrizePool", inputs: [], outputs: [], stateMutability: "payable" },
   {
     type: "function",
     name: "tournamentPlayersCounter",

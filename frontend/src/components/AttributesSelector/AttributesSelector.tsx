@@ -75,28 +75,31 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
         </HStack>
 
         <SimpleGrid columns={2} gap={1} w="full" className={walktrough?.attributes}>
-          {Object.entries(attributes).map(([key, value]) => (
-            <Box key={key} className={attributeLabels[key as keyof CarAttributes] === "luck" ? walktrough?.luck : ""}>
-              <Stat>
-                <HStack>
-                  <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} size="1.1rem" />
-                  <StatLabel>{key.charAt(0).toUpperCase() + key.slice(1)}:</StatLabel>
-                  <StatNumber fontSize="large">{value}</StatNumber>
-                </HStack>
-              </Stat>
-              <RangeSlider
-                value={[value]}
-                min={1}
-                max={10}
-                onChangeEnd={(val) => handleAttributeChange(val[0], key as keyof CarAttributes)}
-              >
-                <RangeSliderTrack>
-                  <RangeSliderFilledTrack />
-                </RangeSliderTrack>
-                <RangeSliderThumb index={0} />
-              </RangeSlider>
-            </Box>
-          ))}
+          {Object.entries(attributes).map(([key, value]) => {
+            console.log(key, value);
+            return (
+              <Box key={key} className={attributeLabels[key as keyof CarAttributes] === "luck" ? walktrough?.luck : ""}>
+                <Stat>
+                  <HStack>
+                    <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} size="1.1rem" />
+                    <StatLabel>{key.charAt(0).toUpperCase() + key.slice(1)}:</StatLabel>
+                    <StatNumber fontSize="large">{value}</StatNumber>
+                  </HStack>
+                </Stat>
+                <RangeSlider
+                  value={[value]}
+                  min={1}
+                  max={10}
+                  onChangeEnd={(val) => handleAttributeChange(val[0], key as keyof CarAttributes)}
+                >
+                  <RangeSliderTrack>
+                    <RangeSliderFilledTrack />
+                  </RangeSliderTrack>
+                  <RangeSliderThumb index={0} />
+                </RangeSlider>
+              </Box>
+            );
+          })}
         </SimpleGrid>
       </VStack>
     </CustomBox>

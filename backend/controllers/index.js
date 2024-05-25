@@ -2,7 +2,6 @@ const HttpError = require("../models/http-error");
 const { validationResult } = require("express-validator");
 const config = require('../config');
 const { ethers } = require('ethers');
-const { Contract, Provider } = require('ethers-multicall');
 
 const submit = async (req, res, next) => {
   const errors = validationResult(req);
@@ -62,7 +61,7 @@ const getScores = async() => {
     console.log(`week: ${week}, players: ${players}`);
 
     const theWeek = week.toNumber();
-    const totalPlayers = 2; // players.toNumber();
+    const totalPlayers = players.toNumber();
 
     if (totalPlayers === 0) {
       return { players: [], scores: [] };
@@ -80,24 +79,15 @@ const getScores = async() => {
 
       return { players: [playerAddress], scores: [elo.toString()] };
     } else {
-    
-      const ethcallProvider = new Provider(provider);
-      
-      const ABI = [
-        'function getPlayerAddressForWeeklyTournament(uint256 week, uint256 index) public view returns (address)',
-        // 'function getNumbers(uint256[] indices) view returns (uint256[])'
-      ];
-      
-      const contractCall = new Contract('0x854c1E1EC8199A0F20050350c00fdCb84C3bc338', ABI);
-      await ethcallProvider.init();
 
-      const calls = [];
+      // get player addresses
+      let calls = [];
       for (let i=0; i<totalPlayers; i++) {
-        console.log(theWeek, i);
-        calls[i] = contractCall.getPlayerAddressForWeeklyTournament(week, ethers.BigNumber.from(i));
+        console.log(theWeek, i+1);
+        calls[i] = contract.getPlayerAddressForWeeklyTournament(week, ethers.BigNumber.from(i+1));
       }
 
-      const playerAddresses = await ethcallProvider.all(calls)
+      const playerAddresses = await Promise.all(calls)
       console.log(playerAddresses);
     }
   } catch(error) {

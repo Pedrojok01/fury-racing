@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 
 import { CarRace, ResultModal } from "@/components";
 import { useReadContract } from "@/hooks";
-import { useGameStates } from "@/stores/useGameStates";
+import { useGameStates } from "@/stores";
 
 const RaceScreen: FC = () => {
   const { address } = useAccount();

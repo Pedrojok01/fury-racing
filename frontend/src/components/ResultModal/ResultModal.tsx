@@ -23,7 +23,7 @@ import { zeroAddress } from "viem";
 import { useAccount } from "wagmi";
 
 import { useReadContract, useWindowSize } from "@/hooks";
-import { useGameStates } from "@/stores/useGameStates";
+import { useGameStates } from "@/stores";
 import { getEllipsisTxt } from "@/utils/formatters";
 
 interface ResultModalProps {

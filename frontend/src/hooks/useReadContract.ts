@@ -4,7 +4,7 @@ import { getContract } from "viem";
 import { usePublicClient } from "wagmi";
 
 import { RACING_CONTRACT } from "@/data";
-import { useGameStates } from "@/stores/useGameStates";
+import { useGameStates } from "@/stores";
 import { logError } from "@/utils/errorUtil";
 
 export const useReadContract = () => {

@@ -7,8 +7,7 @@ import { isMobile } from "react-device-detect";
 import { AttributesSelector, CarAnim, CustomBox, Track, WaitingScreen, Weather } from "@/components";
 import { images, tracks } from "@/data";
 import { useWriteContract } from "@/hooks";
-import { useAnim } from "@/stores/useAnim";
-import { useGameStates } from "@/stores/useGameStates";
+import { useAnim, useGameStates } from "@/stores";
 
 const SelectionScreen: FC = () => {
   const { carData } = useAnim();

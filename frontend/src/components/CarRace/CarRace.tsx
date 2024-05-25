@@ -24,7 +24,7 @@ import { Box } from "@chakra-ui/react";
 
 import { decorations, tracks } from "@/data";
 import "@babylonjs/loaders/glTF";
-import { useAnim } from "@/stores/useAnim";
+import { useAnim } from "@/stores";
 
 import { initializeCamera, initializeTrack, triggerCurrentTileAnim } from "./helper";
 import { carRotateFactor, carThrottleFactor, gridTileSize } from "./helper/constants";

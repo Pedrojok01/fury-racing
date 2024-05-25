@@ -7,7 +7,14 @@ import { formatEther } from "viem";
 
 import { CustomBox, CustomToolTip } from "@/components";
 import { useReadContract } from "@/hooks";
-import { useGameStates } from "@/stores/useGameStates";
+import { useGameStates } from "@/stores";
+
+const descriptionText = {
+  SOLO: "Play a quick solo race against an AI. No entry fee. No waiting. No pressure.",
+  FREE: "Play a 1v1 race against against another player. No entry fee.",
+  TOURNAMENT:
+    "Double or nothing: Pay the entry fee and play to double up your bet against another player! Climb up the rank in the leaderboard and try to grab the weekly prize pool!",
+};
 
 const ModeScreen: FC = () => {
   const { getBetAmount, getCurrentPrizePool } = useReadContract();
@@ -26,13 +33,9 @@ const ModeScreen: FC = () => {
         </Text>
 
         <HStack spacing={5} wrap={"wrap"} justifyContent={"center"}>
-          <ButtonMode text="Training" label="Play a quick solo race for free against an AI. No pressure." mode="SOLO" />
-          <ButtonMode text="Free Play" label="Play a 1v1 race for free against against another player." mode="FREE" />
-          <ButtonMode
-            text="Tournament"
-            label="Double or nothing: Play and try to double up your bet against another player! Climb up the leaderboard and grab the weekly prize pool!"
-            mode="TOURNAMENT"
-          />
+          <ButtonMode text="Training" label={descriptionText.SOLO} mode="SOLO" />
+          <ButtonMode text="Free Play" label={descriptionText.FREE} mode="FREE" />
+          <ButtonMode text="Tournament" label={descriptionText.TOURNAMENT} mode="TOURNAMENT" />
         </HStack>
 
         <CustomBox>

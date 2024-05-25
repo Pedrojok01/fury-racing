@@ -4,8 +4,7 @@ import { getContract, zeroAddress, type TransactionReceipt } from "viem";
 import { usePublicClient, useWalletClient, useWatchContractEvent } from "wagmi";
 
 import { RACING_CONTRACT } from "@/data";
-import { useAnim } from "@/stores/useAnim";
-import { useGameStates } from "@/stores/useGameStates";
+import { useAnim, useGameStates } from "@/stores";
 import { logError } from "@/utils/errorUtil";
 import { generateRandomAttributes } from "@/utils/generateCarAttributes";
 

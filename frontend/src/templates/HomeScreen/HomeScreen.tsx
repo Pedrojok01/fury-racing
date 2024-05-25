@@ -8,7 +8,7 @@ import { useAccount } from "wagmi";
 
 import { images } from "@/data/images";
 import { useAudio } from "@/hooks";
-import { useGameStates } from "@/stores/useGameStates";
+import { useGameStates } from "@/stores";
 
 import styles from "./home.module.css";
 

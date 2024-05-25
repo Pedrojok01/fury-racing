@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 import useSWR from "swr";
 
-import { useAnim } from "@/stores/useAnim";
+import { useAnim } from "@/stores";
 import { mapWeatherData } from "@/utils/mapWeatherData";
 
 type FetchError = {

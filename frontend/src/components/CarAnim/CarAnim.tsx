@@ -14,7 +14,7 @@ import { Button, VStack, HStack, Box } from "@chakra-ui/react";
 
 import { carMetadata } from "@/data/cars";
 import "@babylonjs/loaders/glTF";
-import { useAnim } from "@/stores/useAnim";
+import { useAnim } from "@/stores";
 
 import { CustomToolTip } from "../CustomToolTip";
 

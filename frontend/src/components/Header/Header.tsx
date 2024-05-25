@@ -11,7 +11,7 @@ import { useAccount } from "wagmi";
 
 import { images } from "@/data";
 import { useAudio, useWindowSize } from "@/hooks";
-import { useGameStates } from "@/stores/useGameStates";
+import { useGameStates } from "@/stores";
 
 import styles from "./header.module.css";
 import { DarkModeButton } from "../DarkModeButton";

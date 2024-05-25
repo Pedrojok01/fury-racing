@@ -58,13 +58,48 @@ const getScores = async() => {
 
     // console.log(contract);
 
-    const [week, player] = await contract.getWeekAndPlayerAmount();
-    const playerAddress = await contract.getPlayerAddressForWeeklyTournament(week.toNumber(), player.toNumber());
-    const [attrbutes, theAddress, elo] = await contract.addressToPlayer(playerAddress);
+    const [week, players] = await contract.getWeekAndPlayerAmount();
+    console.log(`week: ${week}, players: ${players}`);
+
+    const theWeek = week.toNumber();
+    const totalPlayers = 2; // players.toNumber();
+
+    if (totalPlayers === 0) {
+      return { players: [], scores: [] };
+    } else if (totalPlayers === 1) {
+      const playerAddress = await contract.getPlayerAddressForWeeklyTournament(week, ethers.BigNumber.from(totalPlayers));
+
+      const [attrbutes, theAddress, elo] = await contract.addressToPlayer(playerAddress);
+      
+      console.log(playerAddress);
+      console.log(attrbutes.toString());
+      console.log(theAddress.toString());
+      console.log(elo);
+      
+      
+
+      return { players: [playerAddress], scores: [elo.toString()] };
+    } else {
     
-    console.log(attrbutes.toString());
-    console.log(theAddress.toString());
-    console.log(elo.toString());
+      const ethcallProvider = new Provider(provider);
+      
+      const ABI = [
+        'function getPlayerAddressForWeeklyTournament(uint256 week, uint256 index) public view returns (address)',
+        // 'function getNumbers(uint256[] indices) view returns (uint256[])'
+      ];
+      
+      const contractCall = new Contract('0x854c1E1EC8199A0F20050350c00fdCb84C3bc338', ABI);
+      await ethcallProvider.init();
+
+      const calls = [];
+      for (let i=0; i<totalPlayers; i++) {
+        console.log(theWeek, i);
+        calls[i] = contractCall.getPlayerAddressForWeeklyTournament(week, ethers.BigNumber.from(i));
+      }
+
+      const playerAddresses = await ethcallProvider.all(calls)
+      console.log(playerAddresses);
+    }
   } catch(error) {
     console.error('Error calling getWeekAndPlayerAmount:', error);
   }

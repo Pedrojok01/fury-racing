@@ -34,7 +34,7 @@ Try it yourself: [https://fury-racing.vercel.app/](https://fury-racing.vercel.ap
 
 ## Description
 
-Onchain racing simulator leveraging Chainlink VRF and Chainlink API. Built using the latest tech out there: [Next.js](https://nextjs.org/), [Babylon.js](https://www.babylonjs.com/), [Viem](https://viem.sh/), [Wagmi](https://wagmi.sh/), [RainbowKit](https://www.rainbowkit.com/), [ChakraUI](https://chakra-ui.com/), and [Typescript](https://www.typescriptlang.org/).
+Onchain racing simulator leveraging Chainlink VRF and Chainlink Functions. Built using the latest tech out there: [Next.js](https://nextjs.org/), [Babylon.js](https://www.babylonjs.com/), [Viem](https://viem.sh/), [Wagmi](https://wagmi.sh/), [RainbowKit](https://www.rainbowkit.com/), [ChakraUI](https://chakra-ui.com/), and [Typescript](https://www.typescriptlang.org/).
 
 ## Built With
 

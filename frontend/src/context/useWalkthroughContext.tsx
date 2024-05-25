@@ -35,12 +35,11 @@ export const WalkthroughProvider: FC<WalkthroughProviderProps> = ({ children }) 
   const [steps, setSteps] = useState<Step[]>([]);
 
   const startWalkthrough = () => {
-    // const hasVisited = localStorage.getItem("hasVisited");
-    // if (!hasVisited) {
-    //   setRun(true);
-    //   localStorage.setItem("hasVisited", "true");
-    // }
-    setRun(true);
+    const hasVisited = localStorage.getItem("hasVisited");
+    if (!hasVisited) {
+      setRun(true);
+      localStorage.setItem("hasVisited", "true");
+    }
   };
 
   const handleJoyrideCallback = (data: CallBackProps) => {

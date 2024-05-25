@@ -50,7 +50,6 @@ const CarAnim: FC = () => {
 
     // Load the car models.
     carMetadata.forEach((meta) => {
-      // console.log("Loading car model:", meta);
       SceneLoader.LoadAssetContainer(`./assets/${meta.path}/`, "scene.gltf", scene, (container) => {
         const car = new TransformNode(`${meta.path}`);
 

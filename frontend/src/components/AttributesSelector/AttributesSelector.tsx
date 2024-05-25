@@ -1,20 +1,9 @@
 import { useState, useCallback, useEffect, type FC } from "react";
 
-import {
-  RangeSlider,
-  RangeSliderTrack,
-  RangeSliderFilledTrack,
-  RangeSliderThumb,
-  VStack,
-  Text,
-  Box,
-  SimpleGrid,
-  HStack,
-  StatLabel,
-  StatNumber,
-  Stat,
-} from "@chakra-ui/react";
+import { VStack, Text, Box, SimpleGrid, HStack, StatLabel, StatNumber, Stat } from "@chakra-ui/react";
+import Slider from "rc-slider";
 
+import "rc-slider/assets/index.css";
 import { CustomBox } from "../CustomBox";
 import { CustomToolTip } from "../CustomToolTip";
 
@@ -31,6 +20,17 @@ const attributeLabels: { [key in keyof CarAttributes]: string } = {
 
 const totalPoints = 40;
 
+interface CarAttributes {
+  reliability: number;
+  maniability: number;
+  speed: number;
+  breaks: number;
+  car_balance: number;
+  aerodynamics: number;
+  driver_skills: number;
+  luck: number;
+}
+
 interface AttributesSelectorProps {
   defaultAttributes: CarAttributes;
   walktrough?: { attributes: string; luck: string };
@@ -44,7 +44,6 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
     setAttributes(defaultAttributes);
   }, [defaultAttributes]);
 
-  // Update remaining points whenever attributes change
   useEffect(() => {
     const totalUsedPoints = Object.values(attributes).reduce((acc, cur) => acc + cur, 0);
     setRemainingPoints(totalPoints - totalUsedPoints);
@@ -52,19 +51,46 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
 
   const handleAttributeChange = useCallback((value: number, attribute: keyof CarAttributes) => {
     setAttributes((prev) => {
-      const newValue = Math.max(0, Math.min(value, 10)); // Ensure values are within 0-10
+      const newValue = Math.max(1, Math.min(value, 10)); // Ensure values are within 1-10
       const newAttributes = { ...prev, [attribute]: newValue };
-
-      // Calculate the new total points used after the change
       const totalUsedPoints = Object.values(newAttributes).reduce((acc, cur) => acc + cur, 0);
 
-      // Only accept the new value if it doesn't exceed the total points available
       if (totalUsedPoints <= totalPoints) {
         return newAttributes;
       }
-      return prev; // Otherwise, reject the change
+      return prev;
     });
   }, []);
+
+  const handleSliderChange = useCallback((value: number, min: number, max: number) => {
+    return Math.max(min, Math.min(value, max));
+  }, []);
+
+  const renderSlider = (key: keyof CarAttributes, value: number, min: number, max: number) => (
+    <Box position="relative" py={2}>
+      <Slider
+        min={1}
+        max={10}
+        value={value}
+        onChange={(val) => handleAttributeChange(handleSliderChange(val as number, min, max), key)}
+        styles={{
+          track: { backgroundColor: "lightgray" },
+          handle: { borderColor: "var(--primary-color)", width: "17px", height: "17px", top: "3px", zIndex: 20 },
+          rail: { backgroundColor: "lightgray" },
+        }}
+      />
+      <Box
+        position="absolute"
+        left={`${((min - 1) / 9) * 100}%`}
+        right={`${((10 - max) / 9) * 100}%`}
+        top="50%"
+        height="4px"
+        backgroundColor="rgba(0, 128, 0, 0.8)"
+        zIndex={10}
+        transform="translateY(-50%)"
+      />
+    </Box>
+  );
 
   return (
     <CustomBox>
@@ -74,10 +100,14 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
           <Text>Remaining: {remainingPoints}</Text>
         </HStack>
 
-        <SimpleGrid columns={2} gap={1} w="full">
+        <SimpleGrid columns={2} gridColumnGap={5} gridRowGap={1} w="full">
           {Object.entries(attributes).map(([key, value]) => {
+            const attributeKey = key as keyof CarAttributes;
+            const maxRange = attributeKey === "luck" ? 10 : Math.min(10, defaultAttributes[attributeKey] + 2);
+            const minRange = attributeKey === "luck" ? 1 : Math.max(1, defaultAttributes[attributeKey] - 2);
+
             return (
-              <Box key={key} className={key === "luck" ? walktrough?.luck : ""}>
+              <Box key={key} className={attributeKey === "luck" ? walktrough?.luck : ""}>
                 <Stat>
                   <HStack>
                     <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} size="1.1rem" />
@@ -85,17 +115,7 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
                     <StatNumber fontSize="large">{value}</StatNumber>
                   </HStack>
                 </Stat>
-                <RangeSlider
-                  value={[value]}
-                  min={1}
-                  max={10}
-                  onChangeEnd={(val) => handleAttributeChange(val[0], key as keyof CarAttributes)}
-                >
-                  <RangeSliderTrack>
-                    <RangeSliderFilledTrack />
-                  </RangeSliderTrack>
-                  <RangeSliderThumb index={0} />
-                </RangeSlider>
+                {renderSlider(attributeKey, value, minRange, maxRange)}
               </Box>
             );
           })}

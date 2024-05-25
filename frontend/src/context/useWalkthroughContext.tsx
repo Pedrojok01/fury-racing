@@ -80,7 +80,7 @@ export const WalkthroughProvider: FC<WalkthroughProviderProps> = ({ children }) 
         showSkipButton={false}
         hideBackButton
         hideCloseButton
-        styles={{ options: { zIndex: 10000, primaryColor: "#e3648f" } }}
+        styles={{ options: { zIndex: 10000, primaryColor: "var(--secondary-color)" } }}
         callback={handleJoyrideCallback}
       />
       {children}

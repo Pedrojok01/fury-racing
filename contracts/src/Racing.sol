@@ -413,7 +413,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
                 Race memory _race = _createNewRace(_circuitId, _mode);
                 races[raceCounter] = _race;
             } else {
-                if (msg.sender == freeRaces[freeRaceCounter].player1) {
+                if (msg.sender == races[raceCounter].player1) {
                     revert Racing__PlayerAlreadyJoined();
                 }
                 // Update the current bet race
@@ -492,10 +492,10 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         addressToPlayer[_player].attributes = _attributes;
 
         if (weeklyBetPlayerAddressToIndex[weeklyTournamentCounter][_player] == 0) {
-            tournamentPlayersCounter++;
-            weeklyBetPlayerIndex[weeklyTournamentCounter][++tournamentPlayersCounter] = _player;
+            weeklyBetPlayerIndex[weeklyTournamentCounter][tournamentPlayersCounter] = _player;
             weeklyBetPlayerAddressToIndex[weeklyTournamentCounter][_player] =
                 tournamentPlayersCounter;
+            tournamentPlayersCounter++;
         }
     }
 

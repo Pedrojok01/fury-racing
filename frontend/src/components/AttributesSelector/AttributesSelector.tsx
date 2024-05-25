@@ -69,16 +69,15 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
   return (
     <CustomBox>
       <VStack spacing={5} w={"100%"}>
-        <HStack w={"100%"} justify={"space-between"}>
+        <HStack w={"100%"} justify={"space-between"} className={walktrough?.attributes}>
           <Text className="subtitle">2. Adjust Your Settings</Text>
           <Text>Remaining: {remainingPoints}</Text>
         </HStack>
 
-        <SimpleGrid columns={2} gap={1} w="full" className={walktrough?.attributes}>
+        <SimpleGrid columns={2} gap={1} w="full">
           {Object.entries(attributes).map(([key, value]) => {
-            console.log(key, value);
             return (
-              <Box key={key} className={attributeLabels[key as keyof CarAttributes] === "luck" ? walktrough?.luck : ""}>
+              <Box key={key} className={key === "luck" ? walktrough?.luck : ""}>
                 <Stat>
                   <HStack>
                     <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} size="1.1rem" />

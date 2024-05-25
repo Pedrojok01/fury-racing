@@ -12,14 +12,25 @@ const RaceScreen: FC = () => {
   const { raceId, raceInfo, mode } = useGameStates();
   const { getRaceInfo } = useReadContract();
 
+  // Fetch race result after 30 seconds, then every 10 seconds
   useEffect(() => {
     if (!raceId || !mode) return;
 
-    const interval = setInterval(async () => {
-      await getRaceInfo(raceId, mode);
-    }, 30000); // 30 seconds interval
+    let interval: NodeJS.Timeout;
+    const initialTimeout = setTimeout(() => {
+      const fetchRaceInfo = async () => {
+        await getRaceInfo(raceId, mode);
+      };
 
-    return () => clearInterval(interval);
+      fetchRaceInfo();
+
+      interval = setInterval(fetchRaceInfo, 10000);
+    }, 30000);
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(interval);
+    };
   }, [raceId, getRaceInfo, mode]);
 
   const hasRaceFinished = raceInfo && raceInfo.player1Time !== 0 && raceInfo.player2Time !== 0;

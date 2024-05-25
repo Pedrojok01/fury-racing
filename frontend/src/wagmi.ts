@@ -12,7 +12,7 @@ import {
 } from "@rainbow-me/rainbowkit/wallets";
 import type { Transport } from "viem";
 import { createConfig, http } from "wagmi";
-import { avalanche, avalancheFuji } from "wagmi/chains";
+import { avalancheFuji } from "wagmi/chains";
 
 import { TITLE } from "./data/constants";
 
@@ -42,11 +42,10 @@ const connectors = connectorsForWallets(
 );
 
 const transports: Record<number, Transport> = {
-  [avalanche.id]: http(),
   [avalancheFuji.id]: http(),
 };
 export const wagmiConfig = createConfig({
-  chains: [avalanche, avalancheFuji],
+  chains: [avalancheFuji],
   connectors,
   transports,
   ssr: true,

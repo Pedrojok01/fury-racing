@@ -12,7 +12,7 @@ import { useAnim, useGameStates } from "@/stores";
 const SelectionScreen: FC = () => {
   const { carData } = useAnim();
   const { joinSoloRace, joinFreeRace, joinTournamentRace, waitForPlayer } = useWriteContract();
-  const { loading, mode, isWaiting, raceId } = useGameStates();
+  const { loading, mode, remainingPoints, isWaiting, raceId } = useGameStates();
   const router = useRouter();
 
   const handlePlayer2Joined = useCallback(() => {
@@ -68,6 +68,7 @@ const SelectionScreen: FC = () => {
           <Weather />
           <Track map={images.track} data={tracks[0]} />
           <Button
+            isDisabled={remainingPoints !== 0}
             mt={"2rem"}
             paddingBlock={"2.5rem"}
             paddingInline={"5rem"}
@@ -82,7 +83,7 @@ const SelectionScreen: FC = () => {
         </VStack>
       </>
     ),
-    [carData.attributes, loading, handleRaceStart],
+    [carData.attributes, loading, handleRaceStart, remainingPoints],
   );
 
   return (

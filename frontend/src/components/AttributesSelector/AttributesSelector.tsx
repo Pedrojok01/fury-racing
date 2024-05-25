@@ -4,6 +4,8 @@ import { VStack, Text, Box, SimpleGrid, HStack, StatLabel, StatNumber, Stat } fr
 import Slider from "rc-slider";
 
 import "rc-slider/assets/index.css";
+import { useGameStates } from "@/stores";
+
 import { CustomBox } from "../CustomBox";
 import { CustomToolTip } from "../CustomToolTip";
 
@@ -17,8 +19,6 @@ const attributeLabels: { [key in keyof CarAttributes]: string } = {
   driver_skills: "Increase the driver's skill and reduce the chance of making mistakes.",
   luck: "Increase your luck and improve the chance of a lucky event.",
 };
-
-const totalPoints = 40;
 
 interface CarAttributes {
   reliability: number;
@@ -36,9 +36,11 @@ interface AttributesSelectorProps {
   walktrough?: { attributes: string; luck: string };
 }
 
+const totalPoints = 40;
+
 const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, walktrough }) => {
+  const { remainingPoints, setRemainingPoints } = useGameStates();
   const [attributes, setAttributes] = useState<CarAttributes>(defaultAttributes);
-  const [remainingPoints, setRemainingPoints] = useState<number>(totalPoints);
 
   useEffect(() => {
     setAttributes(defaultAttributes);
@@ -47,7 +49,7 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
   useEffect(() => {
     const totalUsedPoints = Object.values(attributes).reduce((acc, cur) => acc + cur, 0);
     setRemainingPoints(totalPoints - totalUsedPoints);
-  }, [attributes]);
+  }, [attributes, setRemainingPoints]);
 
   const handleAttributeChange = useCallback((value: number, attribute: keyof CarAttributes) => {
     setAttributes((prev) => {

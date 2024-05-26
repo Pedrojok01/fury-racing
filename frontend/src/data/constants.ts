@@ -3,7 +3,7 @@ import type { Abi } from "viem";
 import { RACING_ABI } from "./abi";
 
 export const TITLE = "Fury Racing";
-export const DESCRIPTION = "Onchain racing simulator leveraging Chainlink VRF and Chainlink Functions.";
+export const DESCRIPTION = "Onchain racing simulator leveraging Chainlink VRF V2.5 and Chainlink Functions.";
 
 export const URL = "https://fury-racing.vercel.app/";
 export const GITHUB_REPO = "https://github.com/Pedrojok01/chainlink-hackathon";

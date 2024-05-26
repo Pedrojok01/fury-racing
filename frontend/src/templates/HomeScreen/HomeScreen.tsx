@@ -1,6 +1,6 @@
 import { type FC } from "react";
 
-import { Box, Button, Text, VStack, Link, Flex } from "@chakra-ui/react";
+import { Box, Button, Text, VStack, Link, Flex, useColorMode } from "@chakra-ui/react";
 import Image from "next/image";
 import NextLink from "next/link";
 import { isMobile } from "react-device-detect";
@@ -16,6 +16,7 @@ const HomeScreen: FC = () => {
   const { isConnected } = useAccount();
   const { setAudio } = useAudio();
   const { reset } = useGameStates();
+  const { colorMode } = useColorMode();
 
   const handlePlayClick = () => {
     reset();
@@ -29,7 +30,10 @@ const HomeScreen: FC = () => {
           Score the <span style={{ color: "var(--primary-color)" }}>best time</span>.
         </Text>
 
-        <Text className={`${styles.title} text-shadow`}>
+        <Text
+          className={`${styles.title} text-shadow`}
+          style={{ backgroundColor: colorMode === "light" ? "rgba(255, 255, 255, 0.9)" : "", borderRadius: "12px" }}
+        >
           Reach the top of the <span style={{ color: "var(--primary-color)" }}>leaderboard</span>.
         </Text>
 

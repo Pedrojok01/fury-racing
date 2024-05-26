@@ -42,7 +42,7 @@ const CustomLayout: FC<CustomLayoutProps> = ({ children }) => {
 
       {!isMobile && (
         <Box position="absolute" bottom="0" left="0" zIndex={-10}>
-          <Image alt="background shape" src={images.road.src} width={350} height={"auto"} rotate={"10deg"} />
+          <Image alt="background shape" src={images.road.src} className="road-bg-image" />
         </Box>
       )}
 

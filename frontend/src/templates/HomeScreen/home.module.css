@@ -23,6 +23,12 @@
   font-weight: 600;
 }
 
+@media (width < 1500px) {
+  .title {
+    font-size: 50px;
+  }
+}
+
 @media (width < 1200px) {
   .container {
     width: 85%;

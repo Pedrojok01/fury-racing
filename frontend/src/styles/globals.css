@@ -55,6 +55,7 @@ a {
   height: calc(100vh - 77px - 1rem - 2.5rem);
   margin: auto;
   font-size: 17px;
+  padding-left: 8rem;
 }
 
 .game-container-iphone {
@@ -74,15 +75,25 @@ a {
   background-color: var(--primary-color) !important;
 }
 
-@media (width < 1200px) {
+.road-bg-image {
+  width: 350px;
+  height: auto;
+}
+
+@media (width < 1500px) {
   .game-container {
     width: 98%;
+    padding-left: 3rem;
+  }
+  .road-bg-image {
+    width: 270px;
   }
 }
 
 @media (width < 1000px) {
   .game-container {
     height: calc(100vh - 77px - 1rem);
+    padding-left: 0;
   }
 }
 

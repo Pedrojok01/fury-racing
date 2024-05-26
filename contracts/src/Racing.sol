@@ -12,17 +12,45 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.s
  * @title Racing - Main contract containing the game logic for Fury Racing.
  * @author @Pedrojok01
  */
+
+/**
+ * | Function Name                       | Sighash    | Function Signature                           |
+ * | ----------------------------------- | ---------- | --------------------------------------------
+ * |
+ * | joinSoloRace                        | 73197373   |
+ * joinSoloRace((uint8,uint8,uint8,uint8,uint8,uint8,uint8,uint8),(uint8,uint8,uint8,uint8,uint8,uint8,uint8,uint8),uint256)
+ * |
+ * | joinFreeRace                        | 3436f847   |
+ * joinFreeRace((uint8,uint8,uint8,uint8,uint8,uint8,uint8,uint8),uint256) |
+ * | joinRace                            | 896caa4a   |
+ * joinRace((uint8,uint8,uint8,uint8,uint8,uint8,uint8,uint8),uint256) |
+ * | sponsorWeeklyPrizePool              | e68a37c5   | sponsorWeeklyPrizePool()                     |
+ * | getSoloRaceFromRaceID               | eab8ff7a   | getSoloRaceFromRaceID(uint256)               |
+ * | getFreeRaceFromRaceID               | ccb3d9ee   | getFreeRaceFromRaceID(uint256)               |
+ * | getRaceFromRaceID                   | e2a5ac42   | getRaceFromRaceID(uint256)                   |
+ * | getWeekAndPlayerAmount              | 192e74c6   | getWeekAndPlayerAmount()                     |
+ * | getPlayerAddressForWeeklyTournament | 3aaeb807   |
+ * getPlayerAddressForWeeklyTournament(uint256,uint256) |
+ * | updateWeatherDataForCircuit         | 9c7ae2db   | updateWeatherDataForCircuit(uint256,uint256)
+ * |
+ * | addCircuit                          | e0b2b785   |
+ * addCircuit((uint8,uint8,uint16,uint8,uint16),string) |
+ * | setBetAmount                        | 53a79d74   | setBetAmount(uint256)                        |
+ * | pause                               | 8456cb59   | pause()                                      |
+ * | unpause                             | 3f4ba83a   | unpause()                                    |
+ * | emergencyWithdraw                   | db2e21bc   | emergencyWithdraw()                          |
+ */
 contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     address private constant AI_PLAYER_ADDRESS = 0x00000000000000000000000000000000000000A1;
     uint256 private constant TOURNAMENT_DURATION = 1 weeks;
     uint256 private constant START_ELO = 1200;
-    uint256 private constant MAX_BET_PLAYERS = 200;
+    uint256 private constant MAX_BET_PLAYERS = 100; // Prevent DoS during prize pool distributing
 
     uint256 public betAmount = 0.1 ether;
     uint256 public currentPrizePool;
     uint256 public lastPrizeDistribution;
     uint256 public playersCounter;
-    uint256 public tournamentPlayersCounter;
+    uint256 public tournamentPlayersCounter; // Separate counter for weekly tournament
     uint256 public weeklyTournamentCounter = 1;
 
     mapping(uint256 => Race) private soloRaces;
@@ -72,7 +100,12 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
                                 RACES
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Play for fun instantly against the AI.
+    /**
+     * @notice Allows to play a solo race against an AI player.
+     * @param attributes1 The player's attributes.
+     * @param attributes2 The AI player's attributes, randomly generated.
+     * @param circuitId The circuit ID.
+     */
     function joinSoloRace(
         PlayerAttributes memory attributes1,
         PlayerAttributes memory attributes2,
@@ -100,7 +133,12 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         soloRaceCounter++;
     }
 
-    /// @notice Join the queue for the upcoming free race or start the free race.
+    /**
+     * @notice Allows to join a free race against another player. Create a new race if it doesn't
+     * exist. Update the current race if it exists, then start the game.
+     * @param attributes The player's attributes.
+     * @param circuitId The circuit ID.
+     */
     function joinFreeRace(PlayerAttributes memory attributes, uint256 circuitId) public {
         _verifyAttributes(attributes);
 
@@ -121,7 +159,13 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
-    /// @notice Join the queue for the upcoming race or start the race.
+    /**
+     * @notice Allows to join a tournament race against another player. Requires to pay the bet
+     * amount. Will increase the weekly prize pool by 5%. The player's ELO will be updated based on
+     * the result.
+     * @param attributes The player's attributes.
+     * @param circuitId The circuit ID.
+     */
     function joinRace(
         PlayerAttributes memory attributes,
         uint256 circuitId
@@ -158,7 +202,14 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
-    /// @notice Calls for simulations.
+    /**
+     * @notice Internal functions called by the Chainlink VRF callback to start the
+     * race with the received random words. The random words are used to adjust the player's
+     * attributes from -5% to +5%.
+     * @param _words The random words received from the Chainlink VRV v2.5.
+     * @param _raceId The ID of the race.
+     * @param _mode The mode of the race (SOLO, FREE, TOURNAMENT)
+     */
     function _startRace(
         uint256[] memory _words,
         uint256 _raceId,
@@ -177,7 +228,14 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         requestRaceResult(_race.circuit, _raceId, weather, _mode, attributes);
     }
 
-    /// @notice Finishes the race and pays the winners following the received race result.
+    /**
+     * @notice Internal functions called by the Chainlink Functions callback to finish the
+     * race with the received values. The values are the time in milliseconds for each player.
+     * The player with the lowest time wins.
+     * @param _raceId The ID of the race.
+     * @param _mode The mode of the race (SOLO, FREE, TOURNAMENT)
+     * @param _values The time in milliseconds for each player.
+     */
     function _finishRace(
         uint256 _raceId,
         RaceMode _mode,
@@ -224,22 +282,50 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         currentPrizePool += msg.value;
     }
 
+    /*//////////////////////////////////////////////////////////////
+                            GETTERS
+    //////////////////////////////////////////////////////////////*/
+
+    /**
+     * @notice Get the Race data for a solo race.
+     * @param raceId The ID of the race.
+     * @return The Race data struct for the given race ID.
+     */
     function getSoloRaceFromRaceID(uint256 raceId) public view returns (Race memory) {
         return soloRaces[raceId];
     }
 
-    function getRaceFromRaceID(uint256 raceId) public view returns (Race memory) {
-        return races[raceId];
-    }
-
+    /**
+     * @notice Get the Race data for a free race.
+     * @param raceId The ID of the race.
+     * @return The Race data struct for the given race ID.
+     */
     function getFreeRaceFromRaceID(uint256 raceId) public view returns (Race memory) {
         return freeRaces[raceId];
     }
 
+    /**
+     * @notice Get the Race data for a tournament race.
+     * @param raceId The ID of the race.
+     * @return The Race data struct for the given race ID.
+     */
+    function getRaceFromRaceID(uint256 raceId) public view returns (Race memory) {
+        return races[raceId];
+    }
+
+    /**
+     * @notice Getter function to simplify the leaderboard creation every week.
+     * Returns the parameters needed to get all player's address in the current weekly tournament.
+     */
     function getWeekAndPlayerAmount() public view returns (uint256, uint256) {
         return (weeklyTournamentCounter, tournamentPlayersCounter);
     }
 
+    /**
+     * @notice Get the player's address for the weekly tournament.
+     * @param week The week of the tournament. Starts at 1. Obtainable from getWeekAndPlayerAmount.
+     * @param index The index of the player. Starts at 1. Obtainable from getWeekAndPlayerAmount.
+     */
     function getPlayerAddressForWeeklyTournament(
         uint256 week,
         uint256 index
@@ -255,8 +341,13 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
                                 RESTRICTED
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Allows to add a new circuits
-    function updateWeatherDataForCircuit(uint256 circuitIndex, uint256 data) external onlyOwner {
+    /**
+     * @notice Allows to update the weather data for a circuit. Is also responsable for
+     * distributing the prize pool every week. Called every hour for each circuit.
+     * @param circuitIndex The index of the circuit.
+     * @param data The new weather data for the circuit. Uint from 00 to 99 to represent a percent.
+     */
+    function updateWeatherDataForCircuit(uint256 circuitIndex, uint256 data) public onlyOwner {
         Circuits memory circuit = _getCircuit(circuitIndex);
         circuit.factors.weather = uint8(data);
         circuits[circuitIndex - 1] = circuit;
@@ -264,33 +355,48 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         _checkAndDistributePrizePool();
     }
 
-    //// @notice Allows to add a new circuits
+    /**
+     * @notice Allows to add new circuits to the game.
+     * @param factors The external factors for the circuit. (see IRacing interface)
+     * @param name The name of the circuit.
+     */
     function addCircuit(ExternalFactors memory factors, string memory name) public onlyOwner {
         Circuits memory _circuit =
             Circuits({ factors: factors, index: circuits.length + 1, name: name });
         circuits.push(_circuit);
     }
 
-    /// @notice Allows to adjust the bet amount per tournament race
-    function setBetAmount(uint256 _betAmount) external onlyOwner {
+    /**
+     * @notice Allows to adjust the bet amount. Added for convenience.
+     * @param _betAmount The new bet amount.
+     */
+    function setBetAmount(uint256 _betAmount) public onlyOwner {
         uint256 oldBetAmount = betAmount;
         betAmount = _betAmount;
         emit BetAmountUpdated(_betAmount, oldBetAmount);
     }
 
-    function pause() external onlyOwner {
+    /**
+     * @notice Allows to pause the contract if any issues arise.
+     * (see Pausable from openzeppelin contracts)
+     */
+    function pause() public onlyOwner {
         _pause();
     }
 
-    function unpause() external onlyOwner {
+    /**
+     * @notice Allows to unpause the contract. (see Pausable from openzeppelin contracts)
+     *
+     */
+    function unpause() public onlyOwner {
         _unpause();
     }
 
     /**
      * @notice Allows to withdraws funds from the contract if needed.
-     * @notice Ideally placed behind a multisig with a timelock.
+     * Added for convenience. Ideally placed behind a multisig with a timelock.
      */
-    function emergencyWithdraw() external onlyOwner {
+    function emergencyWithdraw() public onlyOwner {
         if (address(this).balance > 0) {
             (bool success,) = payable(owner()).call{ value: address(this).balance }("");
             if (!success) {
@@ -303,7 +409,14 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
                                PRIVATE
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Adjusts the player attributes based on the luck factor.
+    /**
+     * @notice Adjusts the player attributes based on the luck factor. The total luck factor
+     * can range from -9% to +10%. -5% to +5% is based on the random number, and the rest is
+     * based on the player's luck attribute.
+     * @param _attributes The player's attributes.
+     * @param _randomNumber A random word received from the Chainlink VRF v2.5.
+     * @return The adjusted player attributes.
+     */
     function _applyLuckFactor(
         PlayerAttributes memory _attributes,
         uint256 _randomNumber
@@ -340,6 +453,11 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         return uint8(uint256(adjusted));
     }
 
+    /**
+     * @notice Check that the timestamp is greater than the last prize distribution timestamp plus
+     * the tournament
+     * duration. If it is, one week has passed and the prize pool distribution will be triggered.
+     */
     function _checkAndDistributePrizePool() private {
         if (block.timestamp >= lastPrizeDistribution + TOURNAMENT_DURATION) {
             lastPrizeDistribution = block.timestamp;
@@ -347,6 +465,11 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
+    /**
+     * @notice Distributes the prize pool every week. The player with the highest ELO will receive
+     * the prize pool. The ELO of all playera will be reset to 1200. Each tournament is limited
+     * to 100 players to prevent running out of gas during the prize pool distribution.
+     */
     function _distributePrizePool() private {
         address topPlayer;
         uint16 highestELO = uint16(START_ELO);
@@ -390,7 +513,13 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Create a racing player with the given attributes.
+    /**
+     * @notice Handle the race status logic when a player join. Create a new
+     * race if it doesn't exist. Update the current one if a player is waiting.
+     * @param _circuitId The circuit ID.
+     * @param _mode The mode of the race (SOLO, FREE, TOURNAMENT).
+     * @return _ongoing A boolean indicating if the race has started or not.
+     */
     function _updateRace(uint256 _circuitId, RaceMode _mode) private returns (bool _ongoing) {
         if (_mode == RaceMode.FREE) {
             if (freeRaces[freeRaceCounter].state == RaceState.NON_EXISTENT) {
@@ -425,6 +554,12 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
+    /**
+     * @notice Handle the creation of a new race and update the appropriate mappings and counters.
+     * @param _circuitId The circuit ID.
+     * @param _mode The mode of the race (SOLO, FREE, TOURNAMENT).
+     * @return Race struct with all the data updated.
+     */
     function _createNewRace(
         uint256 _circuitId,
         RaceMode _mode
@@ -444,6 +579,12 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         });
     }
 
+    /**
+     * @notice Internal getter function to retrieve a Race struct based on the race ID and mode.
+     * @param _raceId The ID of the race.
+     * @param _mode The mode of the race (SOLO, FREE, TOURNAMENT)
+     * @return Race struct of the race.
+     */
     function _getRaceByMode(uint256 _raceId, RaceMode _mode) internal view returns (Race memory) {
         if (_mode == RaceMode.TOURNAMENT) {
             return races[_raceId];
@@ -454,6 +595,11 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
+    /**
+     * @notice Internal function to verify the player's attributes received by the contract. The sum
+     * of all attributes must be
+     * equal to 40. Each attribute must be between 1 and 10.
+     */
     function _verifyAttributes(PlayerAttributes memory _attributes) private pure {
         _checkAttribute(_attributes.reliability);
         _checkAttribute(_attributes.maniability);
@@ -479,6 +625,11 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
+    /**
+     * @notice Internal function to retrieve a Circuit struct based on the circuit ID.
+     * @param _circuitId The ID of the circuit.
+     * @return Circuit struct of the circuit.
+     */
     function _getCircuit(uint256 _circuitId) private view returns (Circuits memory) {
         uint256 index = _circuitId - 1;
 
@@ -488,6 +639,13 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         return circuits[index];
     }
 
+    /**
+     * @notice Internal function to update the player's attributes with each new race. If the player
+     * doesn't exist, a
+     * new player will be created.
+     * @param _player The player's address.
+     * @param _attributes The player's attributes.
+     */
     function updatePlayerAttributes(address _player, PlayerAttributes memory _attributes) private {
         addressToPlayer[_player].attributes = _attributes;
 
@@ -499,6 +657,13 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
+    /**
+     * @notice Internal function to create a new player and update the appropriate mappings and
+     * counters.
+     * @param _player The player's address.
+     * @param _mode The mode of the race (SOLO, FREE, TOURNAMENT).
+     * @param _attributes The player's attributes.
+     */
     function _createPlayer(
         address _player,
         RaceMode _mode,

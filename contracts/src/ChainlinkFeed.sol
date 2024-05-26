@@ -16,6 +16,13 @@ import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { FunctionsSource } from "./FunctionsSource.sol";
 
 /**
+ * | Function Name             | Sighash  | Function Signature                 |
+ * | ------------------------- | -------- | ---------------------------------- |
+ * | getRandomRequestFromID    | 073afa16 | getRandomRequestFromID(uint256)    |
+ * | getFunctionsRequestFromID | ef747798 | getFunctionsRequestFromID(bytes32) |
+ */
+
+/**
  * @title ChainlinkFeed - Abstract contract containing Chainlink VRF and Functions logic;
  * @author @Pedrojok01
  */
@@ -74,7 +81,12 @@ abstract contract ChainlinkFeed is
                             CHAINLINK VRF v2.5
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Random Number Request
+    /**
+     * @notice Request two random words from Chainlink VRF v2.5
+     * @param raceId The ID of the race
+     * @param mode The selected mode (SOLO, FREE, TOURNAMENT)
+     * @return requestId The request ID for the Chainlink VRF request
+     */
     function requestRandomNumber(
         uint256 raceId,
         RaceMode mode
@@ -104,6 +116,11 @@ abstract contract ChainlinkFeed is
         emit RequestedRandomness(requestId, NUM_WORDS);
     }
 
+    /**
+     * @notice Receives random words from Chainlink VRF v2.5 callback
+     * @param requestId The request ID for the Chainlink VRF request
+     * @param randomWords The random words received from Chainlink VRF
+     */
     function fulfillRandomWords(
         uint256 requestId,
         uint256[] calldata randomWords
@@ -131,7 +148,14 @@ abstract contract ChainlinkFeed is
                             CHAINLINK FUNCTIONS
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Race Result Data Request
+    /**
+     * @notice Request the player's times via Chainlink Functions
+     * @param circuit The selected circuit index
+     * @param raceId The ID of the race
+     * @param weather The real-time weather for the selected circuit
+     * @param mode The selected mode (SOLO, FREE, TOURNAMENT)
+     * @param attributes The car attributes selected by the player (see IRacing.sol)
+     */
     function requestRaceResult(
         uint256 circuit,
         uint256 raceId,
@@ -163,11 +187,16 @@ abstract contract ChainlinkFeed is
         return _requestId;
     }
 
-    /// @notice Receives race result.
+    /**
+     * @notice Receives the race results from Chainlink Functions callback
+     * @param requestId The request ID for the Chainlink Functions request
+     * @param response The response received from Chainlink Functions
+     * @param err The error received from Chainlink Functions, if any. Unused here.
+     */
     function fulfillRequest(
         bytes32 requestId,
         bytes memory response,
-        bytes memory
+        bytes memory err
     )
         internal
         override
@@ -197,6 +226,12 @@ abstract contract ChainlinkFeed is
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
 
+    /**
+     * @notice Formats the arguments for the Chainlink Functions request
+     * @param circuit The selected circuit index
+     * @param weather The real-time weather for the selected circuit
+     * @param attributes The car attributes selected by the player (see IRacing.sol)
+     */
     function formatFunctionsArgs(
         uint256 circuit,
         uint256 weather,
@@ -216,6 +251,11 @@ abstract contract ChainlinkFeed is
         );
     }
 
+    /**
+     * @notice Formats the circuit index for the Chainlink Functions request
+     * @param _circuitIndex The selected circuit index
+     * @return The formatted circuit index into a 2 digits number
+     */
     function _formatCircuitIndex(uint256 _circuitIndex) private pure returns (string memory) {
         if (_circuitIndex == 0) {
             revert ChainlinkFeed__InvalidCircuitIndex();
@@ -231,6 +271,13 @@ abstract contract ChainlinkFeed is
         }
     }
 
+    /**
+     * @notice Formats the player's attributes for the Chainlink Functions request
+     * @param _attributes The car attributes selected by the player (see IRacing.sol)
+     * @return The formatted player's attributes into a string (16 digits number
+     *        with each two digit representing an attribute from 10 to 99 to account for a potential
+     * decimal)
+     */
     function _formatPlayerAttributes(PlayerAttributes memory _attributes)
         private
         pure

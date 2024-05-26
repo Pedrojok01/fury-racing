@@ -13,7 +13,7 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
     address constant AI_PLAYER_ADDRESS = 0x00000000000000000000000000000000000000A1;
     uint256 public constant TOURNAMENT_DURATION = 1 weeks;
     uint256 public constant START_ELO = 1200;
-    uint256 public constant MAX_BET_PLAYERS = 200;
+    uint256 public constant MAX_BET_PLAYERS = 100;
 
     uint256 public betAmount = 0.1 ether;
     uint256 public currentPrizePool;
@@ -69,7 +69,6 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
                                 RACES
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Play for fun instantly against the AI.
     function joinSoloRace(
         PlayerAttributes memory attributes1,
         PlayerAttributes memory attributes2,
@@ -97,7 +96,6 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         soloRaceCounter++;
     }
 
-    /// @notice Join the queue for the upcoming free race or start the free race.
     function joinFreeRace(PlayerAttributes memory attributes, uint256 circuitId) public {
         _verifyAttributes(attributes);
 
@@ -119,7 +117,6 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
-    /// @notice Join the queue for the upcoming race or start the race.
     function joinRace(
         PlayerAttributes memory _attributes,
         uint256 circuitId
@@ -156,7 +153,6 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         }
     }
 
-    /// @notice Calls for simulations.
     function _startRace(uint256[] memory _words, uint256 _raceId, RaceMode _mode) public override {
         Race memory _race = _getRaceByMode(_raceId, _mode);
         uint256 weather = uint256(_getCircuit(_race.circuit).factors.weather);
@@ -168,7 +164,6 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         requestRaceResult(_race.circuit, _raceId, weather, _mode, attributes);
     }
 
-    /// @notice Finishes the race and pays the winners following the received race result.
     function _finishRace(
         uint256 _raceId,
         RaceMode _mode,
@@ -243,7 +238,6 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
                                 RESTRICTED
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Allows to add a new circuits
     function updateWeatherDataForCircuit(uint256 circuitIndex, uint256 data) public onlyOwner {
         Circuits memory circuit = _getCircuit(circuitIndex);
         circuit.factors.weather = uint8(data);
@@ -252,14 +246,12 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         _checkAndDistributePrizePool();
     }
 
-    /// @notice Allows to add a new circuits
     function addCircuit(ExternalFactors memory factors, string memory name) public onlyOwner {
         Circuits memory _circuit =
             Circuits({ factors: factors, index: circuits.length + 1, name: name });
         circuits.push(_circuit);
     }
 
-    /// @notice Allows to adjust the bet amount per tournament race
     function setBetAmount(uint256 _betAmount) public onlyOwner {
         uint256 oldBetAmount = betAmount;
         betAmount = _betAmount;
@@ -274,7 +266,6 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         _unpause();
     }
 
-    /// @notice Allows to withdraws funds from the contract if needed.
     function emergencyWithdraw() public onlyOwner {
         if (address(this).balance > 0) {
             (bool success,) = payable(owner()).call{ value: address(this).balance }("");
@@ -288,7 +279,6 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
                                PRIVATE
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Adjusts the player attributes based on the luck factor.
     function _applyLuckFactor(
         PlayerAttributes memory _attributes,
         uint256 _randomNumber
@@ -318,7 +308,6 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         return _attributes;
     }
 
-    /// @notice Adjusts the attribute based on the luck factor with two-digit precision.
     function _adjustAttribute(uint8 _attribute, int256 _luckFactor) public pure returns (uint8) {
         int256 adjusted = int256(uint256(_attribute) * 10) + _luckFactor;
         if (adjusted < 10) adjusted = 10; // Ensure minimum value of 1.0
@@ -376,7 +365,6 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Create a racing player with the given attributes.
     function _updateRace(uint256 _circuitId, RaceMode _mode) public returns (bool _ongoing) {
         if (_mode == RaceMode.FREE) {
             if (freeRaces[freeRaceCounter].state == RaceState.NON_EXISTENT) {
@@ -399,7 +387,7 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
                 Race memory _race = _createNewRace(_circuitId, _mode);
                 races[raceCounter] = _race;
             } else {
-                if (msg.sender == freeRaces[freeRaceCounter].player1) {
+                if (msg.sender == races[raceCounter].player1) {
                     revert Racing__PlayerAlreadyJoined();
                 }
                 // Update the current bet race
@@ -478,10 +466,10 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         addressToPlayer[_player].attributes = _attributes;
 
         if (weeklyBetPlayerAddressToIndex[weeklyTournamentCounter][_player] == 0) {
-            tournamentPlayersCounter++;
             weeklyBetPlayerIndex[weeklyTournamentCounter][tournamentPlayersCounter] = _player;
             weeklyBetPlayerAddressToIndex[weeklyTournamentCounter][_player] =
                 tournamentPlayersCounter;
+            tournamentPlayersCounter++;
         }
     }
 

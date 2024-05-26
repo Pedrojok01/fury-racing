@@ -73,7 +73,6 @@ abstract contract MockChainlinkFeed is
                             CHAINLINK VRF v2.5
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Random Number Request
     function requestRandomNumber(
         uint256 raceId,
         RaceMode mode
@@ -103,7 +102,6 @@ abstract contract MockChainlinkFeed is
         emit RequestedRandomness(requestId, NUM_WORDS);
     }
 
-    /// @notice Added for testing purposes
     function _fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) public {
         fulfillRandomWords(requestId, randomWords);
     }
@@ -135,7 +133,6 @@ abstract contract MockChainlinkFeed is
                             CHAINLINK FUNCTIONS
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Race Result Data Request
     function requestRaceResult(
         uint256 circuit,
         uint256 raceId,
@@ -162,7 +159,6 @@ abstract contract MockChainlinkFeed is
         fulfillRequest(requestId, response, err);
     }
 
-    /// @notice Receives race result.
     function fulfillRequest(
         bytes32 requestId,
         bytes memory response,

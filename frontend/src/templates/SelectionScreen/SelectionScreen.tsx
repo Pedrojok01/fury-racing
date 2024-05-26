@@ -12,8 +12,10 @@ import { useAnim, useGameStates } from "@/stores";
 const SelectionScreen: FC = () => {
   const { carData } = useAnim();
   const { joinSoloRace, joinFreeRace, joinTournamentRace, waitForPlayer } = useWriteContract();
-  const { loading, mode, remainingPoints, isWaiting, raceId } = useGameStates();
+  const { loading, mode, attributes, remainingPoints, isWaiting, raceId } = useGameStates();
   const router = useRouter();
+
+  console.log("attributes", attributes);
 
   const handlePlayer2Joined = useCallback(() => {
     router.push("/race");
@@ -29,22 +31,22 @@ const SelectionScreen: FC = () => {
     let res;
 
     if (mode === "SOLO") {
-      res = await joinSoloRace();
+      res = await joinSoloRace(attributes);
       if (res.success) {
         router.push("/race");
       }
     } else if (mode === "FREE") {
-      res = await joinFreeRace();
+      res = await joinFreeRace(attributes);
       if (res.success) {
         return;
       }
     } else {
-      res = await joinTournamentRace();
+      res = await joinTournamentRace(attributes);
       if (res.success) {
         return;
       }
     }
-  }, [mode, joinSoloRace, joinFreeRace, joinTournamentRace, router]);
+  }, [mode, attributes, joinSoloRace, joinFreeRace, joinTournamentRace, router]);
 
   const mainContent = useMemo(
     () => (

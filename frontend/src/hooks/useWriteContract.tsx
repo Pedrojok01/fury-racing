@@ -4,7 +4,7 @@ import { getContract, zeroAddress, type TransactionReceipt } from "viem";
 import { usePublicClient, useWalletClient, useWatchContractEvent } from "wagmi";
 
 import { RACING_CONTRACT } from "@/data";
-import { useAnim, useGameStates } from "@/stores";
+import { useGameStates } from "@/stores";
 import { logError } from "@/utils/errorUtil";
 import { generateRandomAttributes } from "@/utils/generateCarAttributes";
 
@@ -27,7 +27,6 @@ export const useWriteContract = () => {
   const publicClient = usePublicClient();
   const client = useWalletClient()?.data;
   const { setLoading, setIsWaiting, setTransactionHash } = useGameStates();
-  const { carData } = useAnim();
   const { notifyError } = useNotify();
   const { mode, betAmount, setRaceId } = useGameStates();
   const { getSoloRaceCount, getFreeRaceCount, getTournamentRaceCount } = useReadContract();
@@ -105,29 +104,38 @@ export const useWriteContract = () => {
 
   /* Join Solo Race:
    ******************/
-  const joinSoloRace = useCallback(async (): Promise<ContractCallResponse> => {
-    return await handleTransaction(
-      "joinSoloRace",
-      getSoloRaceCount,
-      false,
-      undefined,
-      carData.attributes,
-      generateRandomAttributes(),
-      circuitId,
-    );
-  }, [handleTransaction, getSoloRaceCount, carData]);
+  const joinSoloRace = useCallback(
+    async (attributes: CarAttributes): Promise<ContractCallResponse> => {
+      return await handleTransaction(
+        "joinSoloRace",
+        getSoloRaceCount,
+        false,
+        undefined,
+        attributes,
+        generateRandomAttributes(),
+        circuitId,
+      );
+    },
+    [handleTransaction, getSoloRaceCount],
+  );
 
   /* Join Free Race (1v1):
    **************************/
-  const joinFreeRace = useCallback(async (): Promise<ContractCallResponse> => {
-    return await handleTransaction("joinFreeRace", getFreeRaceCount, true, undefined, carData.attributes, circuitId);
-  }, [handleTransaction, getFreeRaceCount, carData]);
+  const joinFreeRace = useCallback(
+    async (attributes: CarAttributes): Promise<ContractCallResponse> => {
+      return await handleTransaction("joinFreeRace", getFreeRaceCount, true, undefined, attributes, circuitId);
+    },
+    [handleTransaction, getFreeRaceCount],
+  );
 
   /* Join Tournament Race (1v1):
    ******************************/
-  const joinTournamentRace = useCallback(async (): Promise<ContractCallResponse> => {
-    return await handleTransaction("joinRace", getTournamentRaceCount, true, betAmount, carData.attributes, circuitId);
-  }, [handleTransaction, getTournamentRaceCount, carData, betAmount]);
+  const joinTournamentRace = useCallback(
+    async (attributes: CarAttributes): Promise<ContractCallResponse> => {
+      return await handleTransaction("joinRace", getTournamentRaceCount, true, betAmount, attributes, circuitId);
+    },
+    [handleTransaction, getTournamentRaceCount, betAmount],
+  );
 
   /* Wait for Player:
    *******************/

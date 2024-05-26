@@ -1,10 +1,12 @@
-import { useState, useCallback, useEffect, type FC } from "react";
+import { useCallback, useEffect, type FC } from "react";
 
 import { VStack, Text, Box, SimpleGrid, HStack, StatLabel, StatNumber, Stat } from "@chakra-ui/react";
 import Slider from "rc-slider";
 
 import "rc-slider/assets/index.css";
+import { useDebounce } from "@/hooks";
 import { useGameStates } from "@/stores";
+import { getLuckPercentage } from "@/utils/formatters";
 
 import { CustomBox } from "../CustomBox";
 import { CustomToolTip } from "../CustomToolTip";
@@ -20,17 +22,6 @@ const attributeLabels: { [key in keyof CarAttributes]: string } = {
   luck: "Increase your luck and improve the chance of a lucky event.",
 };
 
-interface CarAttributes {
-  reliability: number;
-  maniability: number;
-  speed: number;
-  breaks: number;
-  car_balance: number;
-  aerodynamics: number;
-  driver_skills: number;
-  luck: number;
-}
-
 interface AttributesSelectorProps {
   defaultAttributes: CarAttributes;
   walktrough?: { attributes: string; luck: string };
@@ -39,30 +30,34 @@ interface AttributesSelectorProps {
 const totalPoints = 40;
 
 const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, walktrough }) => {
-  const { remainingPoints, setRemainingPoints } = useGameStates();
-  const [attributes, setAttributes] = useState<CarAttributes>(defaultAttributes);
+  const { attributes, remainingPoints, setAttributes, setRemainingPoints } = useGameStates();
+
+  const debouncedAttributes = useDebounce(attributes, 1000);
 
   useEffect(() => {
     setAttributes(defaultAttributes);
-  }, [defaultAttributes]);
+  }, [defaultAttributes, setAttributes]);
 
   useEffect(() => {
-    const totalUsedPoints = Object.values(attributes).reduce((acc, cur) => acc + cur, 0);
+    const totalUsedPoints = Object.values(debouncedAttributes).reduce((acc, cur) => acc + cur, 0);
     setRemainingPoints(totalPoints - totalUsedPoints);
-  }, [attributes, setRemainingPoints]);
+  }, [debouncedAttributes, setRemainingPoints]);
 
-  const handleAttributeChange = useCallback((value: number, attribute: keyof CarAttributes) => {
-    setAttributes((prev) => {
-      const newValue = Math.max(1, Math.min(value, 10)); // Ensure values are within 1-10
-      const newAttributes = { ...prev, [attribute]: newValue };
-      const totalUsedPoints = Object.values(newAttributes).reduce((acc, cur) => acc + cur, 0);
+  const handleAttributeChange = useCallback(
+    (value: number, attribute: keyof CarAttributes) => {
+      setAttributes((prev) => {
+        const newValue = Math.max(1, Math.min(value, 10)); // Ensure values are within 1-10
+        const newAttributes = { ...prev, [attribute]: newValue };
+        const totalUsedPoints = Object.values(newAttributes).reduce((acc, cur) => acc + cur, 0);
 
-      if (totalUsedPoints <= totalPoints) {
-        return newAttributes;
-      }
-      return prev;
-    });
-  }, []);
+        if (totalUsedPoints <= totalPoints) {
+          return newAttributes;
+        }
+        return prev;
+      });
+    },
+    [setAttributes],
+  );
 
   const handleSliderChange = useCallback((value: number, min: number, max: number) => {
     return Math.max(min, Math.min(value, max));
@@ -115,6 +110,9 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
                     <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} size="1.1rem" />
                     <StatLabel>{key.charAt(0).toUpperCase() + key.slice(1)}:</StatLabel>
                     <StatNumber fontSize="large">{value}</StatNumber>
+                    <StatNumber fontSize="xs" fontWeight={400}>
+                      {key !== "luck" ? `(${getLuckPercentage(attributes.luck)}% luck)` : ""}
+                    </StatNumber>
                   </HStack>
                 </Stat>
                 {renderSlider(attributeKey, value, minRange, maxRange)}

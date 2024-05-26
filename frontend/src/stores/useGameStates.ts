@@ -1,9 +1,13 @@
+import type { Dispatch, SetStateAction } from "react";
+
 import type { Log } from "viem";
 import { create } from "zustand";
 
 type GameStates = {
   mode: RaceMode | undefined;
   setRaceMode: (mode: RaceMode) => void;
+  attributes: CarAttributes;
+  setAttributes: Dispatch<SetStateAction<CarAttributes>>;
   remainingPoints: number;
   setRemainingPoints: (remainingPoints: number) => void;
   isWaiting: boolean;
@@ -28,6 +32,20 @@ type GameStates = {
 const useGameStates = create<GameStates>((set) => ({
   mode: undefined,
   setRaceMode: (mode: RaceMode) => set({ mode }),
+  attributes: {
+    reliability: 5,
+    maniability: 5,
+    speed: 5,
+    breaks: 5,
+    car_balance: 5,
+    aerodynamics: 5,
+    driver_skills: 5,
+    luck: 5,
+  },
+  setAttributes: (attributes) =>
+    set((prevState) => ({
+      attributes: typeof attributes === "function" ? attributes(prevState.attributes) : attributes,
+    })),
   remainingPoints: 40,
   setRemainingPoints: (remainingPoints) => set({ remainingPoints }),
   isWaiting: false,
@@ -48,6 +66,9 @@ const useGameStates = create<GameStates>((set) => ({
   setEventData: (data) => set({ eventData: data }),
   reset: () =>
     set({
+      mode: undefined,
+      remainingPoints: 40,
+      isWaiting: false,
       loading: false,
       raceId: null,
       raceInfo: null,

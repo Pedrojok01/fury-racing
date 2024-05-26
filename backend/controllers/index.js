@@ -1,7 +1,7 @@
 const HttpError = require("../models/http-error");
 const { validationResult } = require("express-validator");
-const config = require('../config');
-const { ethers } = require('ethers');
+const config = require("../config");
+const { ethers } = require("ethers");
 
 const submit = async (req, res, next) => {
   const errors = validationResult(req);
@@ -46,8 +46,7 @@ function combineToUint256(player1Result, player2Result) {
   return combinedResult;
 }
 
-const getScores = async() => {
-
+const getScores = async () => {
   try {
     const provider = new ethers.providers.JsonRpcProvider(config.INFURA_FUJI_NODE);
     const contractAddress = config.CONTRACT_ADDRESS;
@@ -64,40 +63,62 @@ const getScores = async() => {
     if (totalPlayers === 0) {
       return { players: [], scores: [] };
     } else if (totalPlayers === 1) {
-      const playerAddress = await contract.getPlayerAddressForWeeklyTournament(week, ethers.BigNumber.from(totalPlayers));
+      const playerAddress = await contract.getPlayerAddressForWeeklyTournament(
+        week,
+        ethers.BigNumber.from(totalPlayers)
+      );
 
       const [attrbutes, theAddress, elo] = await contract.addressToPlayer(playerAddress);
-      
+
       console.log(playerAddress);
       console.log(attrbutes.toString());
       console.log(theAddress.toString());
       console.log(elo);
-      
+
       return { players: [playerAddress], scores: [elo.toString()] };
     } else {
-
       // get player addresses
       let calls = [];
-      for (let i=0; i<totalPlayers; i++) {
-        console.log(theWeek, i+1);
-        calls[i] = contract.getPlayerAddressForWeeklyTournament(week, ethers.BigNumber.from(i+1));
+      for (let i = 0; i < totalPlayers; i++) {
+        console.log(theWeek, i + 1);
+        calls[i] = contract.getPlayerAddressForWeeklyTournament(week, ethers.BigNumber.from(i + 1));
       }
 
-      const playerAddresses = await Promise.all(calls)
+      const playerAddresses = await Promise.all(calls);
       console.log(playerAddresses);
 
       // retunr all players' scores
       calls = [];
-      for (let i=0; i<totalPlayers; i++) {
+      for (let i = 0; i < totalPlayers; i++) {
         calls[i] = contract.addressToPlayer(playerAddresses[i]);
       }
 
-      const results = await Promise.all(calls)
-      console.log(results);
+      let results = await Promise.all(calls);
+      // results = Object.values(results)
+      // console.log((results[0])[0]);
+      dashboard(results);
     }
-  } catch(error) {
-    console.error('Error calling getWeekAndPlayerAmount:', error);
+  } catch (error) {
+    console.error("Error calling getWeekAndPlayerAmount:", error);
   }
-}
+};
 
 module.exports = { submit, getScores };
+
+const dashboard = (results) => {
+  console.log();
+  const playersScores = [];
+
+  results.map((x, i) => {
+    const toArray = Object.entries(x);
+
+    const addressArr = toArray[4];
+    const scoreArr = toArray[5];
+    playersScores[i] = { address: addressArr[1], score: scoreArr[1] };
+  });
+
+  // Sort the data in descending order based on the 'score' property
+  playersScores.sort((a, b) => b.score - a.score);
+
+  console.log(playersScores);
+};

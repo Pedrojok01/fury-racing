@@ -4,6 +4,7 @@ import { Box, Divider, Flex, HStack, Heading, Spinner, StatGroup, Text, VStack }
 import Image from "next/image";
 
 import useWeather from "@/hooks/useWeather";
+import { t } from "@/utils/i18";
 
 import { CustomBox } from "../CustomBox";
 import { DisplayStatData } from "../DisplayStatData";
@@ -58,7 +59,7 @@ const Weather: FC = () => {
     <CustomBox>
       <VStack alignItems="flex-start">
         <Text textAlign="left" className="subtitle">
-          Weather Information
+          {t("selection.subtitles.weather")}
         </Text>
 
         {isLoading ? (

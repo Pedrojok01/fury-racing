@@ -66,7 +66,7 @@ const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner, mode }) => {
       {isTournament ? (
         <VStack>
           {winner === address ? <Text fontSize={"2rem"}>+3 Points !</Text> : <Text fontSize={"2rem"}>+1 Point !</Text>}
-          <Text>Current Score: {playerScore ?? ""} ELO</Text>
+          <Text>Current Score: {playerScore ?? ""} Points</Text>
         </VStack>
       ) : (
         <Text>Play in Tournament Mode to gain points and climb the leaderboard!</Text>

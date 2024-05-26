@@ -1,0 +1,45 @@
+{
+  "common": {
+    "title": "Fury Racing",
+    "description": "Onchain racing manager leveraging Chainlink VRF V2.5 and Chainlink Functions."
+  },
+  "menu": {
+    "play": "New Game",
+    "leaderboard": "Leaderboard",
+    "doc": "Ressources"
+  },
+  "mode": {
+    "subtitles": "Select a mode:",
+    "description": {
+      "solo": "Play a quick solo race against an AI. No entry fee. No waiting. No pressure.",
+      "free": "Play a 1v1 race against against another player. No entry fee.",
+      "tournament": "Double or nothing: Pay the entry fee and play to double up your bet against another player! Climb up the rank in the leaderboard and try to grab the weekly prize pool!"
+    },
+    "info": "Tournament Information:",
+    "fee": "Current entry fee:",
+    "prize": "Current prize pool:"
+  },
+  "selection": {
+    "subtitles": {
+      "car": "1. Choose Your Car",
+      "attributes": "2. Adjust Your Settings",
+      "weather": "Weather Information",
+      "track": "Track Information"
+    },
+    "attributesDescription": {
+      "reliability": "Increase the car's reliability and reduce the chance of a breakdown.",
+      "maniability": "Increase the car's ability to turn and corner at high speeds.",
+      "speed": "Increase the car's top speed and acceleration.",
+      "breaks": "Increase the car's braking power and reduce the stopping distance.",
+      "car_balance": "Increase the car's stability and reduce the chance of spinning out.",
+      "aerodynamics": "Increase the car's downforce and reduce the chance of losing grip.",
+      "driver_skills": "Increase the driver's skill and reduce the chance of making mistakes.",
+      "luck": "Increase your luck and improve the chance of a lucky event."
+    }
+  },
+  "cars": {
+    "car_1": "A reliable car with good balance and breaks.",
+    "car_2": "A car with high maniability and aerodynamics.",
+    "car_3": "A fast car with moderate breaks and balance."
+  }
+}

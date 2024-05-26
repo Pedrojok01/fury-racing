@@ -7,19 +7,20 @@ import "rc-slider/assets/index.css";
 import { useDebounce } from "@/hooks";
 import { useGameStates } from "@/stores";
 import { getLuckPercentage } from "@/utils/formatters";
+import { t } from "@/utils/i18";
 
 import { CustomBox } from "../CustomBox";
 import { CustomToolTip } from "../CustomToolTip";
 
 const attributeLabels: { [key in keyof CarAttributes]: string } = {
-  reliability: "Increase the car's reliability and reduce the chance of a breakdown.",
-  maniability: "Increase the car's ability to turn and corner at high speeds.",
-  speed: "Increase the car's top speed and acceleration.",
-  breaks: "Increase the car's braking power and reduce the stopping distance.",
-  car_balance: "Increase the car's stability and reduce the chance of spinning out.",
-  aerodynamics: "Increase the car's downforce and reduce the chance of losing grip.",
-  driver_skills: "Increase the driver's skill and reduce the chance of making mistakes.",
-  luck: "Increase your luck and improve the chance of a lucky event.",
+  reliability: t("selection.attributesDescription.reliability"),
+  maniability: t("selection.attributesDescription.maniability"),
+  speed: t("selection.attributesDescription.speed"),
+  breaks: t("selection.attributesDescription.breaks"),
+  car_balance: t("selection.attributesDescription.car_balance"),
+  aerodynamics: t("selection.attributesDescription.aerodynamics"),
+  driver_skills: t("selection.attributesDescription.driver_skills"),
+  luck: t("selection.attributesDescription.luck"),
 };
 
 interface AttributesSelectorProps {
@@ -93,7 +94,7 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
     <CustomBox>
       <VStack spacing={5} w={"100%"}>
         <HStack w={"100%"} justify={"space-between"} className={walktrough?.attributes}>
-          <Text className="subtitle">2. Adjust Your Settings</Text>
+          <Text className="subtitle">{t("selection.subtitles.attributes")}</Text>
           <Text>Remaining: {remainingPoints}</Text>
         </HStack>
 

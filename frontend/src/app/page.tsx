@@ -1,7 +1,8 @@
 "use client";
 import { BrowserView, MobileView } from "react-device-detect";
 
-import { HomeScreen, CustomLayout } from "@/templates";
+import { CustomLayout } from "@/layout";
+import { HomeScreen } from "@/templates";
 
 export default function Home() {
   return (

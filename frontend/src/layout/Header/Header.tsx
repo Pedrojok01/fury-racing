@@ -9,13 +9,14 @@ import NextLink from "next/link";
 import { isMobile } from "react-device-detect";
 import { useAccount } from "wagmi";
 
+import { DarkModeButton } from "@/components";
 import { useAudio } from "@/context";
 import { images } from "@/data";
 import { useWindowSize } from "@/hooks";
 import { useGameStates } from "@/stores";
+import { t } from "@/utils/i18";
 
 import styles from "./header.module.css";
-import { DarkModeButton } from "../DarkModeButton";
 
 const Header: FC = () => {
   const { isConnected, address } = useAccount();
@@ -34,11 +35,14 @@ const Header: FC = () => {
   const menuIems = (
     <>
       <NextLink href="/mode" className={styles.menuItems} onClick={handlePlayClick}>
-        <Box>New Game</Box>
+        <Box>{t("menu.play")}</Box>
       </NextLink>
       <NextLink href="/leaderboard" className={`${styles.menuItems} leaderboard`}>
-        <Box>Leaderboard</Box>
+        <Box>{t("menu.leaderboard")}</Box>
       </NextLink>
+      <Link href="" className={styles.menuItems} isExternal rel="noopener noreferrer">
+        <Box>{t("menu.doc")}</Box>
+      </Link>
     </>
   );
 

@@ -8,12 +8,12 @@ import { formatEther } from "viem";
 import { CustomBox, CustomToolTip } from "@/components";
 import { useReadContract } from "@/hooks";
 import { useGameStates } from "@/stores";
+import { t } from "@/utils/i18";
 
 const descriptionText = {
-  SOLO: "Play a quick solo race against an AI. No entry fee. No waiting. No pressure.",
-  FREE: "Play a 1v1 race against against another player. No entry fee.",
-  TOURNAMENT:
-    "Double or nothing: Pay the entry fee and play to double up your bet against another player! Climb up the rank in the leaderboard and try to grab the weekly prize pool!",
+  SOLO: t("mode.description.solo"),
+  FREE: t("mode.description.free"),
+  TOURNAMENT: t("mode.description.tournament"),
 };
 
 const ModeScreen: FC = () => {
@@ -29,7 +29,7 @@ const ModeScreen: FC = () => {
     <Center h={"100%"} width={"100%"} justifyContent={"center"}>
       <VStack h={isMobile ? "100%" : "auto"} spacing={isMobile ? 5 : 10}>
         <Text fontSize={isMobile ? "1.2rem" : "3rem"} fontWeight={"bold"} color={"var(--primary-color)"}>
-          Select a mode
+          {t("mode.subtitles")}
         </Text>
 
         <HStack spacing={5} wrap={"wrap"} justifyContent={"center"}>
@@ -40,15 +40,14 @@ const ModeScreen: FC = () => {
 
         <CustomBox>
           <Text textAlign="center" className="subtitle" mb={5}>
-            Tournament Information:
+            {t("mode.info")}
           </Text>
           <Center flexDirection={"column"}>
             <Flex w={"50%"} justifyContent="space-between" minW={280}>
-              <Text>Current entry fee:</Text>{" "}
-              <Text fontWeight={700}>{formatEther(betAmount) ?? " loading..."} AVAX</Text>
+              <Text>{t("mode.fee")}</Text> <Text fontWeight={700}>{formatEther(betAmount) ?? " loading..."} AVAX</Text>
             </Flex>
             <Flex w={"50%"} justifyContent="space-between" minW={280}>
-              <Text>Current prize pool: </Text>{" "}
+              <Text>{t("mode.prize")}</Text>{" "}
               <Text fontWeight={700}>{formatEther(prizePool) ?? " loading..."} AVAX</Text>
             </Flex>
           </Center>

@@ -40,7 +40,7 @@ const ScoreItem: FC<ScoreItemProps> = ({ user_address, score, index, image }) =>
 
       <Spacer />
 
-      <Text className={styles.userScore}>{score} ELO</Text>
+      <Text className={styles.userScore}>{score} Points</Text>
     </Box>
   );
 };

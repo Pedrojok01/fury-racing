@@ -2,7 +2,8 @@
 
 import { BrowserView, MobileView } from "react-device-detect";
 
-import { CustomLayout, LeaderboardScreen } from "@/templates";
+import { CustomLayout } from "@/layout";
+import { LeaderboardScreen } from "@/templates";
 
 export default function Leaderboard() {
   return (

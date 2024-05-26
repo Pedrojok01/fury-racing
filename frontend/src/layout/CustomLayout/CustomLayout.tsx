@@ -4,8 +4,10 @@ import { useEffect, type FC, type ReactNode } from "react";
 import { Box, Flex, Image } from "@chakra-ui/react";
 import { isMobile, isTablet, useMobileOrientation } from "react-device-detect";
 
-import { Footer, Header } from "@/components";
 import { images } from "@/data/images";
+
+import { Footer } from "../Footer";
+import { Header } from "../Header";
 
 type CustomLayoutProps = {
   children: ReactNode;

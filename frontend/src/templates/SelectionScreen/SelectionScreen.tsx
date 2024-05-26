@@ -8,14 +8,13 @@ import { AttributesSelector, CarAnim, CustomBox, Track, WaitingScreen, Weather }
 import { images, tracks } from "@/data";
 import { useWriteContract } from "@/hooks";
 import { useAnim, useGameStates } from "@/stores";
+import { t } from "@/utils/i18";
 
 const SelectionScreen: FC = () => {
   const { carData } = useAnim();
   const { joinSoloRace, joinFreeRace, joinTournamentRace, waitForPlayer } = useWriteContract();
   const { loading, mode, attributes, remainingPoints, isWaiting, raceId } = useGameStates();
   const router = useRouter();
-
-  console.log("attributes", attributes);
 
   const handlePlayer2Joined = useCallback(() => {
     router.push("/race");
@@ -55,7 +54,7 @@ const SelectionScreen: FC = () => {
           <CustomBox>
             <VStack alignItems={"flex-start"} className="select-car">
               <Text textAlign={"left"} className="subtitle">
-                1. Choose Your Car
+                {t("selection.subtitles.car")}
               </Text>
               <CarAnim />
             </VStack>

@@ -3,6 +3,8 @@ import { type FC } from "react";
 import { Divider, Flex, HStack, Heading, StatGroup, Text, VStack } from "@chakra-ui/react";
 import Image, { type StaticImageData } from "next/image";
 
+import { t } from "@/utils/i18";
+
 import { CustomBox } from "../CustomBox";
 import { DisplayStatData } from "../DisplayStatData";
 
@@ -16,7 +18,7 @@ const Track: FC<TrackProps> = ({ map, data }) => {
     <CustomBox>
       <VStack alignItems="flex-start">
         <Text textAlign={"left"} className="subtitle">
-          Track Information
+          {t("selection.subtitles.track")}
         </Text>
 
         <HStack w="100%" h={"100%"} justifyContent="space-between">

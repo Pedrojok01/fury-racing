@@ -1,3 +1,5 @@
+import { t } from "@/utils/i18";
+
 export const carMetadata: CarMetadata[] = [
   {
     path: "car1",
@@ -17,7 +19,7 @@ export const carMetadata: CarMetadata[] = [
       driver_skills: 3, // Low driver skills
       luck: 3, // Low luck
     },
-    description: "A reliable car with good balance and breaks.",
+    description: t("cars.car_1"),
   },
   {
     path: "car2",
@@ -37,7 +39,7 @@ export const carMetadata: CarMetadata[] = [
       driver_skills: 3, // Low driver skills
       luck: 4, // Moderate luck
     },
-    description: "A car with high maniability and aerodynamics.",
+    description: t("cars.car_2"),
   },
   {
     path: "car3",
@@ -57,6 +59,6 @@ export const carMetadata: CarMetadata[] = [
       driver_skills: 5, // Moderate driver skills
       luck: 6, // Higher luck
     },
-    description: "A fast car with moderate breaks and balance.",
+    description: t("cars.car_3"),
   },
 ];

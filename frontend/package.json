@@ -1,7 +1,7 @@
 {
   "name": "fury-racing",
   "version": "1.1.0",
-  "description": "Onchain racing simulator leveraging Chainlink VRF and Chainlink Functions",
+  "description": "Onchain racing manager leveraging Chainlink VRF v2.5 and Chainlink Functions",
   "license": "MIT",
   "private": true,
   "homepage": "https://github.com/Pedrojok01/chainlink-hackathon",

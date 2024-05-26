@@ -111,9 +111,22 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
                     <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} size="1.1rem" />
                     <StatLabel>{key.charAt(0).toUpperCase() + key.slice(1)}:</StatLabel>
                     <StatNumber fontSize="large">{value}</StatNumber>
-                    <StatNumber fontSize="xs" fontWeight={400}>
-                      {key !== "luck" ? `(${getLuckPercentage(attributes.luck)}% luck)` : ""}
-                    </StatNumber>
+                    {key !== "luck" && (
+                      <StatNumber
+                        fontSize="0.6em"
+                        fontWeight={600}
+                        color={"white"}
+                        backgroundColor="rgba(114, 207, 66)"
+                        borderRadius="50%"
+                        display="inline-block"
+                        width="2.8em"
+                        height="2.8em"
+                        lineHeight="2.8em"
+                        textAlign="center"
+                      >
+                        {`${getLuckPercentage(attributes.luck)}%`}
+                      </StatNumber>
+                    )}
                   </HStack>
                 </Stat>
                 {renderSlider(attributeKey, value, minRange, maxRange)}

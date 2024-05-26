@@ -34,7 +34,7 @@
       "car_balance": "Increase the car's stability and reduce the chance of spinning out.",
       "aerodynamics": "Increase the car's downforce and reduce the chance of losing grip.",
       "driver_skills": "Increase the driver's skill and reduce the chance of making mistakes.",
-      "luck": "Increase your luck and improve the chance of a lucky event."
+      "luck": "Increase your luck to boost all your car's attributes by a small percentage. But decrease it too much and the opposite will happen!"
     }
   },
   "cars": {

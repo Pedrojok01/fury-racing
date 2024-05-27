@@ -2,8 +2,8 @@ type WeatherFx = "none" | "fog" | "rain";
 type Sky = "sunny" | "cloudy" | "storm" | "night";
 
 type PlayerScore = {
-  _id: string;
-  user_address: `0x${string}`;
+  id: number;
+  address: `0x${string}`;
   score: number;
 };
 

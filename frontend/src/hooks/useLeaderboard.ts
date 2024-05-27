@@ -1,4 +1,3 @@
-// hooks/useLeaderboard.ts
 import useSWR from "swr";
 
 const fetcher = async (url: string): Promise<LeaderboardResponse> => {

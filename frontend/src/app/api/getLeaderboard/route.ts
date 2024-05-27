@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { mockLeaderboard } from "@/data/mockLeaderboard";
+export const runtime = "nodejs";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
@@ -14,11 +14,28 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json(errorMethod);
     }
 
+    const leaderboardApiUrl = "https://racerback.azurewebsites.net/api/races/players/rank";
+
+    const leaderboardResponse = await fetch(leaderboardApiUrl, {
+      cache: "no-cache",
+    });
+    if (!leaderboardResponse.ok) {
+      const errorResponse: WeatherResponse = {
+        success: false,
+        error: `Failed to fetch weather data: ${leaderboardResponse.statusText}`,
+        status: leaderboardResponse.status,
+        data: null,
+      };
+      return NextResponse.json(errorResponse);
+    }
+
+    const leaderboardData = await leaderboardResponse.json();
+
     const responseData: LeaderboardResponse = {
       success: true,
       error: null,
       status: 200,
-      data: mockLeaderboard,
+      data: leaderboardData.ranking,
     };
 
     return NextResponse.json(responseData);

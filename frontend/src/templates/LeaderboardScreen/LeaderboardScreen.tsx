@@ -26,8 +26,8 @@ const LeaderboardScreen: FC = () => {
 
         {currentData.map((score, index) => (
           <ScoreItem
-            key={score._id}
-            user_address={score.user_address}
+            key={score.id}
+            user_address={score.address}
             score={score.score}
             index={index + 1}
             image={index === 0 ? images.crown : index < 3 ? images.podium : undefined}

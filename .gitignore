@@ -15,6 +15,7 @@ node_modules/
 .env.test
 .env.production
 
+
 # Ignore logs and cache files
 logs/
 *.log

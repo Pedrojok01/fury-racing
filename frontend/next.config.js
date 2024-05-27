@@ -1,4 +1,6 @@
+require("./src/cron.js");
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
   reactStrictMode: false, // Set to 'false' during Babylon development. Set to 'true' otherwise.
   webpack: (config) => {

@@ -1,9 +1,9 @@
 /**
  * @description Calculate a weather score based on temperature, wind, precipitation, humidity, and cloud cover.
- * @param weather The weather data to calculate the score for.
- * @returns The weather score as an integer percentage.
+ * @param {Weather} weather The weather data to calculate the score for.
+ * @returns {number} The weather score as an integer percentage from 0 to 99.
  */
-export const calculateWeatherScore = (weather: Weather): number => {
+const calculateWeatherScore = (weather) => {
   const { temp_c, wind_kph, precip_mm, humidity, cloud } = weather.current;
 
   // Weights per factor
@@ -33,7 +33,15 @@ export const calculateWeatherScore = (weather: Weather): number => {
   return Math.round(score);
 };
 
-// Normalize a value to a 0-99 scale
-function normalize(value: number, min: number, max: number): number {
+/**
+ * @description Normalize a value to a 0-99 scale.
+ * @param {number} value The value to normalize.
+ * @param {number} min The minimum value of the range.
+ * @param {number} max The maximum value of the range.
+ * @returns {number} The normalized value.
+ */
+function normalize(value, min, max) {
   return ((value - min) / (max - min)) * 99;
 }
+
+module.exports = { calculateWeatherScore };

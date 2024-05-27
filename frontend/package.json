@@ -1,8 +1,8 @@
 {
   "name": "fury-racing",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Onchain racing manager leveraging Chainlink VRF v2.5 and Chainlink Functions",
-  "license": "MIT",
+  "license": "BSL-1.1",
   "private": true,
   "homepage": "https://github.com/Pedrojok01/chainlink-hackathon",
   "bugs": "https://github.com/Pedrojok01/chainlink-hackathon/issues",
@@ -33,7 +33,8 @@
     "framer-motion": "11.2.6",
     "lodash.merge": "4.6.2",
     "next": "14.2.3",
-    "rc-slider": "^10.6.2",
+    "node-cron": "3.0.3",
+    "rc-slider": "10.6.2",
     "react": "18.3.1",
     "react-confetti": "6.1.0",
     "react-device-detect": "2.2.3",
@@ -49,6 +50,7 @@
   "devDependencies": {
     "@types/lodash.merge": "4.6.9",
     "@types/node": "20.12.12",
+    "@types/node-cron": "3.0.11",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "@typescript-eslint/eslint-plugin": "7.7.1",
@@ -64,16 +66,15 @@
   },
   "keywords": [
     "nextjs",
+    "babylonjs",
     "wagmi",
     "viem",
     "web3",
-    "boilerplate",
+    "chainlink",
     "chakra-ui",
     "rainbowkit",
+    "avalanche-c-chain",
     "ethereum-dapp",
-    "ethereum-boilerplate",
-    "ethereum-dapp",
-    "web3-boilerplate",
-    "web3-dapp"
+    "web3-game"
   ]
 }

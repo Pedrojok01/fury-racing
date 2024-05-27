@@ -37,6 +37,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
+    "src/utils/calculateWeatherScore.js",
+    "src/cron.js",
   ],
   "exclude": [
     "node_modules"

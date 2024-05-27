@@ -3,7 +3,7 @@ const { ethers } = require("ethers");
 const config = require('../config');
 
 const readWeather = () => {
-    const interval = parser.parseExpression('*/1 * * * *');
+    const interval = parser.parseExpression('*/60 * * * *');
 
     setInterval(async() => {
         

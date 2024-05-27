@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
 
@@ -31,9 +32,6 @@ app.use((error, req, res, next) => {
   res.status(error.code || 500);
   res.json({ message: error.message || "An unknown error occured!" });
 });
-
-const controller = require("./controllers");
-controller.getScores();
 
 readWeather();
 app.listen(process.env.PORT || 3000);

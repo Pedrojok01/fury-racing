@@ -49,7 +49,7 @@ function combineToUint256(player1Result, player2Result) {
 const dashboard = async (req, res, next) => {
   try {
     console.log(process.env.INFURA_FUJI_NODE);
-    const provider = new ethers.providers.JsonRpcProvider(process.env.INFURA_FUJI_NODE);
+    const provider = new ethers.providers.JsonRpcProvider(config.AVALANCHE_NODE);
     const contractAddress = config.CONTRACT_ADDRESS;
     const contractABI = config.RACING_ABI;
 

@@ -1,7 +1,5 @@
 module.exports = {
   AVALANCHE_NODE: "https://avalanche-fuji-c-chain-rpc.publicnode.com",
-  INFURA_FUJI_NODE: "https://avalanche-fuji.infura.io/v3/fb9636a98c6546ec9d5470453e50d9ff",
-  INFURA_PROJECT_ID: "bcd90c270898426da706434eb8265332",
   CONTRACT_ADDRESS: "0xba9d10112E4CEdb056FEB6700090f287AF0b66B9",
   WEATHER_CITY: "Monaco",
   ABI: [

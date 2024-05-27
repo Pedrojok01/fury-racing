@@ -1,4 +1,5 @@
 const parser = require('cron-parser');
+const { ethers } = require("ethers");
 const config = require('../config');
 
 const readWeather = () => {
@@ -8,16 +9,41 @@ const readWeather = () => {
         
         console.log('60 minutes passed - ', new Date().toLocaleString());
 
-        const weatherApiUrl = `https://api.weatherapi.com/v1/current.json?key=${config.WEATHER_API_KEY}&q=${config.WEATHER_CITY}&aqi=no`;
+        const weatherApiUrl = `https://api.weatherapi.com/v1/current.json?key=${process.env.WEATHER_API_KEY}&q=${config.WEATHER_CITY}&aqi=no`;
         const response = await fetch(weatherApiUrl);
         const data = await response.json();
         
-        
         const weatherScore = calculateWeatherScore(data);
         console.log(`Weather score: ${weatherScore}`);
+
+        updateWeatherDataForCircuit(weatherScore);
    
     }, interval.next().getTime() - Date.now());
 
+}
+
+const updateWeatherDataForCircuit = async(weatherPercent) => {
+    const circuitIndex = 1
+
+    const provider = new ethers.providers.JsonRpcProvider('https://api.avax-test.network/ext/bc/C/rpc');
+    const wallet = new ethers.Wallet(process.env.KEY, provider);
+    const contractAddress = config.CONTRACT_ADDRESS;
+    const contractABI = config.RACING_ABI;
+
+    // Create a contract instance
+    const contract = new ethers.Contract(contractAddress, contractABI, provider);
+
+    console.log(provider);
+
+    // Use the wallet to call the contract function
+    const tx = await contract.connect(wallet).updateWeatherDataForCircuit(circuitIndex, weatherPercent, {
+        gasLimit: 1000000
+    });
+
+    // Wait for the transaction to be mined
+    await tx.wait();
+
+    console.log('Weather data updated successfully!');
 }
 
 /**

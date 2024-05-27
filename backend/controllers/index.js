@@ -46,9 +46,10 @@ function combineToUint256(player1Result, player2Result) {
   return combinedResult;
 }
 
-const getScores = async () => {
+const dashboard = async (req, res, next) => {
   try {
-    const provider = new ethers.providers.JsonRpcProvider(config.INFURA_FUJI_NODE);
+    console.log(process.env.INFURA_FUJI_NODE);
+    const provider = new ethers.providers.JsonRpcProvider(process.env.INFURA_FUJI_NODE);
     const contractAddress = config.CONTRACT_ADDRESS;
     const contractABI = config.RACING_ABI;
 
@@ -61,7 +62,7 @@ const getScores = async () => {
     const totalPlayers = players.toNumber();
 
     if (totalPlayers === 0) {
-      return { players: [], scores: [] };
+      res.status(200).json({ players: [], scores: [] })
     } else if (totalPlayers === 1) {
       const playerAddress = await contract.getPlayerAddressForWeeklyTournament(
         week,
@@ -75,7 +76,7 @@ const getScores = async () => {
       console.log(theAddress.toString());
       console.log(elo);
 
-      return { players: [playerAddress], scores: [elo.toString()] };
+      res.status(200).json({ players: [playerAddress], scores: [elo.toString()] })
     } else {
       // get player addresses
       let calls = [];
@@ -93,32 +94,33 @@ const getScores = async () => {
         calls[i] = contract.addressToPlayer(playerAddresses[i]);
       }
 
-      let results = await Promise.all(calls);
-      // results = Object.values(results)
-      // console.log((results[0])[0]);
-      dashboard(results);
+      let getPlayersScore = await Promise.all(calls);
+
+      let playersScores = [];
+
+      getPlayersScore.map((x, i) => {
+        const toArray = Object.entries(x);
+
+        const addressArr = toArray[4];
+        const scoreArr = toArray[5];
+        playersScores[i] = { address: addressArr[1], score: scoreArr[1] };
+      });
+
+      // Sort the data in descending order based on the 'score' property
+      playersScores = playersScores.sort((a, b) => b.score - a.score).map((player, index) => ({
+        id: index + 1,
+        ...player
+      }));
+
+      console.log(playersScores);
+
+      res.status(200).json({ ranking: playersScores})
     }
-  } catch (error) {
-    console.error("Error calling getWeekAndPlayerAmount:", error);
+  } catch (err) {
+    console.error("Error calling dashboard:", err);
+    const error = new HttpError("Error calling dashboard: " + err, 500);
+    return next(error);
   }
 };
 
-module.exports = { submit, getScores };
-
-const dashboard = (results) => {
-  console.log();
-  const playersScores = [];
-
-  results.map((x, i) => {
-    const toArray = Object.entries(x);
-
-    const addressArr = toArray[4];
-    const scoreArr = toArray[5];
-    playersScores[i] = { address: addressArr[1], score: scoreArr[1] };
-  });
-
-  // Sort the data in descending order based on the 'score' property
-  playersScores.sort((a, b) => b.score - a.score);
-
-  console.log(playersScores);
-};
+module.exports = { submit, dashboard };

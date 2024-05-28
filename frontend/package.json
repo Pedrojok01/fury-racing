@@ -34,7 +34,6 @@
     "lodash.merge": "4.6.2",
     "next": "14.2.3",
     "next-pwa": "^5.6.0",
-    "node-cron": "3.0.3",
     "rc-slider": "10.6.2",
     "react": "18.3.1",
     "react-confetti": "6.1.0",
@@ -51,7 +50,6 @@
   "devDependencies": {
     "@types/lodash.merge": "4.6.9",
     "@types/node": "20.12.12",
-    "@types/node-cron": "3.0.11",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "@typescript-eslint/eslint-plugin": "7.7.1",

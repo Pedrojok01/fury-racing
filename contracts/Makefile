@@ -23,8 +23,6 @@ test :; forge test -vvv
 
 coverage :; forge coverage
 
-snapshot :; forge snapshot
-
 format :; forge fmt
 
 anvil :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 1

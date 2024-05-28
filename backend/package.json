@@ -7,13 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
   "license": "BSL-1.1",
   "dependencies": {
     "body-parser": "1.20.2",
     "express": "4.19.2",
     "express-validator": "7.1.0",
-    "node-cron": "3.0.3",
     "serverless-http": "3.2.0",
     "viem": "2.12.5"
   }

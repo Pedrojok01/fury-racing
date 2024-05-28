@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./frontend/public/img/Fury_Racing_logo_HD.png" width="200px"/>
+<img src="../frontend/public/img/Fury_Racing_logo_HD.png" width="200" alt="Fury Racing logo" />
 <br><br>
 
 <h1><strong> Fury Racing </strong></h1>
@@ -17,20 +17,26 @@
 
 </div>
 
-Try it yourself: [https://fury-racing.vercel.app/](https://fury-racing.vercel.app/)
-
 ## Table of Contents
 
 - [Table of Contents](#table-of-contents)
+- [Links:](#links)
 - [Description:](#description)
   - [Concept:](#concept)
   - [Race Mode:](#race-mode)
+- [Installation](#installation)
 - [Features:](#features)
 - [Inspiration](#inspiration)
 
+## Links:
+
+- [Website](https://fury-racing.vercel.app/)
+- [Gitbook documentation](https://fury-racing.gitbook.io/fury-racing)
+- [Devpost](https://devpost.com/software/fury-racing)
+
 ## Description:
 
-This game is a **car manager** (you do not drive the car yourself), based on **strategy** (about 90%) and a bit of luck (about 10%).
+Fury Racing is a **car manager** game (you do not drive the car yourself), based on strategy (about 90%) and a bit of luck (about 10%).
 
 ### Concept:
 
@@ -50,9 +56,17 @@ The 2 luck sources add to each other, giving potential bonuses or malus ranging 
 
 Three different modes have been implemented: solo, free, and tournament.
 
-- In Solo mode, you play against a computer with randomly generated attributes. You can play for free without waiting and without pressure at any time.
-- in Free mode, you play in a synchronous 1v1. You race for free, but you may have to wait a bit for another opponent to join. You do not have to wait if it takes too long as the race will complete without you as well, but you won't be able to start a new race as long as the previous one hasn't started.
-- In Tournament mode, the gameplay is the same as in Free mode. However, you have to pay a small entry fee to participate. The winner of the race will take all the money, minus 5% that will be added to a weekly prize pool. You also gain points that will allow you to climb the leaderboard. And every 7 days, the leader of the leaderboard wins the prize pool! (The prize pool can be sponsored by anyone to attract more players!)
+- **Solo mode**: You play against a computer with randomly generated attributes. You can play for free without waiting and without pressure at any time.
+- **Free mode**: You play in a synchronous 1v1. You race for free, but you may have to wait a bit for another opponent to join. You do not have to wait if it takes too long as the race will complete without you as well, but you won't be able to start a new race as long as the previous one hasn't started.
+- **Tournament mode**: The gameplay is the same as in Free mode. However, you have to pay a small entry fee to participate. The winner of the race will take all the money, minus 5% that will be added to a weekly prize pool. You also gain points that will allow you to climb the leaderboard. And every 7 days, the leader of the leaderboard wins the prize pool! (The prize pool can be sponsored by anyone to attract more players!)
+
+## Installation
+
+Please refer to each folder's README file for more information about the installation process and how to run the project locally.
+
+- [frontend](./frontend/README.md)
+- [backend](./backend/README.md)
+- [contracts](./contracts/README.md)
 
 ## Features:
 

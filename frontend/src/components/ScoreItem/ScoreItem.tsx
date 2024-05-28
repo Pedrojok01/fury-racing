@@ -19,12 +19,20 @@ type ScoreItemProps = {
 
 const ScoreItem: FC<ScoreItemProps> = ({ user_address, score, index, image }) => {
   const { colorMode } = useColorMode();
-  const { chainId } = useAccount();
+  const { chainId, address } = useAccount();
 
-  const backgroundColor = colorMode === "light" ? "var(--background-light)" : "var(--background-dark)";
+  const isPlayer = address === user_address;
+
+  const backgroundColor = isPlayer
+    ? "var(--secondary-color)"
+    : colorMode === "light"
+      ? "var(--background-light)"
+      : "var(--background-dark)";
+
+  const fontWeight = isPlayer ? "bold" : "normal";
 
   return (
-    <Box className={styles.scoreItem} style={{ backgroundColor: backgroundColor }}>
+    <Box className={styles.scoreItem} style={{ backgroundColor: backgroundColor, fontWeight: fontWeight }}>
       <Box>{index}</Box>
 
       <HStack className={styles.userEmail} gap={3} w={"100%"} justifyContent={"center"}>

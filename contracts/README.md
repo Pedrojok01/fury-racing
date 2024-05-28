@@ -1,28 +1,38 @@
-# Name
+<div align="center">
 
-<p align="center">
-<img src="../frontend/public/img/Fury_Racing_logo_HD.png" width="200" alt="Name">
+<h1><strong> Fury Racing </strong></h1><br/>
+<img src="../frontend/public/img/Fury_Racing_logo_HD.png" width="200" alt="Fury Racing logo" />
 <br/>
 
-- [Name](#name)
-- [About](#about)
-- [Getting Started](#getting-started)
-  - [Requirements](#requirements)
-  - [Installation](#installation)
-  - [Quickstart](#quickstart)
+</div>
+
+## Table of Contents
+
 - [Usage](#usage)
   - [Coverage](#coverage)
-- [Audit Scope Details](#audit-scope-details)
-  - [Roles](#roles)
-  - [Known Issues](#known-issues)
 
-# About
+## Description:
 
-<!-- Include a blurb about your project, including a link to docs if applicable -->
+The Racing contract is currently deployed abd verified on Avalanche Fuji at the following address:
 
-# Getting Started
+[0x5a46363a08146fb5d93C687afb4C69D2EeB33412](https://testnet.snowscan.xyz/address/0x5a46363a08146fb5d93C687afb4C69D2EeB33412)
 
-## Requirements
+The smart contracts for Fury Racing have been implemented in Solidity and the Foundry framework. All the critical features are on-chain and handled directly in the contracts. They have been designed with the following in mind:
+
+- Reduce the use of arrays and loops as much as possible;
+- Require as little transactions as possible, to keep the UI/UX smooth and user-friendly;
+- Gas efficiency and security ([Slither](https://github.com/crytic/slither)/[Aderyn](https://github.com/Cyfrin/aderyn));
+
+## Chainlink:
+
+Chainlink features are leveraged in two ways:
+
+1. [**Chainlink VRF V2.5**](https://docs.chain.link/vrf): to generate random numbers for the luck attributes;
+2. [**Chainlink Functions**](https://docs.chain.link/chainlink-functions): to query the backend for the race results (the time per player based on their car attributes).
+
+## Getting Started
+
+### Requirements
 
 - [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
   - You'll know you did it right if you can run `git --version` and you see a response like `git version x.x.x`
@@ -30,51 +40,90 @@
   - You'll know you did it right if you can run `forge --version` and you see a response like `forge 0.2.0 (816e00b 2023-03-16T00:05:26.396218Z)`
   <!-- Additional requirements here -->
 
-## Installation
+### Installation
+
+Start by cloning the repository and navigating to the project directory:
 
 ```bash
-git clone <MY_REPO>
-cd <MY_REPO>
-make
+git clone https://github.com/Pedrojok01/fury-racing.git
+cd contracts
 ```
 
-## Quickstart
+Then install the dependencies:
+
+```bash
+make install
+```
+
+You should now have `chainlink`, `openzeppelin-contracts`, and `forge-std` installed in your `lib` folder.
+
+### Quickstart
+
+Thanks to the make file, all actions are easily accessible.
+
+- To compile the contracts, run:
+
+```bash
+make build
+```
+
+- To run the tests, run:
 
 ```bash
 make test
 ```
 
-# Usage
-
-## Coverage
+You can even run `slither` and `aderyn` if they are installed on your machine:
 
 ```bash
-forge test --report debug
+make slither
+make aderyn
 ```
 
-# Audit Scope Details
-
-- Commit Hash: XXX
-- Files in scope:
-
-```
-make scope
-```
-
-- Solc Version: X.X.X
-- Chain(s) to deploy to:
-  - XXX
-- ERC20 Token Compatibilities:
-  - XXX
-
-## Roles
-
-- Role1: <!-- Description -->
-
-## Known Issues
-
-- Issue1: <!-- Description -->
+- To get the coverage:
 
 ```bash
-forge script script/contract.s.sol:ContractName --rpc-url $RPC_URL  --private-key $PRIVATE_KEY --broadcast --verify --etherscan-api-key $ETHERSCAN_API_KEY -vvvv
+make coverage
 ```
+
+- To format the solidity code:
+
+```bash
+make format
+```
+
+## Deployment
+
+When you are ready to deploy the contracts, first ensure that you have updated the values in the `scripts/deployerTestnet.js` file to match your Chainlink VRF and Functions Subscriptions.
+
+Then, go to https://catapulta.sh/ to get your API key. This is a super cool service to deploy and verify your contracts on multiple networks.
+
+Update the environment variables in the `.env` file with the required value:
+
+```js
+PRIVATE_KEY=
+
+AVALANCHE_RPC_URL=
+AVALANCHE_FUJI_RPC_URL=
+
+CATAPULTA_API_KEY=
+CATAPULTA_SENDER=
+```
+
+Then run:
+
+```bash
+make CatapulTest
+```
+
+You should see your contracts address in the console, and a link to the explorer with your contracts verified!
+
+<br></br>
+
+<div align="center">
+<h2>🎉 Thank you Chainlink for this amazing hackathon! 🎉</h2>
+</div>
+
+<br>
+
+<p align="right">(<a href="#top">back to top</a>)</p>

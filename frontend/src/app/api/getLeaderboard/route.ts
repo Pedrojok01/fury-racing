@@ -14,7 +14,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json(errorMethod);
     }
 
-    const leaderboardApiUrl = "https://racerback.azurewebsites.net/api/races/players/rank";
+    const leaderboardApiUrl = "https://ovabcp98r5.execute-api.us-east-1.amazonaws.com/dev/api/races/leaderboard";
 
     const leaderboardResponse = await fetch(leaderboardApiUrl, {
       cache: "no-cache",

@@ -77,7 +77,7 @@ const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner, mode }) => {
 
   return (
     <Box w="100vw" h="100vh">
-      {isWinner && (
+      {isWinner && !isMobile && (
         <Confetti numberOfPieces={1000} recycle={false} tweenDuration={50000} width={width} height={height} />
       )}
 

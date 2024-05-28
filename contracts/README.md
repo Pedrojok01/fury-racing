@@ -8,8 +8,14 @@
 
 ## Table of Contents
 
-- [Usage](#usage)
-  - [Coverage](#coverage)
+- [Table of Contents](#table-of-contents)
+- [Description:](#description)
+- [Chainlink:](#chainlink)
+- [Getting Started](#getting-started)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+  - [Quickstart](#quickstart)
+  - [Deployment](#deployment)
 
 ## Description:
 
@@ -92,7 +98,7 @@ make coverage
 make format
 ```
 
-## Deployment
+### Deployment
 
 When you are ready to deploy the contracts, first ensure that you have updated the values in the `scripts/deployerTestnet.js` file to match your Chainlink VRF and Functions Subscriptions.
 

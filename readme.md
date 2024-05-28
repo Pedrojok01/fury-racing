@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="../frontend/public/img/Fury_Racing_logo_HD.png" width="200" alt="Fury Racing logo" />
+<img src="./frontend/public/img/Fury_Racing_logo_HD.png" width="200" alt="Fury Racing logo" />
 <br><br>
 
 <h1><strong> Fury Racing </strong></h1>

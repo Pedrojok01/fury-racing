@@ -2,7 +2,7 @@ const RACING_ABI = require("./abi");
 
 module.exports = {
   RACING_CONTRACT: {
-    address: "0xAb402c3Ab7DBc2d8CED597E97d030A8015BA970a",
+    address: "0x5a46363a08146fb5d93C687afb4C69D2EeB33412",
     abi: RACING_ABI,
   },
   CIRCUIT: {

@@ -46,7 +46,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     uint256 private constant START_ELO = 1200;
     uint256 private constant MAX_BET_PLAYERS = 100; // Prevent DoS during prize pool distributing
 
-    uint256 public betAmount = 0.1 ether;
+    uint256 public betAmount = 0.001 ether;
     uint256 public currentPrizePool;
     uint256 public lastPrizeDistribution;
     uint256 public playersCounter;
@@ -650,10 +650,10 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         addressToPlayer[_player].attributes = _attributes;
 
         if (weeklyBetPlayerAddressToIndex[weeklyTournamentCounter][_player] == 0) {
+            tournamentPlayersCounter++;
             weeklyBetPlayerIndex[weeklyTournamentCounter][tournamentPlayersCounter] = _player;
             weeklyBetPlayerAddressToIndex[weeklyTournamentCounter][_player] =
                 tournamentPlayersCounter;
-            tournamentPlayersCounter++;
         }
     }
 

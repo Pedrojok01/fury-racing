@@ -466,10 +466,10 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         addressToPlayer[_player].attributes = _attributes;
 
         if (weeklyBetPlayerAddressToIndex[weeklyTournamentCounter][_player] == 0) {
+            tournamentPlayersCounter++;
             weeklyBetPlayerIndex[weeklyTournamentCounter][tournamentPlayersCounter] = _player;
             weeklyBetPlayerAddressToIndex[weeklyTournamentCounter][_player] =
                 tournamentPlayersCounter;
-            tournamentPlayersCounter++;
         }
     }
 

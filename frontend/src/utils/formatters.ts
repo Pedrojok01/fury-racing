@@ -21,3 +21,16 @@ export const getLuckPercentage = (luck: number): string => {
 
   return luckPercentages[luck] || "0";
 };
+
+// Example usage:
+// const totalMilliseconds = 1234567;
+// const readableTime = convertMillisecondsToReadableTime(totalMilliseconds);
+// console.log(readableTime); // Output: "20m 34s 567ms"
+export const convertMillisecondsToReadableTime = (milliseconds: number): string => {
+  let seconds = Math.floor(milliseconds / 1000);
+  const minutes = Math.floor(seconds / 60);
+  seconds = seconds % 60;
+  const ms = milliseconds % 1000;
+
+  return `${minutes}m ${seconds}s ${ms}ms`;
+};

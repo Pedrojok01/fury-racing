@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, type FC, type ReactNode } from "react";
+import { type FC, type ReactNode } from "react";
 
 import { Box, Flex, Image } from "@chakra-ui/react";
-import { isMobile, isTablet, useMobileOrientation } from "react-device-detect";
+import { isMobile, useMobileOrientation } from "react-device-detect";
 
 import { images } from "@/data/images";
 
@@ -15,20 +15,6 @@ type CustomLayoutProps = {
 
 const CustomLayout: FC<CustomLayoutProps> = ({ children }) => {
   const { isPortrait } = useMobileOrientation();
-
-  const enterFullscreen = async () => {
-    const elem = document.documentElement;
-    if (elem.requestFullscreen) {
-      await elem.requestFullscreen();
-    }
-  };
-
-  useEffect(() => {
-    // Check if Fullscreen API is supported and the device is not an iOS phone
-    if ((isMobile || isTablet) && !navigator.userAgent.match(/iPhone/i) && document.fullscreenEnabled) {
-      enterFullscreen().catch(console.error);
-    }
-  }, []);
 
   return (
     <Flex flexDirection="column" minHeight="100vh" position="relative" overflow="hidden">

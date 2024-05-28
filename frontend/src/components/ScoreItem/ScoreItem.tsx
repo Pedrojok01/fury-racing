@@ -8,6 +8,7 @@ import { useAccount } from "wagmi";
 
 import { networks } from "@/data/networks";
 import styles from "@/templates/LeaderboardScreen/leaderboard.module.css";
+import { getEllipsisTxt } from "@/utils/formatters";
 import { getExplorer } from "@/utils/getExplorerByChain";
 
 type ScoreItemProps = {
@@ -21,7 +22,7 @@ const ScoreItem: FC<ScoreItemProps> = ({ user_address, score, index, image }) =>
   const { colorMode } = useColorMode();
   const { chainId, address } = useAccount();
 
-  const isPlayer = address === user_address;
+  const isPlayer = address?.toLowerCase() === user_address.toLowerCase();
 
   const backgroundColor = isPlayer
     ? "var(--secondary-color)"
@@ -47,7 +48,7 @@ const ScoreItem: FC<ScoreItemProps> = ({ user_address, score, index, image }) =>
           target="_blank"
           href={`${getExplorer(chainId ?? networks.avalanche.id)}/address/${user_address}`}
         >
-          <Text>{user_address}</Text>
+          <Text>{isMobile ? (getEllipsisTxt(user_address, 6) as `0x${string}`) : user_address}</Text>
         </Link>
       </HStack>
 

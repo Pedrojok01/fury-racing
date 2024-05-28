@@ -9,7 +9,7 @@ import NextLink from "next/link";
 import { isMobile } from "react-device-detect";
 import { useAccount } from "wagmi";
 
-import { DarkModeButton } from "@/components";
+import { DarkModeButton, FullScreenButton } from "@/components";
 import { useAudio } from "@/context";
 import { GITBOOK, images } from "@/data";
 import { useWindowSize } from "@/hooks";
@@ -70,6 +70,7 @@ const Header: FC = () => {
           <HStack justifyContent={"right"} w={"100%"}>
             {!isConnected && !address && <Box h={0} className="connect-wallet" />}
             <ConnectButton />
+            <FullScreenButton />
             <DarkModeButton />
           </HStack>
         </HStack>
@@ -110,7 +111,7 @@ const Header: FC = () => {
                 />
                 <MenuList p={2}>
                   <HStack gap={10} justify="center" marginBlock={1}>
-                    <ConnectButton /> <DarkModeButton />
+                    <ConnectButton /> <FullScreenButton /> <DarkModeButton />
                   </HStack>
                 </MenuList>
               </Menu>

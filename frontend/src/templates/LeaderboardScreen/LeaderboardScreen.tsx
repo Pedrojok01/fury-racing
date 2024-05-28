@@ -1,13 +1,11 @@
 import { useEffect, type FC } from "react";
 
 import { Button, Center, HStack, VStack } from "@chakra-ui/react";
-import { isMobile } from "react-device-detect";
 
 import { ScoreItem } from "@/components";
 import { images } from "@/data/images";
 import { usePagination } from "@/hooks";
 import useLeaderboard from "@/hooks/useLeaderboard";
-import { getEllipsisTxt } from "@/utils/formatters";
 
 import styles from "./leaderboard.module.css";
 
@@ -29,7 +27,7 @@ const LeaderboardScreen: FC = () => {
         {currentData.map((score, index) => (
           <ScoreItem
             key={score.id}
-            user_address={isMobile ? (getEllipsisTxt(score.address, 6) as `0x${string}`) : score.address}
+            user_address={score.address}
             score={score.score}
             index={index + 1}
             image={index === 0 ? images.crown : index < 3 ? images.podium : undefined}

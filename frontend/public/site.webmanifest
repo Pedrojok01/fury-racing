@@ -1,6 +1,8 @@
 {
   "name": "Fury Racing",
   "short_name": "Fury Racing",
+  "description": "Onchain racing manager leveraging Chainlink VRF V2.5 and Chainlink Functions.",
+  "start_url": "/",
   "icons": [
     { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }

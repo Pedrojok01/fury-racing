@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 
+const withPWA = require("next-pwa")({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development" ? false : true,
+});
+
 const nextConfig = {
   reactStrictMode: false, // Set to 'false' during Babylon development. Set to 'true' otherwise.
   webpack: (config) => {
@@ -18,4 +23,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withPWA(nextConfig);

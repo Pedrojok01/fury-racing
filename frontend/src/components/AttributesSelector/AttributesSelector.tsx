@@ -2,8 +2,9 @@ import { useCallback, useEffect, type FC } from "react";
 
 import { VStack, Text, Box, SimpleGrid, HStack, StatLabel, StatNumber, Stat } from "@chakra-ui/react";
 import Slider from "rc-slider";
-
 import "rc-slider/assets/index.css";
+import { isMobile } from "react-device-detect";
+
 import { useDebounce } from "@/hooks";
 import { useGameStates } from "@/stores";
 import { getLuckPercentage } from "@/utils/formatters";
@@ -108,9 +109,9 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
               <Box key={key} className={attributeKey === "luck" ? walktrough?.luck : ""}>
                 <Stat>
                   <HStack>
-                    <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} size="1.1rem" />
+                    {!isMobile && <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} size="1.1rem" />}
                     <StatLabel>{key.charAt(0).toUpperCase() + key.slice(1)}:</StatLabel>
-                    <StatNumber fontSize="large">{value}</StatNumber>
+                    <StatNumber fontSize={isMobile ? "medium" : "large"}>{value}</StatNumber>
                     {key !== "luck" && (
                       <StatNumber
                         fontSize="0.6em"

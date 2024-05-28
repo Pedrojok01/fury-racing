@@ -1,6 +1,6 @@
 {
   "name": "fury-racing",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Onchain racing manager leveraging Chainlink VRF v2.5 and Chainlink Functions",
   "license": "BSL-1.1",
   "private": true,

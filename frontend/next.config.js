@@ -1,4 +1,3 @@
-require("./src/cron.js");
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {

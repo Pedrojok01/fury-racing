@@ -11,7 +11,7 @@ import { useAccount } from "wagmi";
 
 import { DarkModeButton } from "@/components";
 import { useAudio } from "@/context";
-import { images } from "@/data";
+import { GITBOOK, images } from "@/data";
 import { useWindowSize } from "@/hooks";
 import { useGameStates } from "@/stores";
 import { t } from "@/utils/i18";
@@ -40,7 +40,7 @@ const Header: FC = () => {
       <NextLink href="/leaderboard" className={`${styles.menuItems} leaderboard`}>
         <Box>{t("menu.leaderboard")}</Box>
       </NextLink>
-      <Link href="" className={styles.menuItems} isExternal rel="noopener noreferrer">
+      <Link href={GITBOOK} className={styles.menuItems} isExternal rel="noopener noreferrer">
         <Box>{t("menu.doc")}</Box>
       </Link>
     </>

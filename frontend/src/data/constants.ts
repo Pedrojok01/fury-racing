@@ -7,6 +7,7 @@ export const DESCRIPTION = "Onchain racing manager leveraging Chainlink VRF V2.5
 
 export const URL = "https://fury-racing.vercel.app/";
 export const GITHUB_REPO = "https://github.com/Pedrojok01/chainlink-hackathon";
+export const GITBOOK = "https://fury-racing.gitbook.io/fury-racing";
 
 export const LINK_TOKEN = {
   tesnet: "0x0b9d5D9136855f6FEc3c0993feE6E9CE8a297846",

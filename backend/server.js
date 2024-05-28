@@ -33,5 +33,5 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "An unknown error occured!" });
 });
 
-readWeather();
+// readWeather();
 app.listen(process.env.PORT || 3000);

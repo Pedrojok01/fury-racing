@@ -27,7 +27,7 @@ yarn-error.log*
 
 # Ignore environment-specific files in each main folder
 frontend/**/.env*
-backend/**/.env*
+backend/**/.env
 contracts/**/.env*
 
 # Ignore package lock files

@@ -35,7 +35,7 @@ const WeatherDisplay: FC<{ weather: Weather }> = ({ weather }) => {
 
   return (
     <HStack w="100%" justifyContent="space-between">
-      <Flex flex={1} justifyContent="center" alignItems="center">
+      <Flex flex={1} justifyContent="center" alignItems="center" minW={120}>
         {icon ? <Image src={`https:${icon}`} alt="Weather Icon" width={80} height={80} /> : <Box w="80px" h="80px" />}
       </Flex>
       <VStack flex={1} justifyContent="center" alignItems="center">

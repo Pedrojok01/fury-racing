@@ -3,6 +3,7 @@ import type { FC } from "react";
 import { Box, HStack, Link, Spacer, Text, useColorMode } from "@chakra-ui/react";
 import Image, { type StaticImageData } from "next/image";
 import Nextlink from "next/link";
+import { isMobile } from "react-device-detect";
 import { useAccount } from "wagmi";
 
 import { networks } from "@/data/networks";
@@ -27,7 +28,11 @@ const ScoreItem: FC<ScoreItemProps> = ({ user_address, score, index, image }) =>
       <Box>{index}</Box>
 
       <HStack className={styles.userEmail} gap={3} w={"100%"} justifyContent={"center"}>
-        {image ? <Image src={image} alt="podium" width={50} height={50} /> : <Box width="50px" />}
+        {image ? (
+          <Image src={image} alt="podium" width={isMobile ? 35 : 50} height={isMobile ? 35 : 50} />
+        ) : (
+          <Box width="50px" />
+        )}
 
         <Link
           as={Nextlink}

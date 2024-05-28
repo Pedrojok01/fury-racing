@@ -96,7 +96,7 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
       <VStack spacing={5} w={"100%"}>
         <HStack w={"100%"} justify={"space-between"} className={walktrough?.attributes}>
           <Text className="subtitle">{t("selection.subtitles.attributes")}</Text>
-          <Text>Remaining: {remainingPoints}</Text>
+          <Text fontSize={isMobile ? "14px" : "17px"}>Remaining: {remainingPoints}</Text>
         </HStack>
 
         <SimpleGrid columns={2} gridColumnGap={5} gridRowGap={1} w="full">
@@ -110,7 +110,9 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
                 <Stat>
                   <HStack>
                     {!isMobile && <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} size="1.1rem" />}
-                    <StatLabel>{key.charAt(0).toUpperCase() + key.slice(1)}:</StatLabel>
+                    <StatLabel fontSize={isMobile ? "12px" : "17px"}>
+                      {key.charAt(0).toUpperCase() + key.slice(1)}:
+                    </StatLabel>
                     <StatNumber fontSize={isMobile ? "medium" : "large"}>{value}</StatNumber>
                     {key !== "luck" && (
                       <StatNumber
@@ -120,9 +122,9 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
                         backgroundColor="rgba(114, 207, 66)"
                         borderRadius="50%"
                         display="inline-block"
-                        width="2.8em"
-                        height="2.8em"
-                        lineHeight="2.8em"
+                        width={isMobile ? "2.4em" : "2.8em"}
+                        height={isMobile ? "2.4em" : "2.8em"}
+                        lineHeight={isMobile ? "2.4em" : "2.8em"}
                         textAlign="center"
                       >
                         {`${getLuckPercentage(attributes.luck)}%`}

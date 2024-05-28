@@ -50,7 +50,7 @@ const SelectionScreen: FC = () => {
   const mainContent = useMemo(
     () => (
       <>
-        <VStack flex="1" align="center" justify="center" spacing={4} minW={330}>
+        <VStack flex="1" align="center" justify="center" spacing={2} minW={330}>
           <CustomBox>
             <VStack alignItems={"flex-start"} className="select-car">
               <Text textAlign={"left"} className="subtitle">
@@ -65,7 +65,7 @@ const SelectionScreen: FC = () => {
           />
         </VStack>
 
-        <VStack flex="1" minW={330}>
+        <VStack flex="1" spacing={2} minW={330}>
           <Weather />
           <Track map={images.track} data={tracks[0]} />
           <Button

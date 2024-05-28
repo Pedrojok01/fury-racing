@@ -1,6 +1,7 @@
 import type { FC } from "react";
 
 import { HStack, Stat, StatLabel, StatNumber } from "@chakra-ui/react";
+import { isMobile } from "react-device-detect";
 
 interface DisplayStatDataProps {
   label: string;
@@ -10,8 +11,8 @@ interface DisplayStatDataProps {
 const DisplayStatData: FC<DisplayStatDataProps> = ({ label, data }) => (
   <Stat>
     <HStack>
-      <StatLabel>{label}</StatLabel>
-      <StatNumber fontSize="large">{data}</StatNumber>
+      <StatLabel fontSize={isMobile ? "12px" : "17px"}>{label}</StatLabel>
+      <StatNumber fontSize={isMobile ? "medium" : "large"}>{data}</StatNumber>
     </HStack>
   </Stat>
 );

@@ -31,6 +31,7 @@
   margin: 7px auto;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: var(--transition-ease);
+  font-size: 16px;
 }
 
 .scoreItem:hover {
@@ -39,12 +40,10 @@
 }
 
 .userEmail {
-  font-size: 16px;
   font-weight: bold;
 }
 
 .userScore {
-  font-size: 16px;
   width: 8rem;
   min-width: 8rem;
   text-align: center;
@@ -53,4 +52,18 @@
   background-color: #e4f2ef;
   padding: 5px 10px;
   border-radius: 5px;
+}
+
+@media (width < 1000px) {
+  .leaderboard {
+    padding: 5px 20px;
+  }
+  .leaderboardTitle {
+    margin-bottom: 5px;
+  }
+  .scoreItem {
+    font-size: 14px;
+    padding: 8px 10px;
+    margin: 4px auto;
+  }
 }

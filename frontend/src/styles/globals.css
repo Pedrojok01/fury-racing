@@ -95,6 +95,9 @@ a {
     height: calc(100vh - 77px - 1rem);
     padding-left: 0;
   }
+  .subtitle {
+    font-size: 1rem;
+  }
 }
 
 @media (prefers-color-scheme: dark) {

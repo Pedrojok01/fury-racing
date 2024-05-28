@@ -22,7 +22,7 @@ const Track: FC<TrackProps> = ({ map, data }) => {
         </Text>
 
         <HStack w="100%" h={"100%"} justifyContent="space-between">
-          <Flex flex={1} justifyContent="center" alignItems="center">
+          <Flex flex={1} justifyContent="center" alignItems="center" minW={120}>
             <Image src={map.src} alt="Race data" width={400} height={337} />
           </Flex>
 

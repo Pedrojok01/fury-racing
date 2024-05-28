@@ -19,6 +19,7 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import Confetti from "react-confetti";
+import { isMobile } from "react-device-detect";
 import { zeroAddress } from "viem";
 import { useAccount } from "wagmi";
 
@@ -62,7 +63,7 @@ const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner, mode }) => {
   }, [onOpen]);
 
   const pointsUpdate = (
-    <Center textAlign={"center"} marginBlock={5} fontWeight={700}>
+    <Center textAlign={"center"} marginBlock={isMobile ? 2 : 5} fontWeight={700}>
       {isTournament ? (
         <VStack>
           {winner === address ? <Text fontSize={"2rem"}>+3 Points !</Text> : <Text fontSize={"2rem"}>+1 Point !</Text>}
@@ -82,9 +83,13 @@ const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner, mode }) => {
 
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
-        <ModalContent pt={2} pb={5} bg={isWinner ? "rgba(144, 238, 144, 0.7)" : "rgba(255, 182, 193, 0.7)"}>
+        <ModalContent
+          pt={isMobile ? 0 : 2}
+          pb={isMobile ? 2 : 5}
+          bg={isWinner ? "rgba(144, 238, 144, 0.7)" : "rgba(255, 182, 193, 0.7)"}
+        >
           <ModalHeader>
-            <Heading as="h2" size="xl" textAlign="center" mb={4}>
+            <Heading as="h2" size={isMobile ? "1.6rem" : "1.875rem"} textAlign="center" mb={isMobile ? 1 : 4}>
               {isWinner ? "🎉 You won! 🎉" : "😢 You Lost!"}
             </Heading>
           </ModalHeader>

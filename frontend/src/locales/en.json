@@ -4,7 +4,7 @@
     "description": "Onchain racing manager leveraging Chainlink VRF V2.5 and Chainlink Functions."
   },
   "menu": {
-    "play": "New Game",
+    "play": "Play",
     "leaderboard": "Leaderboard",
     "doc": "Ressources"
   },

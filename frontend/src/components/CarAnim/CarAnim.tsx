@@ -11,6 +11,7 @@ import {
   Color4,
 } from "@babylonjs/core";
 import { Button, VStack, HStack, Box } from "@chakra-ui/react";
+import { isMobile } from "react-device-detect";
 
 import { carMetadata } from "@/data/cars";
 import "@babylonjs/loaders/glTF";
@@ -117,7 +118,7 @@ const CarAnim: FC = () => {
 
   return (
     <VStack justify={"center"} align={"center"} w={"100%"}>
-      <Box w={"34rem"} h={"17rem"}>
+      <Box w={isMobile ? "28rem" : "34rem"} h={isMobile ? "14rem" : "17rem"}>
         <CustomToolTip label={carData.description}>
           <canvas ref={ref} style={{ width: "100%", height: "100%" }} />
         </CustomToolTip>

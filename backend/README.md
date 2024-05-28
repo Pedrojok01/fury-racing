@@ -58,8 +58,11 @@ Once deployed, don't forget to add the environment variables to the Lambda funct
 
 <br></br>
 
+<br></br>
+
 <div align="center">
 <h2>🎉 Thank you Chainlink for this amazing hackathon! 🎉</h2>
+<h3>⭐️ ... and don't forget to leave a star if you like it! ⭐️</h3>
 </div>
 
 <br>

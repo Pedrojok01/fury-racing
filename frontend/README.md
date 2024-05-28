@@ -114,7 +114,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 <br></br>
 
 <div align="center">
-<h2>🎉🎉🎉 Thank you Chailink for this amazing hackathon!🎉🎉🎉</h2>
+<h2>🎉 Thank you Chainlink for this amazing hackathon! 🎉</h2>
+<h3>⭐️ ... and don't forget to leave a star if you like it! ⭐️</h3>
 </div>
 
 <br>

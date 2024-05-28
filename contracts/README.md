@@ -128,6 +128,7 @@ You should see your contracts address in the console, and a link to the explorer
 
 <div align="center">
 <h2>🎉 Thank you Chainlink for this amazing hackathon! 🎉</h2>
+<h3>⭐️ ... and don't forget to leave a star if you like it! ⭐️</h3>
 </div>
 
 <br>

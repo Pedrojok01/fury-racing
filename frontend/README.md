@@ -1,23 +1,12 @@
 <div align="center">
 
-<img src="./public/img/logo.png" width="70px"/>
+<img src="./public/img/Fury_Racing_logo_HD.png" width="200" alt="Fury Racing logo" />
 <br><br>
 
 <h1><strong> Fury Racing </strong></h1>
 
-[![Stargazers](https://img.shields.io/github/stars/Pedrojok01/chainlink-hackathon)](https://github.com/Pedrojok01/chainlink-hackathon/stargazers)
-[![Forks](https://img.shields.io/github/forks/Pedrojok01/chainlink-hackathon)](https://github.com/Pedrojok01/chainlink-hackathon/issues)
-[![Issues](https://img.shields.io/github/issues/Pedrojok01/chainlink-hackathon)](https://github.com/Pedrojok01/chainlink-hackathon/issues)
-[![MIT License](https://img.shields.io/github/license/Pedrojok01/chainlink-hackathon)](https://github.com/Pedrojok01/chainlink-hackathon/blob/main/License)
-![Vercel](https://img.shields.io/github/deployments/Pedrojok01/chainlink-hackathon/production?label=Vercel&logo=Vercel&logoColor=white)
-
-<br></br>
-
-![Preview](./public/img/preview.gif)
-
 </div>
-
-Try it yourself: [https://fury-racing.vercel.app/](https://fury-racing.vercel.app/)
+</br>
 
 ## Table of Contents
 
@@ -26,11 +15,10 @@ Try it yourself: [https://fury-racing.vercel.app/](https://fury-racing.vercel.ap
 - [Built With](#built-with)
 - [Installation](#installation)
   - [Make sure you have the following ready:](#make-sure-you-have-the-following-ready)
-  - [Once your config is ready, create a new repo, open your favorite code editor, and clone the repo with the following cmd:](#once-your-config-is-ready-create-a-new-repo-open-your-favorite-code-editor-and-clone-the-repo-with-the-following-cmd)
-  - [Install all package dependencies by running:](#install-all-package-dependencies-by-running)
+  - [Clone the repo:](#clone-the-repo)
+  - [Install all package dependencies:](#install-all-package-dependencies)
   - [Add your API keys in the .env file:](#add-your-api-keys-in-the-env-file)
-  - [To start the Next-Web3-Boilerplate:](#to-start-the-next-web3-boilerplate)
-- [Features:](#features)
+  - [To start Fury Racing:](#to-start-fury-racing)
 
 ## Description
 
@@ -40,6 +28,7 @@ Onchain racing simulator leveraging Chainlink VRF and Chainlink Functions. Built
 
 - [![nextjs]][nextjs-url]
 - [![typescript]][typescript-url]
+- [![babylonjs]][babylonjs-url]
 - [![chakraui]][chakraui-url]
 - [![viem]][viem-url]
 - [![wagmi]][wagmi-url]
@@ -56,13 +45,17 @@ Onchain racing simulator leveraging Chainlink VRF and Chainlink Functions. Built
 - [bun](https://bun.sh/) or [pnpm](https://pnpm.io/) or [yarn](https://yarnpkg.com/) or [npm](https://www.npmjs.com/) installed
 - [MetaMask](https://metamask.io/) (or any web3 compatible wallet) installed in your browser
 
-### Once your config is ready, create a new repo, open your favorite code editor, and clone the repo with the following cmd:
+### Clone the repo:
+
+Once your config is ready, create a new repo, open your favorite code editor, and clone the repo with the following cmd:
 
 ```bash
-git clone https://github.com/Pedrojok01/chainlink-hackathon.git .
+git clone https://github.com/Pedrojok01/fury-racing.git .
 ```
 
-### Install all package dependencies by running:
+### Install all package dependencies:
+
+Depending on your favorite package manager, run one of the following commands in your terminal to install all the dependencies needed for the project:
 
 ```bash
 bun install
@@ -78,11 +71,15 @@ npm install
 
 Remove the `.example` from the `.env.example` file name at the root of the project and add your API keys inside. The WalletConnect project ID is now required since the v2 update. You can create one easily on the [WalletConnect dashboard](https://cloud.walletconnect.com/).
 
+And for the weather API key, you can get one for free on [www.weatherapi.com](sign up at https://www.weatherapi.com/.).
+
 ```js
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID = "Project ID needed for WalletConnect v2 here";
+
+WEATHER_API_KEY = "Your OpenWeatherMap API key here";
 ```
 
-### To start the Next-Web3-Boilerplate:
+### To start Fury Racing:
 
 First, run the development server:
 
@@ -97,19 +94,6 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## Features:
-
-- [x] Avalanche Mainnet
-- [x] Car Selection
-- [x] Car Customization
-- [x] Free mode
-- [ ] Tournament mode
-- [x] Dark mode support
-- [x] Responsive design
-- [x] Chainlink VRF
-- [x] Chainlink API
-- [ ] Leaderboard
 
 <br></br>
 
@@ -128,6 +112,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 [nextjs-url]: https://nextjs.org/
 [typescript]: https://img.shields.io/badge/typescript_v5.4.5-375BD2?style=for-the-badge&logo=typescript&logoColor=61DAFB
 [typescript-url]: https://www.typescriptlang.org/
+[babylonjs]: https://img.shields.io/badge/Babylon.js-e0684b?style=for-the-badge&logo=data:image/png;base64,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
+[babylonjs-url]: https://www.babylonjs.com/
 [chakraui]: https://img.shields.io/badge/ChakraUI-purple?style=for-the-badge&logo=ChakraUI&logoColor=319795
 [chakraui-url]: https://chakra-ui.com/
 [wagmi]: https://img.shields.io/badge/Wagmi-35324a?style=for-the-badge&logo=data:image/png;base64,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

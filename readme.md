@@ -5,11 +5,11 @@
 
 <h1><strong> Fury Racing </strong></h1>
 
-[![Stargazers](https://img.shields.io/github/stars/Pedrojok01/chainlink-hackathon)](https://github.com/Pedrojok01/chainlink-hackathon/stargazers)
-[![Forks](https://img.shields.io/github/forks/Pedrojok01/chainlink-hackathon)](https://github.com/Pedrojok01/chainlink-hackathon/issues)
-[![Issues](https://img.shields.io/github/issues/Pedrojok01/chainlink-hackathon)](https://github.com/Pedrojok01/chainlink-hackathon/issues)
-[![MIT License](https://img.shields.io/github/license/Pedrojok01/chainlink-hackathon)](https://github.com/Pedrojok01/chainlink-hackathon/blob/main/License)
-![Vercel](https://img.shields.io/github/deployments/Pedrojok01/chainlink-hackathon/production?label=Vercel&logo=Vercel&logoColor=white)
+[![Stargazers](https://img.shields.io/github/stars/Pedrojok01/fury-racing)](https://github.com/Pedrojok01/fury-racing/stargazers)
+[![Forks](https://img.shields.io/github/forks/Pedrojok01/fury-racing)](https://github.com/Pedrojok01/fury-racing/issues)
+[![Issues](https://img.shields.io/github/issues/Pedrojok01/fury-racing)](https://github.com/Pedrojok01/fury-racing/issues)
+[![MIT License](https://img.shields.io/github/license/Pedrojok01/fury-racing)](https://github.com/Pedrojok01/fury-racing/blob/main/License)
+![Vercel](https://img.shields.io/github/deployments/Pedrojok01/fury-racing/production?label=Vercel&logo=Vercel&logoColor=white)
 
 <br></br>
 

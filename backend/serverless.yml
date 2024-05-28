@@ -1,0 +1,26 @@
+service: backend
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: us-east-1
+
+functions:
+  app:
+    handler: handler.handler
+    events:
+      - http:
+          path: api/races/data/{attributes}
+          method: get
+      - http:
+          path: api/races/leaderboard
+          method: get
+
+  updateWeather:
+    handler: handler.updateWeatherHandler
+    events:
+      - schedule:
+          name: weatherUpdateSchedule
+          rate: rate(1 hour)

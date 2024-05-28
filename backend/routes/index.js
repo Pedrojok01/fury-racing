@@ -5,8 +5,8 @@ const controller = require("../controllers");
 
 const router = express.Router();
 
-router.get("/data/:attributes", [param("attributes").notEmpty().isLength(36)], controller.submit);
+router.get("/data/:attributes", [param("attributes").notEmpty().isLength(36)], controller.results);
 
-router.get("/players/rank", controller.dashboard);
+router.get("/leaderboard", controller.leaderboard);
 
 module.exports = router;

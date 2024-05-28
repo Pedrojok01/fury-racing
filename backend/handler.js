@@ -1,14 +1,15 @@
-require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
+const serverless = require("serverless-http");
+const { updateWeather } = require("./controllers/updateWeather");
 
 const app = express();
 
 const routes = require("./routes");
 const HttpError = require("./models/http-error");
-const readWeather = require("./models/weather.model");
 
 app.use(bodyParser.json());
+app.use(express.json());
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -33,5 +34,14 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "An unknown error occured!" });
 });
 
-// readWeather();
-app.listen(process.env.PORT || 3000);
+module.exports.handler = serverless(app);
+
+module.exports.updateWeatherHandler = async (event) => {
+  try {
+    await updateWeather();
+    return { statusCode: 200, body: JSON.stringify({ message: "Weather data updated successfully" }) };
+  } catch (error) {
+    console.error("Error updating weather data:", error);
+    return { statusCode: 500, body: JSON.stringify({ message: "Failed to update weather data" }) };
+  }
+};

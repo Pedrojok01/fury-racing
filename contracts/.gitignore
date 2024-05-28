@@ -13,6 +13,7 @@ docs/
 
 # Dotenv file
 .env
+!.env.example
 
 # zkSync files
 zkout/

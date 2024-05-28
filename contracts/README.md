@@ -1,7 +1,7 @@
 # Name
 
 <p align="center">
-<img src="./images/logo.png" width="200" alt="Name">
+<img src="../frontend/public/img/Fury_Racing_logo_HD.png" width="200" alt="Name">
 <br/>
 
 - [Name](#name)

@@ -16,6 +16,7 @@ import {
   useDisclosure,
   HStack,
   VStack,
+  Spacer,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import Confetti from "react-confetti";
@@ -25,7 +26,7 @@ import { useAccount } from "wagmi";
 
 import { useReadContract, useWindowSize } from "@/hooks";
 import { useGameStates } from "@/stores";
-import { getEllipsisTxt } from "@/utils/formatters";
+import { convertMillisecondsToReadableTime, getEllipsisTxt } from "@/utils/formatters";
 
 interface ResultModalProps {
   raceInfo: RaceInfo;
@@ -57,6 +58,12 @@ const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner, mode }) => {
 
   const winner = raceInfo.player1Time < raceInfo.player2Time ? raceInfo.player1 : raceInfo.player2;
   const loser = raceInfo.player1Time > raceInfo.player2Time ? raceInfo.player1 : raceInfo.player2;
+  const winnerTime = convertMillisecondsToReadableTime(
+    winner === raceInfo.player1 ? raceInfo.player1Time : raceInfo.player2Time,
+  );
+  const loserTime = convertMillisecondsToReadableTime(
+    winner === raceInfo.player1 ? raceInfo.player2Time : raceInfo.player1Time,
+  );
 
   useEffect(() => {
     onOpen();
@@ -89,7 +96,7 @@ const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner, mode }) => {
           bg={isWinner ? "rgba(144, 238, 144, 0.7)" : "rgba(255, 182, 193, 0.7)"}
         >
           <ModalHeader>
-            <Heading as="h2" size={isMobile ? "1.6rem" : "1.875rem"} textAlign="center" mb={isMobile ? 1 : 4}>
+            <Heading as="h2" size={isMobile ? "1.6em" : "1.875em"} textAlign="center" mb={isMobile ? 1 : 4}>
               {isWinner ? "🎉 You won! 🎉" : "😢 You Lost!"}
             </Heading>
           </ModalHeader>
@@ -98,9 +105,16 @@ const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner, mode }) => {
             <Text fontSize="lg" textAlign="center" mb={5}>
               {isWinner ? "Congrats! You won the race!" : "Better luck next time!"}
             </Text>
-            <VStack justifyContent={"center"}>
+            <VStack w={"100%"} wrap={"wrap"} justifyContent={"space-between"}>
               <Text>Winner: {winner === zeroAddress ? "Computer" : getEllipsisTxt(winner, 8)}</Text>
+              <Text>
+                Time: <b>{winnerTime}</b>
+              </Text>
+              <Spacer />
               <Text>Loser: {loser === zeroAddress ? "Computer" : getEllipsisTxt(loser, 8)}</Text>
+              <Text>
+                Time: <b>{loserTime}</b>
+              </Text>
               {pointsUpdate}
             </VStack>
 

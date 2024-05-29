@@ -16,8 +16,9 @@
       "tournament": "Double or nothing: Pay the entry fee and play to double up your bet against another player! Climb up the rank in the leaderboard and try to grab the weekly prize pool!"
     },
     "info": "Tournament Information:",
-    "fee": "Current entry fee:",
-    "prize": "Current prize pool:"
+    "fee": "Current entry fee*:",
+    "prize": "Current prize pool:",
+    "note": "* 5% of the entry fees collected are going to the weekly prize pool. The rest goes to the winner of the race."
   },
   "selection": {
     "subtitles": {

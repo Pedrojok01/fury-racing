@@ -50,6 +50,9 @@ const ModeScreen: FC = () => {
               <Text>{t("mode.prize")}</Text>{" "}
               <Text fontWeight={700}>{formatEther(prizePool) ?? " loading..."} AVAX</Text>
             </Flex>
+            <Text mt={"1rem"} fontSize={"0.7em"}>
+              {t("mode.note")}
+            </Text>
           </Center>
         </CustomBox>
       </VStack>

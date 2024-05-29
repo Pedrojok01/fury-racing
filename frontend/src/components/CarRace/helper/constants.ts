@@ -4,6 +4,8 @@ const carThrottleFactor = 0.5;
 const carAnimNumFrames = 2;
 const carAnimDriftRatioPos = 0.9;
 const carAnimDriftRatioRot = 0.55;
+const carAnimAccelRate = 0.0075;
+const carAnimMaxRate = 2.0;
 
 export {
   gridTileSize,
@@ -12,4 +14,6 @@ export {
   carAnimNumFrames,
   carAnimDriftRatioPos,
   carAnimDriftRatioRot,
+  carAnimAccelRate,
+  carAnimMaxRate,
 };

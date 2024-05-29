@@ -1,6 +1,6 @@
 import { type FC } from "react";
 
-import { Box, Button, Text, VStack, Link, Flex, useColorMode } from "@chakra-ui/react";
+import { Box, Button, Text, VStack, Link, Flex, useColorMode, Checkbox } from "@chakra-ui/react";
 import Image from "next/image";
 import NextLink from "next/link";
 import { isMobile } from "react-device-detect";
@@ -14,13 +14,12 @@ import styles from "./home.module.css";
 
 const HomeScreen: FC = () => {
   const { isConnected } = useAccount();
-  const { setAudio } = useAudio();
+  const { audio, setAudio } = useAudio();
   const { reset } = useGameStates();
   const { colorMode } = useColorMode();
 
   const handlePlayClick = () => {
     reset();
-    setAudio(true);
   };
 
   return (
@@ -38,19 +37,25 @@ const HomeScreen: FC = () => {
         </Text>
 
         {isConnected && (
-          <Link as={NextLink} href="/mode" style={{ textDecoration: "none" }} className="play">
-            <Button
-              mt={isMobile ? "0.5rem" : "2rem"}
-              paddingBlock={isMobile ? "2.2rem" : "2.5rem"}
-              paddingInline={isMobile ? "5rem" : "5rem"}
-              fontSize={"2rem"}
-              fontWeight={"bold"}
-              className="custom-button"
-              onClick={handlePlayClick}
-            >
-              Play
-            </Button>
-          </Link>
+          <>
+            <Link as={NextLink} href="/mode" style={{ textDecoration: "none" }} className="play">
+              <Button
+                mt={isMobile ? "0.5rem" : "2rem"}
+                paddingBlock={isMobile ? "2.2rem" : "2.5rem"}
+                paddingInline={isMobile ? "5rem" : "5rem"}
+                fontSize={"2rem"}
+                fontWeight={"bold"}
+                className="custom-button"
+                onClick={handlePlayClick}
+              >
+                Play
+              </Button>
+            </Link>
+
+            <Checkbox mt={isMobile ? "0.25rem" : "0.5rem"} checked={audio} onChange={() => setAudio(!audio)}>
+              Music enabled
+            </Checkbox>
+          </>
         )}
       </VStack>
 

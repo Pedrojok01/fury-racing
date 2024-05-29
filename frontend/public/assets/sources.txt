@@ -1,2 +1,0 @@
-Grass tile: https://doc.babylonjs.com/features/featuresDeepDive/mesh/creation/set/tiled_ground
-Road tiles: https://www.kenney.nl/assets/racing-pack

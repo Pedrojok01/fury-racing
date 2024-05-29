@@ -1,4 +1,4 @@
-import { AnimationGroup, Scene, TransformNode } from "@babylonjs/core";
+import { AnimationGroup, TransformNode } from "@babylonjs/core";
 
 import { carAnimNumFrames, carAnimDriftRatioPos, carAnimDriftRatioRot, gridTileSize } from "./constants";
 import { createCarAnim } from "./createCarAnim";
@@ -48,7 +48,7 @@ const getCarTilePosition = (car: TransformNode, carDirection: CarDirection): { x
  * @param track - The track configuration.
  * @param car - The car TransformNode.
  */
-export const triggerCurrentTileAnim = (scene: Scene, track: TrackAnim, car: TransformNode) => {
+export const getCurrentTileAnim = (track: TrackAnim, car: TransformNode) => {
   const carDirection = getCarDirection(car);
   const { x: carTileX, y: carTileY } = getCarTilePosition(car, carDirection);
 
@@ -57,7 +57,6 @@ export const triggerCurrentTileAnim = (scene: Scene, track: TrackAnim, car: Tran
   const tileChar = tileRow[carTileX];
 
   const animationGroup = new AnimationGroup("car");
-  animationGroup.speedRatio = 2.0;
 
   const addAnimation = (property: string, startValue: number, endValue: number, drift: number | null = null) => {
     const keyframes = [
@@ -135,13 +134,5 @@ export const triggerCurrentTileAnim = (scene: Scene, track: TrackAnim, car: Tran
       break;
   }
 
-  let animEndCallbackInvoked = false;
-  animationGroup.onAnimationEndObservable.add(() => {
-    if (!animEndCallbackInvoked) {
-      triggerCurrentTileAnim(scene, track, car);
-      animEndCallbackInvoked = true;
-    }
-  });
-
-  animationGroup.play();
+  return animationGroup;
 };

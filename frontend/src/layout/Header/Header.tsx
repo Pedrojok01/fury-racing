@@ -10,7 +10,6 @@ import { isMobile } from "react-device-detect";
 import { useAccount } from "wagmi";
 
 import { DarkModeButton, FullScreenButton } from "@/components";
-import { useAudio } from "@/context";
 import { GITBOOK, images } from "@/data";
 import { useWindowSize } from "@/hooks";
 import { useGameStates } from "@/stores";
@@ -22,14 +21,10 @@ const Header: FC = () => {
   const { isConnected, address } = useAccount();
   const { colorMode } = useColorMode();
   const { reset } = useGameStates();
-  const { audio, setAudio } = useAudio();
   const { width } = useWindowSize();
 
   const handlePlayClick = () => {
     reset();
-    if (!audio) {
-      setAudio(true);
-    }
   };
 
   const menuIems = (

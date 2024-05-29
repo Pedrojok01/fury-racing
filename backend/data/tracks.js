@@ -6,7 +6,7 @@ const tracks = [
     maxSpeed: 290,
     fullThrottle: 0.59,
     longestFlatOut: 669,
-    downforceLevel: "Maximum",
+    downforceLevel: 90,
     gearChangesPerLap: 47,
     technicalFactor: 0.8,
     bestLapTime: 74.26 * 1000, // Best lap time in milliseconds

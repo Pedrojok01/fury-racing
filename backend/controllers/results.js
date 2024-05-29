@@ -81,7 +81,7 @@ function calculateTotalRaceTime(attributes, trackData, weatherScore) {
   for (let lap = 0; lap < 10; lap++) {
     totalRaceTime += calculateLapTime(attributes, trackData, weatherScore);
   }
-  return totalRaceTime;
+  return Math.round(totalRaceTime);
 }
 
 /**
@@ -175,7 +175,7 @@ function calculateLapTime(attributes, trackData, weatherScore) {
 
   lapTime += adjustedRandomFactor;
 
-  return Math.max(0, lapTime); // Ensure lapTime is not negative
+  return Math.max(0, Math.round(lapTime)); // Ensure lapTime is not negative
 }
 
 /**

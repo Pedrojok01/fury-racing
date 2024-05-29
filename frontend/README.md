@@ -36,6 +36,31 @@ Onchain racing simulator leveraging Chainlink VRF and Chainlink Functions. Built
 - [![prettier]][prettier-url]
 - [![ESLint]][eslint-url]
 
+### BabylonJS implementation
+
+The following features of the BabylonJS engine were used:
+* Loading all assets (meshes, textures) in batch, with a loading screen during processing, with `AssetsManager`.
+* Loading glTF meshes specifically with the built-in BabylonJS loader.
+* Using a `FollowCamera` to automatically follow the vehicle as it moves.
+* Using `Animation` and `AnimationGroup` classes to animate the vehicle's movement.
+* Generating shadows for the vehicle  with `ShadowGenerator` and a `DirectionalLight`. 
+* Generating a skybox with the `Scene.createDefaultSkybox()` helper function.
+* Generating rain particles with a `ParticleSystem`.
+* Generating fog via the `Scene.fogMode` property.
+
+#### Successfully importing third-party assets
+
+All 3D assets were found on [SketchFab](https://sketchfab.com) (credits listed further down this document).
+However, not all assets were perfectly centered on the origin `(0, 0, 0)`.
+Furthermore, many of the assets varied greatly in size.
+
+As such, an array of metadata constants was created to specify the offset and scale of each asset.
+The meshes are therefore correspondingly offset and re-scaled during initialization.
+
+#### Programming the racetrack layout
+
+TODO
+
 ## Installation
 
 ### Make sure you have the following ready:
@@ -94,6 +119,24 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Credits, asset attributions
+
+This work is based on:
+* "Low poly Ad Billboard" (https://sketchfab.com/3d-models/low-poly-ad-billboard-864b8ce5d520478481198d1face5a7e5) by Anthony Yanez (https://sketchfab.com/paulyanez) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* "Modern building 03" (https://sketchfab.com/3d-models/modern-building-03-254942864da94533a4e740a9c400f7a1) by burunduk (https://sketchfab.com/burunduk) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* "Modern building 02" (https://sketchfab.com/3d-models/modern-building-02-3044b2aa3f1e4218a842e63815a48452) by burunduk (https://sketchfab.com/burunduk) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* "Modern building 05" (https://sketchfab.com/3d-models/modern-building-05-7fc1d3bd4bde4be7ab4eee80771fbef1) by burunduk (https://sketchfab.com/burunduk) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* "Classic Muscle car" (https://sketchfab.com/3d-models/classic-muscle-car-641efc889e5f4543bae51d0922e6f4b3) by Lexyc16 (https://sketchfab.com/Lexyc16) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* "Toyota Corolla AE86 Trueno" (https://sketchfab.com/3d-models/toyota-corolla-ae86-trueno-fe02fba6302e450ea8424591493341ea) by Lexyc16 (https://sketchfab.com/Lexyc16) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* "Low Poly Car" (https://sketchfab.com/3d-models/low-poly-car-93971323324243468f24d7da9d18f617) by Straight Design (https://sketchfab.com/creativemango) licensed under CC-BY-SA-4.0 (http://creativecommons.org/licenses/by-sa/4.0/)
+* "Low poly house" (https://sketchfab.com/3d-models/low-poly-house-796232a307d24b6881f4f42476058701) by its_sagar_bro (https://sketchfab.com/its_sagar_bro) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* "Low poly house" (https://sketchfab.com/3d-models/low-poly-house-2596e4c92af848b8a830f6c307e93a45) by its_sagar_bro (https://sketchfab.com/its_sagar_bro) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* "low poly building" (https://sketchfab.com/3d-models/low-poly-building-386b478c0d2841b288c7342beca28892) by GreyHorn102 (https://sketchfab.com/GreyHorn102) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* "Low Poly Tree 2" (https://sketchfab.com/3d-models/low-poly-tree-2-73eb8c73bd6c4a8db4e02dbb6bfcffcf) by Render Zing (https://sketchfab.com/RenderZing) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* "Leafy Tree - Low poly" (https://sketchfab.com/3d-models/leafy-tree-low-poly-6db96be0ea694f558836e662c595788a) by lightguard (https://sketchfab.com/lightguard) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* "Low-poly Tree" (https://sketchfab.com/3d-models/low-poly-tree-c452f70f0ffb4dd4ab257348ff44e367) by ALostEggroll (https://sketchfab.com/ALostEggroll) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* "Abstract green grass seamless texture." (https://www.vecteezy.com/vector-art/5473024-abstract-green-grass-seamless-texture) by Maksim Borzdov (https://www.vecteezy.com/members/makstorm10000510543)
 
 <br></br>
 

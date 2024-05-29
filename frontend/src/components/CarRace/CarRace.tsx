@@ -26,7 +26,7 @@ import { Box } from "@chakra-ui/react";
 
 import { decorations, tracks } from "@/data";
 import "@babylonjs/loaders/glTF";
-import { useAnim } from "@/stores";
+import { useAnim, useGameStates } from "@/stores";
 
 import { initializeCamera, initializeTrack, getCurrentTileAnim } from "./helper";
 import { carAnimAccelRate, carAnimMaxRate, carRotateFactor, carThrottleFactor, gridTileSize } from "./helper/constants";
@@ -39,7 +39,8 @@ const CarRace: FC = () => {
   const animRef = useRef<AnimationGroup | null>(null);
   const animSpeedRef = useRef<number>(0);
   const animObserverRef = useRef<Observer<Scene> | null>(null);
-  const { carIdx, carData, isRacing, skybox, weatherFx } = useAnim();
+  const { carIdx, carData, skybox, weatherFx } = useAnim();
+  const { raceInfo } = useGameStates();
   const track = tracks[0].animData;
   const isKeyboardControlEnabled = false;
 
@@ -65,31 +66,31 @@ const CarRace: FC = () => {
     // -- Track materials.
     assetTasks["texture_grid_empty"] = assetsManager.addTextureTask(
       `task_texture_grid_empty`,
-      "assets/texture-grass.jpg",
+      "assets/texture-grass.webp",
     );
     assetTasks["texture_grid_road_en"] = assetsManager.addTextureTask(
       `task_texture_grid_road_en`,
-      "assets/texture-road-en.jpg",
+      "assets/texture-road-en.webp",
     );
     assetTasks["texture_grid_road_es"] = assetsManager.addTextureTask(
       `task_texture_grid_road_es`,
-      "assets/texture-road-es.jpg",
+      "assets/texture-road-es.webp",
     );
     assetTasks["texture_grid_road_ew"] = assetsManager.addTextureTask(
       `task_texture_grid_road_ew`,
-      "assets/texture-road-ew.jpg",
+      "assets/texture-road-ew.webp",
     );
     assetTasks["texture_grid_road_ns"] = assetsManager.addTextureTask(
       `task_texture_grid_road_ns`,
-      "assets/texture-road-ns.jpg",
+      "assets/texture-road-ns.webp",
     );
     assetTasks["texture_grid_road_nw"] = assetsManager.addTextureTask(
       `task_texture_grid_road_nw`,
-      "assets/texture-road-nw.jpg",
+      "assets/texture-road-nw.webp",
     );
     assetTasks["texture_grid_road_sw"] = assetsManager.addTextureTask(
       `task_texture_grid_road_sw`,
-      "assets/texture-road-sw.jpg",
+      "assets/texture-road-sw.webp",
     );
 
     // -- Car.
@@ -399,14 +400,17 @@ const CarRace: FC = () => {
   }, [carIdx, carData, skybox, weatherFx, controlState, isKeyboardControlEnabled, track]);
 
   useEffect(() => {
+    // Abort if the scene isn't set up yet.
     if (!ref.current || !sceneRef.current) return;
 
     // Implement acceleration/deceleration.
     if (animObserverRef.current) sceneRef.current.onBeforeRenderObservable.remove(animObserverRef.current);
     animObserverRef.current = sceneRef.current.onBeforeRenderObservable.add(() => {
+      // Abort if no animation is ongoing yet.
       if (!animRef.current) return;
 
-      if (isRacing) {
+      const hasRaceFinished = raceInfo && raceInfo.player1Time !== 0 && raceInfo.player2Time !== 0;
+      if (!hasRaceFinished) {
         if (animSpeedRef.current < carAnimMaxRate) {
           animSpeedRef.current += carAnimAccelRate;
           animRef.current.speedRatio = animSpeedRef.current;
@@ -418,7 +422,7 @@ const CarRace: FC = () => {
         }
       }
     });
-  }, [isRacing]);
+  }, [raceInfo]);
 
   return (
     <Box w={"70vw"}>

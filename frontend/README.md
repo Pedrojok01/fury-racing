@@ -13,12 +13,16 @@
 - [Table of Contents](#table-of-contents)
 - [Description](#description)
 - [Built With](#built-with)
+  - [BabylonJS implementation](#babylonjs-implementation)
+    - [Successfully importing third-party assets](#successfully-importing-third-party-assets)
+    - [Programming the race track layout](#programming-the-race-track-layout)
 - [Installation](#installation)
   - [Make sure you have the following ready:](#make-sure-you-have-the-following-ready)
   - [Clone the repo:](#clone-the-repo)
   - [Install all package dependencies:](#install-all-package-dependencies)
   - [Add your API keys in the .env file:](#add-your-api-keys-in-the-env-file)
   - [To start Fury Racing:](#to-start-fury-racing)
+- [Credits, asset attributions](#credits-asset-attributions)
 
 ## Description
 
@@ -39,14 +43,15 @@ Onchain racing simulator leveraging Chainlink VRF and Chainlink Functions. Built
 ### BabylonJS implementation
 
 The following features of the BabylonJS engine were used:
-* Loading all assets (meshes, textures) in batch, with a loading screen during processing, with `AssetsManager`.
-* Loading `glTF` meshes specifically with the built-in BabylonJS loader.
-* Using a `FollowCamera` to automatically follow the vehicle as it moves.
-* Using `Animation` and `AnimationGroup` classes to animate the vehicle's movement.
-* Generating shadows for the vehicle  with `ShadowGenerator` and a `DirectionalLight`. 
-* Generating a skybox with the `Scene.createDefaultSkybox()` helper function.
-* Generating rain particles with a `ParticleSystem`.
-* Generating fog via the `Scene.fogMode` property.
+
+- Loading all assets (meshes, textures) in batch, with a loading screen during processing, with `AssetsManager`.
+- Loading `glTF` meshes specifically with the built-in BabylonJS loader.
+- Using a `FollowCamera` to automatically follow the vehicle as it moves.
+- Using `Animation` and `AnimationGroup` classes to animate the vehicle's movement.
+- Generating shadows for the vehicle with `ShadowGenerator` and a `DirectionalLight`.
+- Generating a skybox with the `Scene.createDefaultSkybox()` helper function.
+- Generating rain particles with a `ParticleSystem`.
+- Generating fog via the `Scene.fogMode` property.
 
 #### Successfully importing third-party assets
 
@@ -56,6 +61,8 @@ Furthermore, many of the assets varied greatly in size.
 
 As such, an array of metadata constants was created to specify the offset and scale of each asset.
 The meshes are therefore correspondingly offset and re-scaled during initialization.
+
+![raceAnim](../frontend/public/img/raceAnim.png)
 
 #### Programming the race track layout
 
@@ -67,6 +74,7 @@ By going with a grid/tile-based approach, it also simplifies the automation of t
 The engine simply gets the vehicle to move from the current tile to the next tile in the appropriate direction through a looping process.
 
 We ended up choosing Monaco as the sole race track of the first release. You can see its ASCII equivalent below:
+
 ```
 0000000000V000000˻V00V
 000V00000000VV┌───┐0V0
@@ -87,14 +95,16 @@ V│0│┤V0V00000V0000000V
 V└┐└─┐00000000000000V0
 0V└──┘ 0V00000V0000000
 00VVVV00000000000V0000
-``` 
+```
+
 With the corresponding character legend:
-* `0`: Blank (grass) tile.
-* `V`: Tree (vegetation) tile.
-* `─`, `│`, `┌`, `┐`, `└` and `┘`: Road tiles.
-* `├`, `┤`, `┴` and `┬`: House tiles, each representing a particular orientation.
-* `╠`, `╣`, `╩` and `╦`: Building tiles, each representing a particular orientation.
-* `˼`, `˻`, `˹` and `˺`: Billboards, each representing a particular orientation.
+
+- `0`: Blank (grass) tile.
+- `V`: Tree (vegetation) tile.
+- `─`, `│`, `┌`, `┐`, `└` and `┘`: Road tiles.
+- `├`, `┤`, `┴` and `┬`: House tiles, each representing a particular orientation.
+- `╠`, `╣`, `╩` and `╦`: Building tiles, each representing a particular orientation.
+- `˼`, `˻`, `˹` and `˺`: Billboards, each representing a particular orientation.
 
 ## Installation
 
@@ -158,24 +168,25 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## Credits, asset attributions
 
 This work is based on:
-* ["Low poly Ad Billboard"](https://sketchfab.com/3d-models/low-poly-ad-billboard-864b8ce5d520478481198d1face5a7e5) by [Anthony Yanez](https://sketchfab.com/paulyanez) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
-* ["Modern building 03"](https://sketchfab.com/3d-models/modern-building-03-254942864da94533a4e740a9c400f7a1) by [burunduk](https://sketchfab.com/burunduk) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
-* ["Modern building 02"](https://sketchfab.com/3d-models/modern-building-02-3044b2aa3f1e4218a842e63815a48452) by [burunduk](https://sketchfab.com/burunduk) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
-* ["Modern building 05"](https://sketchfab.com/3d-models/modern-building-05-7fc1d3bd4bde4be7ab4eee80771fbef1) by [burunduk](https://sketchfab.com/burunduk) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
-* ["Classic Muscle car"](https://sketchfab.com/3d-models/classic-muscle-car-641efc889e5f4543bae51d0922e6f4b3) by [Lexyc16](https://sketchfab.com/Lexyc16) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
-* ["Toyota Corolla AE86 Trueno"](https://sketchfab.com/3d-models/toyota-corolla-ae86-trueno-fe02fba6302e450ea8424591493341ea) by [Lexyc16](https://sketchfab.com/Lexyc16) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
-* ["Low Poly Car"](https://sketchfab.com/3d-models/low-poly-car-93971323324243468f24d7da9d18f617) by [Straight Design](https://sketchfab.com/creativemango) licensed under [CC-BY-SA-4.0](http://creativecommons.org/licenses/by-sa/4.0/)
-* ["Low poly house"](https://sketchfab.com/3d-models/low-poly-house-796232a307d24b6881f4f42476058701) by [its_sagar_bro](https://sketchfab.com/its_sagar_bro) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
-* ["Low poly house"](https://sketchfab.com/3d-models/low-poly-house-2596e4c92af848b8a830f6c307e93a45) by [its_sagar_bro](https://sketchfab.com/its_sagar_bro) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
-* ["low poly building"](https://sketchfab.com/3d-models/low-poly-building-386b478c0d2841b288c7342beca28892) by [GreyHorn102](https://sketchfab.com/GreyHorn102) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
-* ["Low Poly Tree 2"](https://sketchfab.com/3d-models/low-poly-tree-2-73eb8c73bd6c4a8db4e02dbb6bfcffcf) by [Render Zing](https://sketchfab.com/RenderZing) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
-* ["Leafy Tree - Low poly"](https://sketchfab.com/3d-models/leafy-tree-low-poly-6db96be0ea694f558836e662c595788a) by [lightguard](https://sketchfab.com/lightguard) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
-* ["Low-poly Tree"](https://sketchfab.com/3d-models/low-poly-tree-c452f70f0ffb4dd4ab257348ff44e367) by [ALostEggroll](https://sketchfab.com/ALostEggroll) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
-* ["Abstract green grass seamless texture"](https://www.vecteezy.com/vector-art/5473024-abstract-green-grass-seamless-texture) by [Maksim Borzdov](https://www.vecteezy.com/members/makstorm10000510543)
-* [Overcast Soil (Pure Sky)](https://polyhaven.com/a/overcast_soil_puresky) by [Sergej Majboroda](https://polyhaven.com/all?a=Sergej%20Majboroda), [Jarod Guest](https://polyhaven.com/all?a=Jarod%20Guest) licensed under [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
-* [Farm Field (Pure Sky)](https://polyhaven.com/a/farm_field_puresky) by [Dimitrios Savva](https://polyhaven.com/all?a=Dimitrios%20Savva), [Jarod Guest](https://polyhaven.com/all?a=Jarod%20Guest) licensed under [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
-* [Drakensberg Solitary Mountain (Pure Sky)](https://polyhaven.com/a/drakensberg_solitary_mountain_puresky) by [Dimitrios Savva](https://polyhaven.com/all?a=Dimitrios%20Savva), [Jarod Guest](https://polyhaven.com/all?a=Jarod%20Guest) licensed under [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
-* [The colour of the sky from Gaia’s Early Data Release 3](https://www.esa.int/ESA_Multimedia/Images/2020/12/The_colour_of_the_sky_from_Gaia_s_Early_Data_Release_32) from the [European Space Agency](https://www.esa.int/) licensed under [CC BY-SA 3.0 IGO](https://creativecommons.org/licenses/by-sa/3.0/igo/)
+
+- ["Low poly Ad Billboard"](https://sketchfab.com/3d-models/low-poly-ad-billboard-864b8ce5d520478481198d1face5a7e5) by [Anthony Yanez](https://sketchfab.com/paulyanez) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
+- ["Modern building 03"](https://sketchfab.com/3d-models/modern-building-03-254942864da94533a4e740a9c400f7a1) by [burunduk](https://sketchfab.com/burunduk) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
+- ["Modern building 02"](https://sketchfab.com/3d-models/modern-building-02-3044b2aa3f1e4218a842e63815a48452) by [burunduk](https://sketchfab.com/burunduk) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
+- ["Modern building 05"](https://sketchfab.com/3d-models/modern-building-05-7fc1d3bd4bde4be7ab4eee80771fbef1) by [burunduk](https://sketchfab.com/burunduk) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
+- ["Classic Muscle car"](https://sketchfab.com/3d-models/classic-muscle-car-641efc889e5f4543bae51d0922e6f4b3) by [Lexyc16](https://sketchfab.com/Lexyc16) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
+- ["Toyota Corolla AE86 Trueno"](https://sketchfab.com/3d-models/toyota-corolla-ae86-trueno-fe02fba6302e450ea8424591493341ea) by [Lexyc16](https://sketchfab.com/Lexyc16) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
+- ["Low Poly Car"](https://sketchfab.com/3d-models/low-poly-car-93971323324243468f24d7da9d18f617) by [Straight Design](https://sketchfab.com/creativemango) licensed under [CC-BY-SA-4.0](http://creativecommons.org/licenses/by-sa/4.0/)
+- ["Low poly house"](https://sketchfab.com/3d-models/low-poly-house-796232a307d24b6881f4f42476058701) by [its_sagar_bro](https://sketchfab.com/its_sagar_bro) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
+- ["Low poly house"](https://sketchfab.com/3d-models/low-poly-house-2596e4c92af848b8a830f6c307e93a45) by [its_sagar_bro](https://sketchfab.com/its_sagar_bro) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
+- ["low poly building"](https://sketchfab.com/3d-models/low-poly-building-386b478c0d2841b288c7342beca28892) by [GreyHorn102](https://sketchfab.com/GreyHorn102) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
+- ["Low Poly Tree 2"](https://sketchfab.com/3d-models/low-poly-tree-2-73eb8c73bd6c4a8db4e02dbb6bfcffcf) by [Render Zing](https://sketchfab.com/RenderZing) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
+- ["Leafy Tree - Low poly"](https://sketchfab.com/3d-models/leafy-tree-low-poly-6db96be0ea694f558836e662c595788a) by [lightguard](https://sketchfab.com/lightguard) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
+- ["Low-poly Tree"](https://sketchfab.com/3d-models/low-poly-tree-c452f70f0ffb4dd4ab257348ff44e367) by [ALostEggroll](https://sketchfab.com/ALostEggroll) licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
+- ["Abstract green grass seamless texture"](https://www.vecteezy.com/vector-art/5473024-abstract-green-grass-seamless-texture) by [Maksim Borzdov](https://www.vecteezy.com/members/makstorm10000510543)
+- [Overcast Soil (Pure Sky)](https://polyhaven.com/a/overcast_soil_puresky) by [Sergej Majboroda](https://polyhaven.com/all?a=Sergej%20Majboroda), [Jarod Guest](https://polyhaven.com/all?a=Jarod%20Guest) licensed under [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
+- [Farm Field (Pure Sky)](https://polyhaven.com/a/farm_field_puresky) by [Dimitrios Savva](https://polyhaven.com/all?a=Dimitrios%20Savva), [Jarod Guest](https://polyhaven.com/all?a=Jarod%20Guest) licensed under [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
+- [Drakensberg Solitary Mountain (Pure Sky)](https://polyhaven.com/a/drakensberg_solitary_mountain_puresky) by [Dimitrios Savva](https://polyhaven.com/all?a=Dimitrios%20Savva), [Jarod Guest](https://polyhaven.com/all?a=Jarod%20Guest) licensed under [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
+- [The colour of the sky from Gaia’s Early Data Release 3](https://www.esa.int/ESA_Multimedia/Images/2020/12/The_colour_of_the_sky_from_Gaia_s_Early_Data_Release_32) from the [European Space Agency](https://www.esa.int/) licensed under [CC BY-SA 3.0 IGO](https://creativecommons.org/licenses/by-sa/3.0/igo/)
 
 <br></br>
 

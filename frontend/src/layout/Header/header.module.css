@@ -1,5 +1,5 @@
 .menuItems {
-  text-decoration: none;
+  text-decoration: none !important;
   color: var(--primary-color);
   font-weight: 800;
   font-size: large;

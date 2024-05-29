@@ -6,6 +6,7 @@ import logo from "../../public/img/logo.png";
 import logo_black from "../../public/img/logo_black.png";
 import podium from "../../public/img/podium.png";
 import road from "../../public/img/road.webp";
+import star from "../../public/img/star.png";
 import track from "../../public/img/track-map.png";
 
 export const images = {
@@ -17,5 +18,6 @@ export const images = {
   logo_black,
   podium,
   road,
+  star,
   track,
 };

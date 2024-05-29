@@ -38,7 +38,7 @@ const ScoreItem: FC<ScoreItemProps> = ({ user_address, score, index, image }) =>
 
       <HStack className={styles.userEmail} gap={3} w={"100%"} justifyContent={"center"}>
         {image ? (
-          <Image src={image} alt="podium" width={isMobile ? 35 : 50} height={isMobile ? 35 : 50} />
+          <Image src={image} alt="podium" width={isMobile ? 35 : 45} height={isMobile ? 35 : 45} />
         ) : (
           <Box width="50px" />
         )}

@@ -15,8 +15,7 @@
   color: var(--primary-color);
   text-align: center;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-  padding: 10px;
+  padding-top: 10px;
 }
 
 .scoreItem {

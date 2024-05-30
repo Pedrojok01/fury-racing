@@ -86,14 +86,16 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
             addressToPlayer[msg.sender].attributes = attributes1;
         }
 
+        uint256 raceId = soloRaceCounter;
+
         addressToPlayer[AI_PLAYER_ADDRESS].attributes = attributes2;
         Race memory race = _createNewRace(circuitId, RaceMode.SOLO);
         race.state = RaceState.ONGOING;
-        soloRaces[soloRaceCounter] = race;
-
-        emit SoloRaceStarted(msg.sender, soloRaceCounter);
-        requestRandomNumber(soloRaceCounter, RaceMode.SOLO);
+        soloRaces[raceId] = race;
         soloRaceCounter++;
+
+        emit SoloRaceStarted(msg.sender, raceId);
+        requestRandomNumber(raceId, RaceMode.SOLO);
     }
 
     function joinFreeRace(PlayerAttributes memory attributes, uint256 circuitId) public {
@@ -106,14 +108,15 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
             addressToPlayer[msg.sender].attributes = attributes;
         }
 
-        bool ongoing = _updateRace(circuitId, RaceMode.FREE);
-        emit JoinedRace(msg.sender, freeRaceCounter);
+        uint256 raceId = freeRaceCounter;
+        bool ongoing = _updateRace(circuitId, raceId, RaceMode.FREE);
+        emit JoinedRace(msg.sender, raceId);
 
         // Run race when it is full.
         if (ongoing) {
-            emit FreeRaceStarted(freeRaceCounter);
-            requestRandomNumber(freeRaceCounter, RaceMode.FREE);
+            emit FreeRaceStarted(raceId);
             freeRaceCounter++;
+            requestRandomNumber(raceId, RaceMode.FREE);
         }
     }
 
@@ -142,14 +145,15 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         // 5% goes to weekly prize pool
         currentPrizePool += (msg.value * 5) / 100;
 
-        bool ongoing = _updateRace(circuitId, RaceMode.TOURNAMENT);
-        emit JoinedRace(msg.sender, raceCounter);
+        uint256 raceId = raceCounter;
+        bool ongoing = _updateRace(circuitId, raceId, RaceMode.TOURNAMENT);
+        emit JoinedRace(msg.sender, raceId);
 
         // Run race when it is full.
         if (ongoing) {
-            emit RaceStarted(raceCounter);
-            requestRandomNumber(raceCounter, RaceMode.TOURNAMENT);
+            emit RaceStarted(raceId);
             raceCounter++;
+            requestRandomNumber(raceId, RaceMode.TOURNAMENT);
         }
     }
 
@@ -346,52 +350,60 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
             }
         }
 
+        weeklyTournamentCounter++; // Increment the weekly tournament counter
+        tournamentPlayersCounter = 0; // Reset the bet players counter
+
         if (topPlayer != address(0) && currentPrizePool > 0) {
             if (address(this).balance < currentPrizePool) {
                 revert Racing__WeeklyPaymentInsufficientBalance();
             }
-            (bool success,) = payable(topPlayer).call{ value: currentPrizePool }("");
+            uint256 prize = currentPrizePool;
+            currentPrizePool = 0;
+            (bool success,) = payable(topPlayer).call{ value: prize }("");
             if (!success) {
                 revert Racing__WeeklyPaymentFailed();
             }
-            currentPrizePool = 0;
         }
-
-        weeklyTournamentCounter++; // Increment the weekly tournament counter
-        tournamentPlayersCounter = 0; // Reset the bet players counter
     }
 
     /*//////////////////////////////////////////////////////////////
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
 
-    function _updateRace(uint256 _circuitId, RaceMode _mode) public returns (bool _ongoing) {
+    function _updateRace(
+        uint256 _circuitId,
+        uint256 _raceId,
+        RaceMode _mode
+    )
+        public
+        returns (bool _ongoing)
+    {
         if (_mode == RaceMode.FREE) {
-            if (freeRaces[freeRaceCounter].state == RaceState.NON_EXISTENT) {
+            if (freeRaces[_raceId].state == RaceState.NON_EXISTENT) {
                 // Create a new free race
                 Race memory _race = _createNewRace(_circuitId, _mode);
-                freeRaces[freeRaceCounter] = _race;
+                freeRaces[_raceId] = _race;
             } else {
-                if (msg.sender == freeRaces[freeRaceCounter].player1) {
+                if (msg.sender == freeRaces[_raceId].player1) {
                     revert Racing__PlayerAlreadyJoined();
                 }
                 // Update the current free race
-                Race storage currentRace = freeRaces[freeRaceCounter];
+                Race storage currentRace = freeRaces[_raceId];
                 currentRace.state = RaceState.ONGOING;
                 currentRace.player2 = msg.sender;
                 _ongoing = true;
             }
         } else {
-            if (races[raceCounter].state == RaceState.NON_EXISTENT) {
+            if (races[_raceId].state == RaceState.NON_EXISTENT) {
                 // Create a new bet race
                 Race memory _race = _createNewRace(_circuitId, _mode);
-                races[raceCounter] = _race;
+                races[_raceId] = _race;
             } else {
-                if (msg.sender == races[raceCounter].player1) {
+                if (msg.sender == races[_raceId].player1) {
                     revert Racing__PlayerAlreadyJoined();
                 }
                 // Update the current bet race
-                Race storage currentRace = races[raceCounter];
+                Race storage currentRace = races[_raceId];
                 currentRace.state = RaceState.ONGOING;
                 currentRace.player2 = msg.sender;
                 _ongoing = true;

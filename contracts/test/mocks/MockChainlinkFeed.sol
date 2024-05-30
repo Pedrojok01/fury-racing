@@ -46,6 +46,9 @@ abstract contract MockChainlinkFeed is
     mapping(bytes32 => RaceMode) public requestIdToRaceMode;
     mapping(bytes32 => uint256) public requestIdToRaceId;
 
+    mapping(RaceMode => mapping(uint256 => uint256)) private raceIdModeToRandomRequestId;
+    mapping(RaceMode => mapping(uint256 => bytes32)) private raceIdModeToFunctionsRequestId;
+
     // Events
     event RequestedRandomness(uint256 requestId, uint32 numWords);
     event RandomnessReceived(uint256 requestId, uint256[] randomWords);
@@ -67,6 +70,16 @@ abstract contract MockChainlinkFeed is
 
     function getFunctionsRequestFromID(bytes32 id) public view returns (FunctionsRequests memory) {
         return requestIdToFunctionsRequests[id];
+    }
+
+    function getRandomWords(uint256 raceId, RaceMode mode) public view returns (uint256[] memory) {
+        uint256 requestId = raceIdModeToRandomRequestId[mode][raceId];
+        return requestIdToRandomRequests[requestId].randomWords;
+    }
+
+    function getRaceResults(uint256 raceId, RaceMode mode) public view returns (uint256[] memory) {
+        bytes32 requestId = raceIdModeToFunctionsRequestId[mode][raceId];
+        return requestIdToFunctionsRequests[requestId].results;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -98,6 +111,7 @@ abstract contract MockChainlinkFeed is
 
         requestIdToRaceMode[bytes32(requestId)] = mode;
         requestIdToRaceId[bytes32(requestId)] = raceId;
+        raceIdModeToRandomRequestId[mode][raceId] = requestId;
 
         emit RequestedRandomness(requestId, NUM_WORDS);
     }
@@ -151,6 +165,7 @@ abstract contract MockChainlinkFeed is
 
         requestIdToRaceMode[_requestId] = mode;
         requestIdToRaceId[_requestId] = raceId;
+        raceIdModeToFunctionsRequestId[mode][raceId] = _requestId;
 
         return _requestId;
     }

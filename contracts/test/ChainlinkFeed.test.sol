@@ -161,6 +161,105 @@ contract ChainlinkFeedTest is BaseTestSetup {
         vm.stopPrank();
     }
 
+    function testGetRandomWords() public {
+        uint256 circuitId = 1;
+        uint256 raceId = 1;
+        uint256 requestId = 1;
+        RaceMode mode = RaceMode.TOURNAMENT;
+
+        // First race
+        vm.prank(player1);
+        racing.joinRace{ value: 0.1 ether }(attributes1, circuitId);
+
+        vm.prank(player2);
+        racing.joinRace{ value: 0.1 ether }(attributes2, circuitId);
+
+        // Mock VRF Coordinator callback
+        uint256[] memory randomWords = new uint256[](2);
+        randomWords[0] = uint256(keccak256(abi.encode(block.timestamp, 0)));
+        randomWords[1] = uint256(keccak256(abi.encode(block.timestamp, 1)));
+        racing._fulfillRandomWords(requestId, randomWords);
+
+        uint256[] memory retrievedRandomWords1 = racing.getRandomWords(raceId, mode);
+        assertEq(retrievedRandomWords1[0], randomWords[0]);
+        assertEq(retrievedRandomWords1[1], randomWords[1]);
+
+        // Second race
+        raceId++;
+        requestId++;
+
+        vm.prank(player1);
+        racing.joinRace{ value: 0.1 ether }(attributes1, circuitId);
+
+        vm.prank(player2);
+        racing.joinRace{ value: 0.1 ether }(attributes2, circuitId);
+
+        uint256[] memory randomWords2 = new uint256[](2);
+        randomWords2[0] = uint256(keccak256(abi.encode(block.timestamp, 2)));
+        randomWords2[1] = uint256(keccak256(abi.encode(block.timestamp, 3)));
+        racing._fulfillRandomWords(requestId, randomWords2);
+
+        uint256[] memory retrievedRandomWords2 = racing.getRandomWords(raceId, mode);
+        assertEq(retrievedRandomWords2[0], randomWords2[0]);
+        assertEq(retrievedRandomWords2[1], randomWords2[1]);
+    }
+
+    function testGetRaceResults() public {
+        uint256 requestId = 1;
+        uint256[] memory randomWords = new uint256[](2);
+        randomWords[0] = uint256(keccak256(abi.encode(block.timestamp, 0)));
+        randomWords[1] = uint256(keccak256(abi.encode(block.timestamp, 1)));
+
+        uint256 circuit = 1;
+        uint256 weather = 17;
+        uint256 raceId = 1;
+        RaceMode mode = RaceMode.FREE;
+
+        // First race
+        vm.prank(player1);
+        racing.joinFreeRace(attributes1, circuit);
+
+        vm.prank(player2);
+        racing.joinFreeRace(attributes2, circuit);
+
+        racing._fulfillRandomWords(requestId, randomWords);
+
+        bytes32 requestId1 = keccak256(abi.encodePacked(raceId, mode, uint256(1)));
+        uint256[] memory raceResults = new uint256[](2);
+        raceResults[0] = 100;
+        raceResults[1] = 200;
+        racing._fulfillRequest(requestId1, abi.encode(raceResults), "");
+
+        uint256[] memory retrievedRaceResults = racing.getRaceResults(raceId, mode);
+        assertEq(retrievedRaceResults[0], raceResults[0]);
+        assertEq(retrievedRaceResults[1], raceResults[1]);
+
+        // Second race
+        requestId++;
+        raceId++;
+
+        vm.prank(player1);
+        racing.joinFreeRace(attributes1, circuit);
+
+        vm.prank(player2);
+        racing.joinFreeRace(attributes2, circuit);
+
+        racing._fulfillRandomWords(requestId, randomWords);
+
+        bytes32 requestId2 = keccak256(abi.encodePacked(raceId, mode, uint256(1)));
+
+        uint256[] memory raceResults2 = new uint256[](2);
+        raceResults2[0] = 300;
+        raceResults2[1] = 400;
+        racing._fulfillRequest(requestId2, abi.encode(raceResults2), "");
+
+        uint256[] memory retrievedRaceResults2 = racing.getRaceResults(raceId, mode);
+        assertEq(retrievedRaceResults2[0], raceResults2[0]);
+        assertEq(retrievedRaceResults2[1], raceResults2[1]);
+
+        vm.stopPrank();
+    }
+
     // function testInitializeRequest() public {
     //     uint256 circuit = 1;
     //     PlayerAttributes[] memory attributes = new PlayerAttributes[](2);

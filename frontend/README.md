@@ -1,9 +1,9 @@
 <div align="center">
 
+<h1><strong> Fury Racing | Frontend </strong></h1>
+<br/>
 <img src="./public/img/Fury_Racing_logo_HD.png" width="200" alt="Fury Racing logo" />
-<br><br>
-
-<h1><strong> Fury Racing </strong></h1>
+<br>
 
 </div>
 </br>
@@ -11,11 +11,11 @@
 ## Table of Contents
 
 - [Table of Contents](#table-of-contents)
-- [Description](#description)
-- [Built With](#built-with)
-  - [BabylonJS implementation](#babylonjs-implementation)
-    - [Successfully importing third-party assets](#successfully-importing-third-party-assets)
-    - [Programming the race track layout](#programming-the-race-track-layout)
+- [Description:](#description)
+- [Built With:](#built-with)
+- [BabylonJS implementation](#babylonjs-implementation)
+  - [Successfully importing third-party assets](#successfully-importing-third-party-assets)
+  - [Programming the race track layout](#programming-the-race-track-layout)
 - [Installation](#installation)
   - [Make sure you have the following ready:](#make-sure-you-have-the-following-ready)
   - [Clone the repo:](#clone-the-repo)
@@ -24,11 +24,21 @@
   - [To start Fury Racing:](#to-start-fury-racing)
 - [Credits, asset attributions](#credits-asset-attributions)
 
-## Description
+## Description:
 
-Onchain racing simulator leveraging Chainlink VRF and Chainlink Functions. Built using the latest tech out there: [Next.js](https://nextjs.org/), [Babylon.js](https://www.babylonjs.com/), [Viem](https://viem.sh/), [Wagmi](https://wagmi.sh/), [RainbowKit](https://www.rainbowkit.com/), [ChakraUI](https://chakra-ui.com/), and [Typescript](https://www.typescriptlang.org/).
+The front end of Fury Racing has been built to make the interaction with the smart contracts as smooth as possible. Only one transaction is required to play a game, even as a new player. All racing modes are accessible directly from the front end.
 
-## Built With
+This comes as a PWA (Progressive Web App) with a responsive design, allowing it to be played on any device, from desktop to mobile to be accessible to as many users as possible. And because it is a PWA, you can even install it on your device in one click!
+
+Dark mode, sound, and Fullscreen are also available to enhance the user experience and make it feel like a real game.
+
+And the best part... To make it even cooler, we have integrated some beautiful 3D animations with BabylonJS to make the game more immersive and fun!
+
+<div align="center">
+  <img src="./public/img/car_anim.gif" alt="car animation" />
+</div>
+
+## Built With:
 
 - [![nextjs]][nextjs-url]
 - [![typescript]][typescript-url]
@@ -40,7 +50,7 @@ Onchain racing simulator leveraging Chainlink VRF and Chainlink Functions. Built
 - [![prettier]][prettier-url]
 - [![ESLint]][eslint-url]
 
-### BabylonJS implementation
+## BabylonJS implementation
 
 The following features of the BabylonJS engine were used:
 

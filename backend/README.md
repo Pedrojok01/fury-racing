@@ -1,10 +1,12 @@
 <div align="center">
 
-<h1><strong> Fury Racing </strong></h1><br/>
-<img src="../frontend/public/img/Fury_Racing_logo_HD.png" width="200" alt="Fury Racing logo" />
+<h1><strong> Fury Racing | Backend </strong></h1>
 <br/>
+<img src="../frontend/public/img/Fury_Racing_logo_HD.png" width="200" alt="Fury Racing logo" />
+<br>
 
 </div>
+</br>
 
 ## Table of Contents
 
@@ -15,7 +17,7 @@
   - [Track Data:](#track-data)
   - [Calculating the Time:](#calculating-the-time)
   - [Example:](#example)
-- [About:](#about)
+- [Built With:](#built-with)
 - [Getting Started](#getting-started)
 
 ## Description:
@@ -23,12 +25,12 @@
 The backend part of Fury Racing is quite small, so it has been implemented using AWS Lambda functions and CloudWatch BridgeEvents. The backend is responsible for the following tasks:
 
 - **Leaderboard**: as the leaderboard requires reading a lot of data from the blockchain, as well as sorting those data, it was both simpler and more efficient to implement it as a backend function, leveraging multicall to reduce the number of requests to the node provider.
-- **Race Results**: The time generated for each player based on their selected attributes is also handled in the Lambda function. This endpoint is directly queried by the smart contracts when needed via Chainlink Functions.
-- **Weather**: The weather is also handled by the backend. The weather for each track is stored on-chain in the smart contracts. A cron job allows to update the data every hour so the weather is almost in real-time.
+- **Race Results**: The time generated for each player based on their selected attributes is also handled in the Lambda function. This endpoint is the heart of the backend and is directly queried by the smart contracts when needed via Chainlink Functions.
+- **Weather**: The weather is also handled by the backend. The weather for each track is stored on-chain in the smart contracts. A cron job allows to update the data every hour so the weather is almost in real-time. Chainlink Automation could be a good replacement for this cron job in the future.
 
 ## Car Attributes, Track Data, and Time Calculation:
 
-Each attribute has 3 positive and 3 negative factors that affect the time calculation. The description can be found below:
+Each attribute has 3 positive and 3 negative factors that affect the time calculation. The positive factors amplify each other, while the negative ones neglect their effect. The description can be found below:
 
 ### Car Attributes:
 
@@ -123,7 +125,7 @@ Each attribute has 3 positive and 3 negative factors that affect the time calcul
 
 In addition to car attributes, the track data and weather conditions significantly impact the lap times. Each track has specific characteristics, such as:
 
-- Best Lap Time: The benchmark lap time for the track.
+- Best Lap Time: The benchmark lap time for the track, used as a reference.
 - Full Throttle: The percentage of the track that can be driven at full throttle.
 - Longest Flat Out: The longest distance on the track that can be driven without braking.
 - Max Speed: The maximum speed achievable on the track.
@@ -150,14 +152,14 @@ In addition to car attributes, the track data and weather conditions significant
 | Set 4           | 91802.90              |
 | Set 5           | 92472.82              |
 
-## About:
+## Built With:
 
 The main technologies used in the backend are:
 
 - **Node.js**: to write the functions
 - **Express.js**: to handle the API requests
 - **Viem**: to communicate with the smart contracts
-- **AWS Lambda**: to deploy the functions
+- **AWS Lambda**: to host the functions
 - **Serverless Framework**: to deploy the functions
 - **CloudWatch BridgeEvents**: to schedule the cron jobs and update the weather every hour
 
@@ -190,8 +192,6 @@ serverless deploy
 Note: you need to have the AWS CLI installed and configured on your machine.
 
 Once deployed, don't forget to add the environment variables to the Lambda function. You can find the list of environment variables in the `.env.example` file.
-
-<br></br>
 
 <br></br>
 

@@ -8,7 +8,6 @@
 [![Stargazers](https://img.shields.io/github/stars/Pedrojok01/fury-racing)](https://github.com/Pedrojok01/fury-racing/stargazers)
 [![Forks](https://img.shields.io/github/forks/Pedrojok01/fury-racing)](https://github.com/Pedrojok01/fury-racing/issues)
 [![Issues](https://img.shields.io/github/issues/Pedrojok01/fury-racing)](https://github.com/Pedrojok01/fury-racing/issues)
-[![MIT License](https://img.shields.io/github/license/Pedrojok01/fury-racing)](https://github.com/Pedrojok01/fury-racing/blob/main/License)
 ![Vercel](https://img.shields.io/github/deployments/Pedrojok01/fury-racing/production?label=Vercel&logo=Vercel&logoColor=white)
 
 <br></br>
@@ -40,7 +39,7 @@ Fury Racing is a **car manager** game (you do not drive the car yourself), based
 
 ### Concept:
 
-The concept is simple: you must select a car and optimize its attributes to make the best time against another player. The time is automatically calculated based on the selected attributes, the circuit characteristics, and the real-time weather of the circuit's location. This is where all the strategy comes in.
+The concept is simple: you must select a car and optimize its attributes to make the best time against another player. The time is automatically calculated based on the selected attributes, the circuit characteristics, and the real-time weather of the circuit's location. This is where all the strategy comes in (See the [backend READM.md](./backend/README.md) for more information about the calculation process).
 In addition, a luck mechanism has been introduced to add some spicy to the game. This luck comes from 2 different sources:
 
 1.  your luck attributes vary depending on how many points you allocate there as shown in the table below:
@@ -49,7 +48,10 @@ In addition, a luck mechanism has been introduced to add some spicy to the game.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | -4% | -3% | -2% | -1% | 0%  | +1% | +2% | +3% | +4% | +5% |
 
-So you will get a percentage ranging from +4% to +5% for all other attributes. While it could be tempting to go for the max bonus, keep in mind that the points that you allocate here do not count in your car performance... 2. The second source of luck comes from Chainlink VRF V2.5. As soon as the race starts, an additional random percentage ranging from -5% to +5% is also applied to your other attributes!
+So you will get a percentage ranging from +4% to +5% for all other attributes. While it could be tempting to go for the max bonus, keep in mind that the points that you allocate here do not count in your car performance...
+
+2. The second source of luck comes from Chainlink VRF V2.5. As soon as the race starts, an additional random percentage ranging from -5% to +5% is also applied to your other attributes!
+
 The 2 luck sources add to each other, giving potential bonuses or malus ranging from -9% to +10% in total! This doesn't make it any less interesting since it won't be enough to reverse the best settings for the race. It does however help "leveling" the field a bit and may push players to play more to try to get lucky!
 
 ### Race Mode:
@@ -77,7 +79,7 @@ Please refer to each folder's README file for more information about the install
 - [x] 1v1 Free mode
 - [x] 1v1 Tournament mode
 - [x] Dark mode support
-- [x] Responsive design
+- [x] Responsive design / PWA
 - [x] Chainlink VRF V2.5
 - [x] Chainlink Functions
 - [x] Leaderboard

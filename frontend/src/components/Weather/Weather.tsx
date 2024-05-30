@@ -30,6 +30,7 @@ const WeatherDisplay: FC<{ weather: Weather }> = ({ weather }) => {
       condition: { icon, text },
       temp_c,
       precip_mm,
+      wind_kph,
     },
   } = weather;
 
@@ -45,6 +46,7 @@ const WeatherDisplay: FC<{ weather: Weather }> = ({ weather }) => {
           <VStack spacing={1} alignItems="flex-start" minW="175px">
             <DisplayStatData label="Temperature:" data={`${temp_c}°C`} />
             <DisplayStatData label="Precipitation:" data={`${precip_mm}mm`} />
+            <DisplayStatData label="Wind:" data={`${wind_kph}km/h`} />
           </VStack>
         </StatGroup>
       </VStack>

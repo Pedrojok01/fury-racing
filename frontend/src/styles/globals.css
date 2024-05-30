@@ -55,7 +55,7 @@ a {
   height: calc(100vh - 77px - 1rem - 2.5rem);
   margin: auto;
   font-size: 17px;
-  padding-left: 8rem;
+  /* padding-left: 8rem; */
 }
 
 .game-container-iphone {

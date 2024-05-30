@@ -175,6 +175,12 @@ yarn install
 npm install
 ```
 
+You can run the tests to see some simulation examples based on different car attribute sets and weather conditions with the following command:
+
+```bash
+node test/test.js
+```
+
 Then you can deploy the function to AWS by running the following command:
 
 ```bash

@@ -19,14 +19,14 @@
 
 ## Description:
 
-The Racing contract is currently deployed abd verified on Avalanche Fuji at the following address:
+The Racing contract is currently deployed and verified on Avalanche Fuji at the following address:
 
-[0x5a46363a08146fb5d93C687afb4C69D2EeB33412](https://testnet.snowscan.xyz/address/0x5a46363a08146fb5d93C687afb4C69D2EeB33412)
+[0x3cc19b0B45c505f0EF697d56eBc0a706c943dF40](https://testnet.snowscan.xyz/address/0x3cc19b0B45c505f0EF697d56eBc0a706c943dF40)
 
 The smart contracts for Fury Racing have been implemented in Solidity and the Foundry framework. All the critical features are on-chain and handled directly in the contracts. They have been designed with the following in mind:
 
 - Reduce the use of arrays and loops as much as possible;
-- Require as little transactions as possible, to keep the UI/UX smooth and user-friendly;
+- Require a single transaction per game (registration included), to keep the UI/UX smooth and user-friendly;
 - Gas efficiency and security ([Slither](https://github.com/crytic/slither)/[Aderyn](https://github.com/Cyfrin/aderyn));
 
 ## Chainlink:

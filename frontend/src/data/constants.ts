@@ -15,6 +15,6 @@ export const LINK_TOKEN = {
 };
 
 export const RACING_CONTRACT = {
-  address: "0x5a46363a08146fb5d93C687afb4C69D2EeB33412" as `0x${string}`,
+  address: "0x3cc19b0B45c505f0EF697d56eBc0a706c943dF40" as `0x${string}`,
   ABI: RACING_ABI as Abi,
 };

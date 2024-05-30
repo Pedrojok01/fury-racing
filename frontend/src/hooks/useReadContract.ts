@@ -111,8 +111,8 @@ export const useReadContract = () => {
   /* Get race info for raceId :
    *****************************/
   const getRaceInfo = useCallback(
-    async (raceId: bigint, mode: RaceMode): Promise<void> => {
-      if (!racingInstance) return;
+    async (raceId: bigint, mode: RaceMode): Promise<RaceInfo | undefined> => {
+      if (!racingInstance) return undefined;
 
       try {
         let race: RaceInfo | null = null;
@@ -133,10 +133,11 @@ export const useReadContract = () => {
 
         if (race && (race.player1Time !== 0 || race.player2Time !== 0)) {
           setRaceInfo(race);
+          return race;
         }
       } catch (error: unknown) {
         logError(error);
-        return;
+        return undefined;
       }
     },
     [racingInstance, setRaceInfo],

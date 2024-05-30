@@ -178,6 +178,16 @@ const RACING_ABI = [
   },
   {
     type: "function",
+    name: "getRaceResults",
+    inputs: [
+      { name: "raceId", type: "uint256", internalType: "uint256" },
+      { name: "mode", type: "uint8", internalType: "enum IRacing.RaceMode" },
+    ],
+    outputs: [{ name: "", type: "uint256[]", internalType: "uint256[]" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "getRandomRequestFromID",
     inputs: [{ name: "id", type: "uint256", internalType: "uint256" }],
     outputs: [
@@ -192,6 +202,16 @@ const RACING_ABI = [
         ],
       },
     ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getRandomWords",
+    inputs: [
+      { name: "raceId", type: "uint256", internalType: "uint256" },
+      { name: "mode", type: "uint8", internalType: "enum IRacing.RaceMode" },
+    ],
+    outputs: [{ name: "", type: "uint256[]", internalType: "uint256[]" }],
     stateMutability: "view",
   },
   {

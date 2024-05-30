@@ -7,3 +7,4 @@ export * from "./useSignMessageHook";
 export * from "./useWeather";
 export * from "./useWindowSize";
 export * from "./useWriteContract";
+export * from "./useRace";

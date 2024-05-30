@@ -23,8 +23,8 @@ const HomeScreen: FC = () => {
   };
 
   return (
-    <Flex h={"100%"} className={styles.container} gap={5} alignItems={"center"}>
-      <VStack className={styles.subContainer} flex={1}>
+    <Flex className={styles.container}>
+      <VStack className={styles.subContainer}>
         <Text className={`${styles.title} text-shadow`}>
           Score the <span style={{ color: "var(--primary-color)" }}>best time</span>.
         </Text>

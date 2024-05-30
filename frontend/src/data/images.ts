@@ -2,6 +2,7 @@ import avaxLogo from "../../public/img/avax-logo.png";
 import chainlinkLogo from "../../public/img/chainlink-logo.png";
 import crown from "../../public/img/crown.png";
 import homeCar from "../../public/img/home-car.webp";
+import live from "../../public/img/live-stream.png";
 import logo from "../../public/img/logo.png";
 import logo_black from "../../public/img/logo_black.png";
 import podium from "../../public/img/podium.png";
@@ -14,6 +15,7 @@ export const images = {
   chainlinkLogo,
   crown,
   homeCar,
+  live,
   logo,
   logo_black,
   podium,

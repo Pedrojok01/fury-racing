@@ -6,6 +6,7 @@ import { usePublicClient } from "wagmi";
 import { RACING_CONTRACT } from "@/data";
 import { useGameStates } from "@/stores";
 import { logError } from "@/utils/errorUtil";
+import { calculateBaseLuck, raceModeToInt } from "@/utils/formatters";
 
 export const useReadContract = () => {
   const { setBetAmount, setPrizePool, setRaceInfo } = useGameStates();
@@ -108,6 +109,23 @@ export const useReadContract = () => {
     [racingInstance],
   );
 
+  /* Get chainlink random words :
+   *****************************/
+  const getRandomWords = useCallback(
+    async (raceId: bigint, mode: RaceMode): Promise<number[]> => {
+      if (!racingInstance) return [];
+
+      try {
+        const words = (await racingInstance.read.getRandomWords([raceId, raceModeToInt[mode]])) as [bigint, bigint];
+        return words.map((word) => calculateBaseLuck(word));
+      } catch (error: unknown) {
+        logError(error);
+        return [];
+      }
+    },
+    [racingInstance],
+  );
+
   /* Get race info for raceId :
    *****************************/
   const getRaceInfo = useCallback(
@@ -150,6 +168,7 @@ export const useReadContract = () => {
     getFreeRaceCount,
     getTournamentRaceCount,
     getPlayerInfo,
+    getRandomWords,
     getRaceInfo,
   };
 };

@@ -51,11 +51,14 @@ a {
 }
 
 .game-container {
+  flex: 1;
+  overflow: auto;
+  overflow-x: hidden;
   width: calc(100% - 2rem);
   height: calc(100vh - 77px - 1rem - 2.5rem);
   margin: auto;
+  padding-top: "2rem";
   font-size: 17px;
-  /* padding-left: 8rem; */
 }
 
 .game-container-iphone {
@@ -83,7 +86,6 @@ a {
 @media (width < 1500px) {
   .game-container {
     width: 98%;
-    padding-left: 3rem;
   }
   .road-bg-image {
     width: 270px;
@@ -93,7 +95,6 @@ a {
 @media (width < 1000px) {
   .game-container {
     height: calc(100vh - 77px - 1rem);
-    padding-left: 0;
   }
   .subtitle {
     font-size: 1rem;

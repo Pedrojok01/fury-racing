@@ -22,7 +22,7 @@ const CustomLayout: FC<CustomLayoutProps> = ({ children }) => {
 
       <Header />
 
-      <Box as="main" flex={1} overflow={"auto"} h={`calc(100vh - 77px - 1rem - 2.5rem)`} overflowX={"hidden"}>
+      <Box as="main" className="game-container">
         {children}
       </Box>
 

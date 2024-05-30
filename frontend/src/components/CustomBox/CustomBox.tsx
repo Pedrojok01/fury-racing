@@ -11,7 +11,7 @@ const CustomBox: FC<CustomBoxProps> = ({ children }) => {
 
   return (
     <Box
-      p={5}
+      p={4}
       shadow="md"
       borderWidth="1px"
       borderRadius="12px"

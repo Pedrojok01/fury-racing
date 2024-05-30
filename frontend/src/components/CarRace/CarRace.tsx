@@ -22,7 +22,6 @@ import {
   TransformNode,
   Vector3,
 } from "@babylonjs/core";
-import { Box } from "@chakra-ui/react";
 
 import { decorations, tracks } from "@/data";
 import "@babylonjs/loaders/glTF";
@@ -424,11 +423,7 @@ const CarRace: FC = () => {
     });
   }, [raceInfo]);
 
-  return (
-    <Box w={"70vw"}>
-      <canvas ref={ref} style={{ width: "100%", height: "100%" }} />
-    </Box>
-  );
+  return <canvas ref={ref} style={{ width: "100%", height: "100%" }} />;
 };
 
 export default CarRace;

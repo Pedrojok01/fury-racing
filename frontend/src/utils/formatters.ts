@@ -34,3 +34,21 @@ export const convertMillisecondsToReadableTime = (milliseconds: number): string 
 
   return `${minutes}m ${seconds}s ${ms}ms`;
 };
+
+export const calculateBaseLuck = (randomNumber: bigint): number => {
+  const modResult = randomNumber % 101n;
+  const dividedResult = modResult / 10n;
+  return Number(dividedResult) - 5;
+};
+
+export const raceModeToInt: { [key in RaceMode]: number } = {
+  SOLO: 0,
+  FREE: 1,
+  TOURNAMENT: 2,
+};
+
+export const formatLuck = (luck: number): string => {
+  if (luck > 0) return `+${luck}%`;
+  if (luck < 0) return `${luck}%`;
+  return "0%";
+};

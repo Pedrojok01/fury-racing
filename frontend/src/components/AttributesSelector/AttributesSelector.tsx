@@ -12,6 +12,7 @@ import { t } from "@/utils/i18";
 
 import { CustomBox } from "../CustomBox";
 import { CustomToolTip } from "../CustomToolTip";
+import { LuckBubble } from "../LuckBuble";
 
 const attributeLabels: { [key in keyof CarAttributes]: string } = {
   reliability: t("selection.attributesDescription.reliability"),
@@ -115,20 +116,7 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
                     </StatLabel>
                     <StatNumber fontSize={isMobile ? "medium" : "large"}>{value}</StatNumber>
                     {key !== "luck" && (
-                      <StatNumber
-                        fontSize="0.6em"
-                        fontWeight={600}
-                        color={"white"}
-                        backgroundColor="rgba(114, 207, 66)"
-                        borderRadius="50%"
-                        display="inline-block"
-                        width={isMobile ? "2.4em" : "2.8em"}
-                        height={isMobile ? "2.4em" : "2.8em"}
-                        lineHeight={isMobile ? "2.4em" : "2.8em"}
-                        textAlign="center"
-                      >
-                        {`${getLuckPercentage(attributes.luck)}%`}
-                      </StatNumber>
+                      <LuckBubble value={`${getLuckPercentage(attributes.luck)}%`} color="var(--secondary-color)" />
                     )}
                   </HStack>
                 </Stat>

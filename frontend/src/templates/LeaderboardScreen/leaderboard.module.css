@@ -1,7 +1,7 @@
 .leaderboard {
   display: flex;
   justify-content: flex-start;
-  height: 100%;
+  height: inherit;
   align-items: center;
   padding: 20px;
   width: 90%;

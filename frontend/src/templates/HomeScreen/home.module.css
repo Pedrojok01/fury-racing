@@ -1,8 +1,12 @@
 .container {
   display: flex;
+  height: inherit;
   width: 80%;
+  align-items: center;
+  align-content: center;
   justify-content: space-between;
   margin: auto;
+  padding-left: 8rem;
 }
 
 .subContainer {
@@ -32,6 +36,7 @@
 @media (width < 1200px) {
   .container {
     width: 85%;
+    padding-left: 3rem;
   }
 
   .title {
@@ -48,6 +53,7 @@
   .container {
     width: 100%;
     text-align: center;
+    padding-left: 0;
   }
   .subContainer {
     width: 100%;

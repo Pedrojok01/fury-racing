@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
-import { Button, Center, VStack, Wrap, Text } from "@chakra-ui/react";
+import { Button, Center, VStack, Wrap, Text, Flex } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { isMobile } from "react-device-detect";
 
@@ -88,10 +88,16 @@ const SelectionScreen: FC = () => {
   );
 
   return (
-    <Center p={isMobile ? 0 : "2rem"} h={isWaiting ? "100%" : "auto"}>
-      <Wrap w={"100%"} direction="row" justify="space-between" gap={0}>
-        {isWaiting ? <WaitingScreen /> : mainContent}
-      </Wrap>
+    <Center py={isMobile ? "0.5rem" : "1rem"} h="inherit" w="100%">
+      {isWaiting ? (
+        <Flex h="inherit" w="inherit" alignContent="center" alignItems="center" justifyContent="center">
+          <WaitingScreen />
+        </Flex>
+      ) : (
+        <Wrap w={"100%"} h={"100%"} direction="row" justify="space-between" gap={0}>
+          {mainContent}
+        </Wrap>
+      )}
     </Center>
   );
 };

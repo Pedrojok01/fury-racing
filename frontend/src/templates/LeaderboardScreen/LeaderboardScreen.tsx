@@ -22,7 +22,7 @@ const LeaderboardScreen: FC = () => {
   }, [leaderboard, setDataset]);
 
   return (
-    <Center h={"100%"}>
+    <Center h={"inherit"}>
       <VStack className={styles.leaderboard}>
         <h1 className={styles.leaderboardTitle}>LEADERBOARD</h1>
 

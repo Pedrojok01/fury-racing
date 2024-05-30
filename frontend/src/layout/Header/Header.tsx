@@ -42,7 +42,7 @@ const Header: FC = () => {
   );
 
   return (
-    <Box as="header" flex={3}>
+    <Box as="header">
       {!isMobile && (
         <HStack paddingInline={"1rem"} position="sticky" top={0} zIndex={10} justifyContent={"left"}>
           <Link as={NextLink} href="/" textDecoration={"none"} w={"100%"} justifyContent={"left"}>

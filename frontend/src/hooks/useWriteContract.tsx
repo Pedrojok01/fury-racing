@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from "react";
 
 import { getContract, zeroAddress, type TransactionReceipt } from "viem";
-import { usePublicClient, useWalletClient, useWatchContractEvent } from "wagmi";
+import { usePublicClient, useWalletClient } from "wagmi";
 
 import { RACING_CONTRACT } from "@/data";
 import { useGameStates } from "@/stores";
@@ -34,15 +34,6 @@ export const useWriteContract = () => {
   const racingInstance = useMemo(() => {
     return client ? getContract({ address: RACING_CONTRACT.address, abi: RACING_CONTRACT.ABI, client }) : null;
   }, [client]);
-
-  useWatchContractEvent({
-    address: RACING_CONTRACT.address,
-    abi: RACING_CONTRACT.ABI,
-    eventName: "RandomnessReceived",
-    onLogs(logs) {
-      console.log("RandomnessReceived!", logs);
-    },
-  });
 
   /* Join Race Handler:
    *********************/

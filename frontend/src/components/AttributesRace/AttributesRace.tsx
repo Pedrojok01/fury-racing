@@ -21,8 +21,7 @@ const AttributesRace: FC = () => {
   const { raceInfo, luck, attributes } = useGameStates();
   const { width } = useWindowSize();
 
-  const extraLuck = address === raceInfo?.player1 ? luck.player1 : luck.player2;
-
+  const extraLuck = address?.toLowerCase() === raceInfo?.player1?.toLowerCase() ? luck.player1 : luck.player2;
   const luckPercentage = getLuckPercentage(attributes.luck);
   const totalAdjustment = Number(luckPercentage) + extraLuck;
 

@@ -29,15 +29,14 @@ import { useGameStates } from "@/stores";
 import { convertMillisecondsToReadableTime, getEllipsisTxt } from "@/utils/formatters";
 
 interface ResultModalProps {
-  raceInfo: RaceInfo;
   isWinner: boolean;
-  mode: RaceMode;
+  raceInfo: RaceInfo;
 }
 
-const ResultModal: FC<ResultModalProps> = ({ raceInfo, isWinner, mode }) => {
+const ResultModal: FC<ResultModalProps> = ({ isWinner, raceInfo }) => {
   const { width, height } = useWindowSize();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { reset } = useGameStates();
+  const { mode, reset } = useGameStates();
   const { address } = useAccount();
   const { getPlayerInfo } = useReadContract();
   const [playerScore, setPlayerScore] = useState<number | null>(null);

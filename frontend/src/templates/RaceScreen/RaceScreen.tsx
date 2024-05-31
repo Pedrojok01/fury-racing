@@ -4,9 +4,11 @@ import { Center, Flex, HStack } from "@chakra-ui/react";
 
 import { AttributesRace, CarRace, ResultModal } from "@/components";
 import { useRace } from "@/hooks";
+import { useGameStates } from "@/stores";
 
 const RaceScreen: FC = () => {
-  const { raceInfo, mode, hasRaceFinished, isWinner } = useRace();
+  const { raceInfo } = useGameStates();
+  const { hasRaceFinished, isWinner } = useRace();
 
   return (
     <>
@@ -21,7 +23,7 @@ const RaceScreen: FC = () => {
         </HStack>
       </Center>
 
-      {hasRaceFinished && raceInfo && <ResultModal raceInfo={raceInfo} isWinner={!!isWinner} mode={mode ?? "SOLO"} />}
+      {hasRaceFinished && raceInfo && <ResultModal isWinner={!!isWinner} raceInfo={raceInfo} />}
     </>
   );
 };

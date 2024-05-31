@@ -22,7 +22,9 @@
   - [Install all package dependencies:](#install-all-package-dependencies)
   - [Add your API keys in the .env file:](#add-your-api-keys-in-the-env-file)
   - [To start Fury Racing:](#to-start-fury-racing)
-- [Credits, asset attributions](#credits-asset-attributions)
+- [Credits](#credits)
+  - [Asset attributions:](#asset-attributions)
+  - [Music attributions:](#music-attributions)
 
 ## Description:
 
@@ -175,7 +177,9 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Credits, asset attributions
+## Credits
+
+### Asset attributions:
 
 This work is based on:
 
@@ -197,6 +201,14 @@ This work is based on:
 - [Farm Field (Pure Sky)](https://polyhaven.com/a/farm_field_puresky) by [Dimitrios Savva](https://polyhaven.com/all?a=Dimitrios%20Savva), [Jarod Guest](https://polyhaven.com/all?a=Jarod%20Guest) licensed under [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - [Drakensberg Solitary Mountain (Pure Sky)](https://polyhaven.com/a/drakensberg_solitary_mountain_puresky) by [Dimitrios Savva](https://polyhaven.com/all?a=Dimitrios%20Savva), [Jarod Guest](https://polyhaven.com/all?a=Jarod%20Guest) licensed under [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - [The colour of the sky from Gaia’s Early Data Release 3](https://www.esa.int/ESA_Multimedia/Images/2020/12/The_colour_of_the_sky_from_Gaia_s_Early_Data_Release_32) from the [European Space Agency](https://www.esa.int/) licensed under [CC BY-SA 3.0 IGO](https://creativecommons.org/licenses/by-sa/3.0/igo/)
+
+### Music attributions:
+
+The music in the game is free for use under the [Pixabay Content License](https://pixabay.com/fr/service/license-summary/).
+
+- <i>Gym Phonk</i> by **dopestuff**: https://pixabay.com/music/beats-gym-phonk-187854/
+- <i>Night Phonk</i> by **Artiss22**: https://pixabay.com/music/upbeat-night-phonk-203960/
+- <i>The Final Race</i> by **Audiorezout**: https://pixabay.com/music/adventure-the-final-race-epic-sport-action-trailer-cinematic-music-198690/
 
 <br></br>
 

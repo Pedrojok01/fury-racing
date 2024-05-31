@@ -21,7 +21,7 @@ export const useRace = () => {
       }
     };
 
-    const intervalId = setInterval(fetchLuck, 3000); // fetchLuck every 3 seconds
+    const intervalId = setInterval(fetchLuck, 5000); // fetchLuck every 3 seconds
 
     return () => clearInterval(intervalId);
   }, [raceId, mode, getRandomWords, setLuck]);

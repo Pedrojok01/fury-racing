@@ -111,20 +111,17 @@ export const useReadContract = () => {
 
   /* Get chainlink random words :
    *****************************/
-  const getRandomWords = useCallback(
-    async (raceId: bigint, mode: RaceMode): Promise<number[]> => {
-      if (!racingInstance) return [];
+  const getRandomWords = async (raceId: bigint, mode: RaceMode): Promise<number[]> => {
+    if (!racingInstance) return [];
 
-      try {
-        const words = (await racingInstance.read.getRandomWords([raceId, raceModeToInt[mode]])) as [bigint, bigint];
-        return words.map((word) => calculateBaseLuck(word));
-      } catch (error: unknown) {
-        logError(error);
-        return [];
-      }
-    },
-    [racingInstance],
-  );
+    try {
+      const words = (await racingInstance.read.getRandomWords([raceId, raceModeToInt[mode]])) as [bigint, bigint];
+      return words.map((word) => calculateBaseLuck(word));
+    } catch (error: unknown) {
+      logError(error);
+      return [];
+    }
+  };
 
   /* Get race info for raceId :
    *****************************/

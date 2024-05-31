@@ -17,7 +17,9 @@
   - [Requirements](#requirements)
   - [Installation](#installation)
   - [Quickstart](#quickstart)
+  - [Chainlink VRF and Functions Subscriptions](#chainlink-vrf-and-functions-subscriptions)
   - [Deployment](#deployment)
+  - [Chainlink Automation](#chainlink-automation)
 
 ## Description:
 
@@ -36,9 +38,10 @@ The smart contracts for Fury Racing have been implemented in Solidity with the h
 Chainlink features are leveraged in two ways:
 
 1. [**Chainlink VRF V2.5**](https://docs.chain.link/vrf): to generate random numbers for the luck attributes;
-2. [**Chainlink Functions**](https://docs.chain.link/chainlink-functions): to query the backend for the race results (the time per player based on their car attributes).
+2. [**Chainlink Functions**](https://docs.chain.link/chainlink-functions): to query the backend for race results (the time per player based on their car attributes) as well as for weather conditions converted to a percentage;
+3. [**Chainlink Automation**](https://automation.chain.link/fuji): to automate the updates of each circuit's weather in the smart contract every hour.
 
-Thanks to Chainlink, the entire logic can stay on-chain and transparent, while the heavy calculations are done off-chain. This allows for a better user experience and a more secure and gas-efficient contract.
+Thanks to Chainlink, the entire logic can stay on-chain and transparent, while the heavy calculations are done off-chain. This allows for more transparency and a more secure, gas-efficient contract. Automation also eliminates the need for a third party to update the weather conditions, removing the requirement to store a private key at the same time.
 
 ## Getting Started
 
@@ -104,6 +107,17 @@ make coverage
 make format
 ```
 
+### Chainlink VRF and Functions Subscriptions
+
+Before deploying the contracts, you will need to create your subscriptions to get your subscription IDs. Just follow the instructions for each service:
+
+- Chainlink VRF: https://vrf.chain.link/
+- Chainlink Functions: https://functions.chain.link/
+
+Add your contract as a consumer, then fund the subscription with some LINK tokens. You can get some testnet LINK tokens from the Chainlink Faucet: https://faucets.chain.link/
+
+Finally, once you're done setting up the subscriptions, you can update the contract with the new subscription IDs:
+
 ### Deployment
 
 When you are ready to deploy the contracts, first ensure that you have updated the values in the `scripts/deployerTestnet.sol` file to match your Chainlink VRF and Functions Subscriptions.
@@ -130,7 +144,15 @@ make CatapulTest
 
 You should see your contracts address in the console, and a link to the explorer with your contracts verified!
 
-And, that's it! You are ready to start racing!
+### Chainlink Automation
+
+Chainlink Automation setup is a bit different since you must have your contract address to set the function that you want to call. Once you have the contract address, you can follow the instructions there:
+
+- Chainlink Automation: https://automation.chain.link/
+
+Once that's done, don't forget to set the `forwarder` address to your `Upkeep address` in your contract to make sure that only the Chainlink Automation can update the weather conditions.
+
+And... that's it! You are ready to start racing!
 
 <br></br>
 

@@ -3,24 +3,26 @@ import { type FC } from "react";
 import { VStack, Box, HStack, StatLabel, StatNumber, Stat, Badge } from "@chakra-ui/react";
 import Image from "next/image";
 import { isMobile } from "react-device-detect";
+import { useAccount } from "wagmi";
 
 import { CustomBox, LuckBubble } from "@/components";
 import { images } from "@/data";
 import { useWindowSize } from "@/hooks";
+import { useGameStates } from "@/stores";
 import { formatLuck, getLuckPercentage } from "@/utils/formatters";
-
-interface AttributesRaceProps {
-  attributes: CarAttributes;
-  extraLuck: number;
-}
 
 const calculateAdjustedValue = (value: number, adjustment: number): number => {
   const adjustmentFactor = 1 + adjustment / 100;
   return Number((value * adjustmentFactor).toFixed(2));
 };
 
-const AttributesRace: FC<AttributesRaceProps> = ({ attributes, extraLuck }) => {
+const AttributesRace: FC = () => {
+  const { address } = useAccount();
+  const { raceInfo, luck, attributes } = useGameStates();
   const { width } = useWindowSize();
+
+  const extraLuck = address === raceInfo?.player1 ? luck.player1 : luck.player2;
+
   const luckPercentage = getLuckPercentage(attributes.luck);
   const totalAdjustment = Number(luckPercentage) + extraLuck;
 

@@ -147,14 +147,13 @@ export const useWriteContract = () => {
           if (raceInfo.player2 !== zeroAddress) {
             onPlayer2Joined();
             clearInterval(interval);
-            setIsWaiting(false);
           }
         } catch (error: unknown) {
           logError(error);
         }
       }, 2000); // Check every 2 seconds
     },
-    [racingInstance, publicClient, mode, setIsWaiting],
+    [racingInstance, publicClient, mode],
   );
 
   return {

@@ -12,6 +12,8 @@ type GameStates = {
   setRemainingPoints: (remainingPoints: number) => void;
   isWaiting: boolean;
   setIsWaiting: (isWaiting: boolean) => void;
+  luck: { player1: number; player2: number };
+  setLuck: (luck: { player1: number; player2: number }) => void;
   betAmount: bigint;
   setBetAmount: (betAmount: bigint) => void;
   loading: boolean;
@@ -50,6 +52,8 @@ const useGameStates = create<GameStates>((set) => ({
   setRemainingPoints: (remainingPoints) => set({ remainingPoints }),
   isWaiting: false,
   setIsWaiting: (isWaiting) => set({ isWaiting }),
+  luck: { player1: 0, player2: 0 },
+  setLuck: (luck) => set({ luck }),
   betAmount: 0n,
   setBetAmount: (betAmount) => set({ betAmount }),
   loading: false,
@@ -69,6 +73,7 @@ const useGameStates = create<GameStates>((set) => ({
       mode: undefined,
       remainingPoints: 40,
       isWaiting: false,
+      luck: { player1: 0, player2: 0 },
       loading: false,
       raceId: null,
       raceInfo: null,

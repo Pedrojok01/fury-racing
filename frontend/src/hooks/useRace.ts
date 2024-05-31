@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { useAccount } from "wagmi";
 
@@ -7,9 +7,8 @@ import { useGameStates } from "@/stores";
 
 export const useRace = () => {
   const { address } = useAccount();
-  const { raceId, raceInfo, mode, attributes } = useGameStates();
+  const { raceId, raceInfo, mode, attributes, setLuck } = useGameStates();
   const { getRaceInfo, getRandomWords } = useReadContract();
-  const [luck, setLuck] = useState({ player1: 0, player2: 0 });
 
   useEffect(() => {
     if (!raceId || !mode) return;
@@ -25,7 +24,7 @@ export const useRace = () => {
     const intervalId = setInterval(fetchLuck, 3000); // fetchLuck every 3 seconds
 
     return () => clearInterval(intervalId);
-  }, [raceId, mode, getRandomWords]);
+  }, [raceId, mode, getRandomWords, setLuck]);
 
   // Fetch race result after 30 seconds, then every 10 seconds
   useEffect(() => {
@@ -55,5 +54,5 @@ export const useRace = () => {
     ((address === raceInfo.player1 && raceInfo.player1Time < raceInfo.player2Time) ||
       (address === raceInfo.player2 && raceInfo.player2Time < raceInfo.player1Time));
 
-  return { address, raceId, raceInfo, mode, attributes, luck, hasRaceFinished, isWinner };
+  return { raceId, raceInfo, mode, attributes, hasRaceFinished, isWinner };
 };

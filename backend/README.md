@@ -26,7 +26,7 @@ The backend part of Fury Racing is quite small, so it has been implemented using
 
 - **Leaderboard**: as the leaderboard requires reading a lot of data from the blockchain, as well as sorting those data, it was both simpler and more efficient to implement it as a backend function, leveraging multicall to reduce the number of requests to the node provider.
 - **Race Results**: The time generated for each player based on their selected attributes is also handled in the Lambda function. This endpoint is the heart of the backend and is directly queried by the smart contracts when needed via Chainlink Functions.
-- **Weather**: The weather is also handled by the backend. The weather for each track is stored on-chain in the smart contracts. A cron job allows to update the data every hour so the weather is almost in real-time. Chainlink Automation could be a good replacement for this cron job in the future.
+- **Weather**: The weather for each track is stored on-chain in the smart contracts. The weather is fetched and converted into a percentage by the backend, then a Chainlink Function is in charge of querying the API endpoint. Chainlink Automation has been implemented to trigger an update every hour so the weather is almost in real-time.
 
 ## Car Attributes, Track Data, and Time Calculation:
 
@@ -161,7 +161,7 @@ The main technologies used in the backend are:
 - **Viem**: to communicate with the smart contracts
 - **AWS Lambda**: to host the functions
 - **Serverless Framework**: to deploy the functions
-- **CloudWatch BridgeEvents**: to schedule the cron jobs and update the weather every hour
+- **Chainlink Functions & Chainlink Automation**: to schedule the cron jobs and update the weather every hour
 
 ## Getting Started
 

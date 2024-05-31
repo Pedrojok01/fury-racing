@@ -23,7 +23,7 @@
 
 The Racing contract is currently deployed and verified on **Avalanche Fuji** at the following address:
 
-[0xE9cdc9A02729C8ee79aF4951c964c9A217e42BeC](https://testnet.snowscan.xyz/address/0xE9cdc9A02729C8ee79aF4951c964c9A217e42BeC)
+[0x143989DeA4CdB29b452b241eF3134d2554E583Bc](https://testnet.snowscan.xyz/address/0x143989DeA4CdB29b452b241eF3134d2554E583Bc)
 
 The smart contracts for Fury Racing have been implemented in Solidity with the help of the [Foundry](https://book.getfoundry.sh/) framework. All the critical features are executed on-chain and handled directly in the contracts. They have been designed with the following goals in mind:
 

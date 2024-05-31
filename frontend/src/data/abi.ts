@@ -138,6 +138,7 @@ export const RACING_ABI = [
         components: [
           { name: "fulfilled", type: "bool", internalType: "bool" },
           { name: "exists", type: "bool", internalType: "bool" },
+          { name: "requestType", type: "uint8", internalType: "enum IRacing.RequestType" },
           { name: "results", type: "uint256[]", internalType: "uint256[]" },
         ],
       },
@@ -392,6 +393,13 @@ export const RACING_ABI = [
   },
   {
     type: "function",
+    name: "requestWeatherUpdate",
+    inputs: [],
+    outputs: [{ name: "_requestId", type: "bytes32", internalType: "bytes32" }],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "s_vrfCoordinator",
     inputs: [],
     outputs: [{ name: "", type: "address", internalType: "contract IVRFCoordinatorV2Plus" }],
@@ -436,11 +444,8 @@ export const RACING_ABI = [
   { type: "function", name: "unpause", inputs: [], outputs: [], stateMutability: "nonpayable" },
   {
     type: "function",
-    name: "updateWeatherDataForCircuit",
-    inputs: [
-      { name: "circuitIndex", type: "uint256", internalType: "uint256" },
-      { name: "data", type: "uint256", internalType: "uint256" },
-    ],
+    name: "updateForwarder",
+    inputs: [{ name: "_forwarder", type: "address", internalType: "address" }],
     outputs: [],
     stateMutability: "nonpayable",
   },
@@ -473,6 +478,15 @@ export const RACING_ABI = [
       { name: "raceId", type: "uint256", indexed: true, internalType: "uint256" },
       { name: "winner", type: "address", indexed: false, internalType: "address" },
       { name: "loser", type: "address", indexed: false, internalType: "address" },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "ForwarderUpdated",
+    inputs: [
+      { name: "newForwarder", type: "address", indexed: false, internalType: "address" },
+      { name: "oldForwarder", type: "address", indexed: false, internalType: "address" },
     ],
     anonymous: false,
   },
@@ -600,9 +614,21 @@ export const RACING_ABI = [
     inputs: [{ name: "account", type: "address", indexed: false, internalType: "address" }],
     anonymous: false,
   },
+  {
+    type: "event",
+    name: "WeatherResultFulfilled",
+    inputs: [
+      { name: "requestId", type: "bytes32", indexed: true, internalType: "bytes32" },
+      { name: "values", type: "uint256[]", indexed: false, internalType: "uint256[]" },
+    ],
+    anonymous: false,
+  },
   { type: "error", name: "ChainlinkFeed__InvalidCircuitIndex", inputs: [] },
+  { type: "error", name: "ChainlinkFeed__InvalidForwarder", inputs: [] },
   { type: "error", name: "ChainlinkFeed__InvalidFunctionRequestId", inputs: [] },
   { type: "error", name: "ChainlinkFeed__InvalidRandomRequestId", inputs: [] },
+  { type: "error", name: "ChainlinkFeed__OnlyForwarder", inputs: [] },
+  { type: "error", name: "ChainlinkFeed__UnknownResquestType", inputs: [] },
   { type: "error", name: "EmptyArgs", inputs: [] },
   { type: "error", name: "EmptySource", inputs: [] },
   { type: "error", name: "EnforcedPause", inputs: [] },

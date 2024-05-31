@@ -132,15 +132,16 @@ contract ChainlinkFeedTest is BaseTestSetup {
     }
 
     function testFulfillRequest() public {
-        vm.startPrank(player1);
         uint256 circuit = 1;
         uint256 weather = 17;
+        uint256 raceId = 1;
+        RaceMode mode = RaceMode.FREE;
+        uint256 requestType = 0;
+
+        vm.startPrank(player1);
         PlayerAttributes[] memory attributes = new PlayerAttributes[](2);
         attributes[0] = attributesAfterLuck1;
         attributes[1] = attributesAfterLuck2;
-
-        uint256 raceId = 1;
-        RaceMode mode = RaceMode.FREE;
 
         bytes32 requestId = racing.requestRaceResult(circuit, raceId, weather, mode, attributes);
 
@@ -155,10 +156,34 @@ contract ChainlinkFeedTest is BaseTestSetup {
         FunctionsRequests memory request = racing.getFunctionsRequestFromID(requestId);
         assert(request.exists);
         assert(request.fulfilled);
+        assertEq(uint256(request.requestType), requestType);
         assertEq(request.results[0], raceResults[0]);
         assertEq(request.results[1], raceResults[1]);
 
         vm.stopPrank();
+    }
+
+    function testFulfillWeatherRequest() public {
+        uint256 requestType = 1;
+        uint256 weatherResult = 77;
+
+        vm.prank(owner);
+        racing.updateForwarder(forwarder);
+
+        assertEq(forwarder, racing.forwarder());
+
+        vm.prank(forwarder);
+        bytes32 requestId = racing.requestWeatherUpdate();
+
+        // Fulfill the request
+        racing._fulfillRequest(requestId, abi.encode(weatherResult), "");
+
+        // Verify the function behavior
+        FunctionsRequests memory request = racing.getFunctionsRequestFromID(requestId);
+        assert(request.exists);
+        assert(request.fulfilled);
+        assertEq(uint256(request.requestType), requestType);
+        assertEq(request.results[0], weatherResult);
     }
 
     function testGetRandomWords() public {
@@ -211,7 +236,6 @@ contract ChainlinkFeedTest is BaseTestSetup {
         randomWords[1] = uint256(keccak256(abi.encode(block.timestamp, 1)));
 
         uint256 circuit = 1;
-        uint256 weather = 17;
         uint256 raceId = 1;
         RaceMode mode = RaceMode.FREE;
 

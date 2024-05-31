@@ -49,8 +49,7 @@ contract RacingTest is BaseTestSetup {
 
         // Move forward in time by one week and trigger prize pool distribution
         vm.warp(block.timestamp + 1 weeks + 1000);
-        vm.prank(owner);
-        racing.updateWeatherDataForCircuit(1, 75);
+        racing._updateWeatherDataForCircuit(1, 75);
 
         // Check the values after a week and distribution
         (week, playerAmount) = racing.getWeekAndPlayerAmount();
@@ -405,8 +404,7 @@ contract RacingTest is BaseTestSetup {
             player1.balance > player2.balance ? player1.balance : player2.balance;
         address topPlayer = player1.balance > player2.balance ? player1 : player2;
 
-        vm.prank(owner);
-        racing.updateWeatherDataForCircuit(1, 17); // Trigger prize pool distribution
+        racing._updateWeatherDataForCircuit(1, 17); // Trigger prize pool distribution
 
         // Verify that the prize pool was distributed to the top player
         assertEq(topPlayer.balance, initialTopPlayerBalance + initialBalances.prizePool);

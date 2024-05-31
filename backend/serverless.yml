@@ -17,10 +17,6 @@ functions:
       - http:
           path: api/races/leaderboard
           method: get
-
-  updateWeather:
-    handler: handler.updateWeatherHandler
-    events:
-      - schedule:
-          name: weatherUpdateSchedule
-          rate: rate(1 hour)
+      - http:
+          path: api/races/weather
+          method: get

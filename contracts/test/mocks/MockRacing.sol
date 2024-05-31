@@ -139,7 +139,7 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         if (addressToPlayer[msg.sender].playerAddress == address(0)) {
             _createPlayer(msg.sender, RaceMode.TOURNAMENT, _attributes);
         } else {
-            updatePlayerAttributes(msg.sender, _attributes);
+            _updatePlayerAttributes(msg.sender, _attributes);
         }
 
         // 5% goes to weekly prize pool
@@ -215,12 +215,12 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         return soloRaces[raceId];
     }
 
-    function getRaceFromRaceID(uint256 raceId) public view returns (Race memory) {
-        return races[raceId];
-    }
-
     function getFreeRaceFromRaceID(uint256 raceId) public view returns (Race memory) {
         return freeRaces[raceId];
+    }
+
+    function getRaceFromRaceID(uint256 raceId) public view returns (Race memory) {
+        return races[raceId];
     }
 
     function getWeekAndPlayerAmount() public view returns (uint256, uint256) {
@@ -241,14 +241,6 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
     /*//////////////////////////////////////////////////////////////
                                 RESTRICTED
     //////////////////////////////////////////////////////////////*/
-
-    function updateWeatherDataForCircuit(uint256 circuitIndex, uint256 data) public onlyOwner {
-        Circuits memory circuit = _getCircuit(circuitIndex);
-        circuit.factors.weather = uint8(data);
-        circuits[circuitIndex - 1] = circuit;
-
-        _checkAndDistributePrizePool();
-    }
 
     function addCircuit(ExternalFactors memory factors, string memory name) public onlyOwner {
         Circuits memory _circuit =
@@ -282,6 +274,14 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
     /*//////////////////////////////////////////////////////////////
                                PRIVATE
     //////////////////////////////////////////////////////////////*/
+
+    function _updateWeatherDataForCircuit(uint256 circuitIndex, uint256 data) public override {
+        Circuits memory circuit = _getCircuit(circuitIndex);
+        circuit.factors.weather = uint8(data);
+        circuits[circuitIndex - 1] = circuit;
+
+        _checkAndDistributePrizePool();
+    }
 
     function _applyLuckFactor(
         PlayerAttributes memory _attributes,
@@ -474,7 +474,7 @@ contract MockRacing is Script, MockChainlinkFeed, Pausable, ReentrancyGuard {
         return circuits[index];
     }
 
-    function updatePlayerAttributes(address _player, PlayerAttributes memory _attributes) public {
+    function _updatePlayerAttributes(address _player, PlayerAttributes memory _attributes) public {
         addressToPlayer[_player].attributes = _attributes;
 
         if (weeklyBetPlayerAddressToIndex[weeklyTournamentCounter][_player] == 0) {

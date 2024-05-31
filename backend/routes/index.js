@@ -9,4 +9,6 @@ router.get("/data/:attributes", [param("attributes").notEmpty().isLength(36)], c
 
 router.get("/leaderboard", controller.leaderboard);
 
+router.get("/weather", controller.calculateWeather);
+
 module.exports = router;

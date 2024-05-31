@@ -1,37 +1,11 @@
-const { createWalletClient, http } = require("viem");
-const { privateKeyToAccount } = require("viem/accounts");
-const { avalancheFuji } = require("viem/chains");
 const { calculateWeatherScore } = require("../utils/calculateWeatherScore");
-const { CIRCUIT, RACING_CONTRACT } = require("../data/config");
+const { CIRCUIT } = require("../data/config");
 const HttpError = require("../models/http-error");
 
 const apiKey = process.env.WEATHER_API_KEY;
-const privateKey = process.env.PRIVATE_KEY;
-
-const updateWeatherDataForCircuit = async (weatherScore) => {
-  const client = createWalletClient({
-    chain: avalancheFuji,
-    transport: http(),
-  });
-  const account = privateKeyToAccount(privateKey);
-
-  try {
-    const hash = await client.writeContract({
-      address: RACING_CONTRACT.address,
-      abi: RACING_CONTRACT.abi,
-      functionName: "updateWeatherDataForCircuit",
-      args: [CIRCUIT.index, weatherScore],
-      account,
-    });
-    console.log(`Weather data updated successfully. Hash: ${hash}`);
-  } catch (error) {
-    console.error("Error updating weather data:", error);
-    throw new HttpError("Failed to update weather data on the blockchain.", 500);
-  }
-};
 
 const fetchWeatherData = async () => {
-  if (!apiKey || !privateKey) {
+  if (!apiKey) {
     console.error(`Some environment variables are missing.`);
     throw new HttpError("Environment variables are missing.", 500);
   }
@@ -78,21 +52,19 @@ const fetchWeatherData = async () => {
     },
   };
 
-  const weatherScore = calculateWeatherScore(filteredWeatherData);
-  console.log(`Weather score: ${weatherScore}`);
-
-  await updateWeatherDataForCircuit(weatherScore);
-
-  return weatherScore;
+  return calculateWeatherScore(filteredWeatherData);
 };
 
-const updateWeather = async (req, res, next) => {
+const calculateWeather = async (req, res, next) => {
   try {
-    await fetchWeatherData();
-    res?.status(200).json({ message: "Weather data updated successfully" });
+    const weatherScore = await fetchWeatherData();
+    console.log(`Weather score: ${weatherScore}`);
+    res
+      ?.status(200)
+      .json({ message: `Weather data calculated successfully: ${weatherScore}`, weatherScore: weatherScore });
   } catch (err) {
     next?.(err) ?? console.error(err);
   }
 };
 
-module.exports = { updateWeather };
+module.exports = { calculateWeather };

@@ -39,7 +39,10 @@ abstract contract MockChainlinkFeed is
     address public immutable ROUTER;
     uint64 public immutable FUNCTIONS_SUBSCRIPTION_ID;
     uint32 private constant FUNCTIONS_GAS_LIMIT = 300_000;
+    address public forwarder;
     bytes32 public immutable DON_ID;
+
+    uint256 weatherCounter = 0; // Used to simulate weather updates
 
     mapping(uint256 => RandomRequests) public requestIdToRandomRequests;
     mapping(bytes32 => FunctionsRequests) public requestIdToFunctionsRequests;
@@ -53,6 +56,15 @@ abstract contract MockChainlinkFeed is
     event RequestedRandomness(uint256 requestId, uint32 numWords);
     event RandomnessReceived(uint256 requestId, uint256[] randomWords);
     event RaceResultFulfilled(bytes32 indexed requestId, uint256[] values);
+    event WeatherResultFulfilled(bytes32 indexed requestId, uint256[] values);
+    event ForwarderUpdated(address newForwarder, address oldForwarder);
+
+    modifier onlyForwarder() {
+        if (msg.sender != forwarder) {
+            revert ChainlinkFeed__OnlyForwarder();
+        }
+        _;
+    }
 
     constructor(
         address _router,
@@ -150,9 +162,9 @@ abstract contract MockChainlinkFeed is
     function requestRaceResult(
         uint256 circuit,
         uint256 raceId,
-        uint256 weather,
+        uint256, // weather
         RaceMode mode,
-        PlayerAttributes[] memory attributes
+        PlayerAttributes[] memory // attributes
     )
         public
         returns (bytes32 _requestId)
@@ -160,12 +172,31 @@ abstract contract MockChainlinkFeed is
         // Logic modified for testing purposes: requestId hardcoded
         _requestId = keccak256(abi.encodePacked(raceId, mode, circuit));
 
-        requestIdToFunctionsRequests[_requestId] =
-            FunctionsRequests({ fulfilled: false, exists: true, results: new uint256[](0) });
+        requestIdToFunctionsRequests[_requestId] = FunctionsRequests({
+            fulfilled: false,
+            exists: true,
+            requestType: RequestType.RACE_RESULT,
+            results: new uint256[](0)
+        });
 
         requestIdToRaceMode[_requestId] = mode;
         requestIdToRaceId[_requestId] = raceId;
         raceIdModeToFunctionsRequestId[mode][raceId] = _requestId;
+
+        return _requestId;
+    }
+
+    function requestWeatherUpdate() public onlyForwarder returns (bytes32 _requestId) {
+        // Logic modified for testing purposes: requestId hardcoded
+        weatherCounter++;
+        _requestId = keccak256(abi.encodePacked(weatherCounter, RequestType.WEATHER_SCORE));
+
+        requestIdToFunctionsRequests[_requestId] = FunctionsRequests({
+            fulfilled: false,
+            exists: true,
+            requestType: RequestType.WEATHER_SCORE,
+            results: new uint256[](0)
+        });
 
         return _requestId;
     }
@@ -182,19 +213,43 @@ abstract contract MockChainlinkFeed is
         internal
         override
     {
-        if (!requestIdToFunctionsRequests[requestId].exists) {
+        FunctionsRequests memory _request = requestIdToFunctionsRequests[requestId];
+
+        if (!_request.exists) {
             revert ChainlinkFeed__InvalidFunctionRequestId();
         }
 
-        requestIdToFunctionsRequests[requestId].fulfilled = true;
+        _request.fulfilled = true;
 
-        // Decode the response bytes into an array of uint256 values
-        uint256[] memory values = abi.decode(response, (uint256[]));
-        requestIdToFunctionsRequests[requestId].results = values;
+        if (_request.requestType == RequestType.WEATHER_SCORE) {
+            uint256 weatherScore = abi.decode(response, (uint256));
+            _request.results = new uint256[](1);
+            _request.results[0] = weatherScore;
 
-        emit RaceResultFulfilled(requestId, values);
+            requestIdToFunctionsRequests[requestId] = _request;
+            _updateWeatherDataForCircuit(uint256(1), weatherScore);
+            emit WeatherResultFulfilled(requestId, _request.results);
+        } else if (_request.requestType == RequestType.RACE_RESULT) {
+            uint256[] memory values = abi.decode(response, (uint256[]));
+            _request.results = values;
+            requestIdToFunctionsRequests[requestId] = _request;
 
-        _finishRace(requestIdToRaceId[requestId], requestIdToRaceMode[requestId], values);
+            emit RaceResultFulfilled(requestId, values);
+
+            _finishRace(requestIdToRaceId[requestId], requestIdToRaceMode[requestId], values);
+        } else {
+            revert ChainlinkFeed__UnknownResquestType();
+        }
+    }
+
+    function updateForwarder(address _forwarder) public onlyOwner {
+        if (_forwarder == address(0)) {
+            revert ChainlinkFeed__InvalidForwarder();
+        }
+        address oldForwarder = forwarder;
+        forwarder = _forwarder;
+
+        emit ForwarderUpdated(_forwarder, oldForwarder);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -258,4 +313,6 @@ abstract contract MockChainlinkFeed is
     function _startRace(uint256[] memory words, uint256 raceId, RaceMode mode) public virtual;
 
     function _finishRace(uint256 raceId, RaceMode mode, uint256[] memory values) public virtual;
+
+    function _updateWeatherDataForCircuit(uint256 circuit, uint256 weatherScore) public virtual;
 }

@@ -21,6 +21,7 @@ contract BaseTestSetup is Test, IRacing {
     address public player1 = address(0x2);
     address public player2 = address(0x3);
     address public player3 = address(0x4);
+    address public forwarder = address(0x5);
 
     PlayerAttributes public attributes1;
     PlayerAttributes public attributes2;

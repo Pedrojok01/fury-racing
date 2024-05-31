@@ -1,9 +1,9 @@
 const { results } = require("./results");
 const { leaderboard } = require("./leaderboard");
-const { updateWeather } = require("./updateWeather");
+const { calculateWeather } = require("./calculateWeather");
 
 module.exports = {
   results,
   leaderboard,
-  updateWeather,
+  calculateWeather,
 };

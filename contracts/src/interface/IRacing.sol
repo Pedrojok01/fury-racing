@@ -118,6 +118,11 @@ interface IRacing {
                             CHAINLINK REQUESTS
     //////////////////////////////////////////////////////////////*/
 
+    enum RequestType {
+        RACE_RESULT,
+        WEATHER_SCORE
+    }
+
     struct RandomRequests {
         bool fulfilled;
         bool exists;
@@ -127,6 +132,7 @@ interface IRacing {
     struct FunctionsRequests {
         bool fulfilled;
         bool exists;
+        RequestType requestType;
         uint256[] results;
     }
 

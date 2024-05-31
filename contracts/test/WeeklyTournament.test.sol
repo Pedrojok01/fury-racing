@@ -52,8 +52,7 @@ contract RacingTest is BaseTestSetup {
         vm.warp(block.timestamp + 1 weeks + 1000);
 
         // Trigger weekly prize pool distribution
-        vm.prank(owner);
-        racing.updateWeatherDataForCircuit(1, 75);
+        racing._updateWeatherDataForCircuit(1, 75);
 
         // Verify prize pool distribution
         assertEq(
@@ -97,8 +96,7 @@ contract RacingTest is BaseTestSetup {
         vm.warp(block.timestamp + 1 weeks + 1000);
 
         // Trigger weekly prize pool distribution again
-        vm.prank(owner);
-        racing.updateWeatherDataForCircuit(1, 75);
+        racing._updateWeatherDataForCircuit(1, 75);
 
         // Verify prize pool distribution
         assertEq(

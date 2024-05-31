@@ -20,6 +20,10 @@ import { FunctionsSource } from "./FunctionsSource.sol";
  * | ------------------------- | -------- | ---------------------------------- |
  * | getRandomRequestFromID    | 073afa16 | getRandomRequestFromID(uint256)    |
  * | getFunctionsRequestFromID | ef747798 | getFunctionsRequestFromID(bytes32) |
+ * | getRandomWords            | 735323d2 | getRandomWords(uint256,uint8)      |
+ * | getRaceResults            | 254f7225 | getRaceResults(uint256,uint8)      |
+ * | requestWeatherUpdate      | df2fb6e6 | requestWeatherUpdate()             |
+ * | updateForwarder           | 2291237e | updateForwarder(address)           |
  */
 
 /**
@@ -47,6 +51,7 @@ abstract contract ChainlinkFeed is
     address internal immutable ROUTER;
     uint64 internal immutable FUNCTIONS_SUBSCRIPTION_ID;
     uint32 private constant FUNCTIONS_GAS_LIMIT = 300_000;
+    address private forwarder;
     bytes32 internal immutable DON_ID;
 
     mapping(uint256 => RandomRequests) private requestIdToRandomRequests;
@@ -61,6 +66,15 @@ abstract contract ChainlinkFeed is
     event RequestedRandomness(uint256 requestId, uint32 numWords);
     event RandomnessReceived(uint256 requestId, uint256[] randomWords);
     event RaceResultFulfilled(bytes32 indexed requestId, uint256[] values);
+    event WeatherResultFulfilled(bytes32 indexed requestId, uint256[] values);
+    event ForwarderUpdated(address newForwarder, address oldForwarder);
+
+    modifier onlyForwarder() {
+        if (msg.sender != forwarder) {
+            revert ChainlinkFeed__OnlyForwarder();
+        }
+        _;
+    }
 
     constructor(
         address _router,
@@ -192,12 +206,38 @@ abstract contract ChainlinkFeed is
         _requestId =
             _sendRequest(req.encodeCBOR(), FUNCTIONS_SUBSCRIPTION_ID, FUNCTIONS_GAS_LIMIT, DON_ID);
 
-        requestIdToFunctionsRequests[_requestId] =
-            FunctionsRequests({ fulfilled: false, exists: true, results: new uint256[](0) });
+        requestIdToFunctionsRequests[_requestId] = FunctionsRequests({
+            fulfilled: false,
+            exists: true,
+            requestType: RequestType.RACE_RESULT,
+            results: new uint256[](0)
+        });
 
         requestIdToRaceMode[_requestId] = mode;
         requestIdToRaceId[_requestId] = raceId;
         raceIdModeToFunctionsRequestId[mode][raceId] = _requestId;
+
+        return _requestId;
+    }
+
+    /**
+     * @notice Request the real-time weather score via Chainlink Functions
+     * Chainlink Automation will call this function every 1 hour
+     */
+    function requestWeatherUpdate() public onlyForwarder returns (bytes32 _requestId) {
+        FunctionsRequest.Request memory req;
+        req.initializeRequestForInlineJavaScript(FunctionsSource.getWeatherScore());
+
+        // Send the request and store the request ID
+        _requestId =
+            _sendRequest(req.encodeCBOR(), FUNCTIONS_SUBSCRIPTION_ID, FUNCTIONS_GAS_LIMIT, DON_ID);
+
+        requestIdToFunctionsRequests[_requestId] = FunctionsRequests({
+            fulfilled: false,
+            exists: true,
+            requestType: RequestType.WEATHER_SCORE,
+            results: new uint256[](0)
+        });
 
         return _requestId;
     }
@@ -216,25 +256,50 @@ abstract contract ChainlinkFeed is
         internal
         override
     {
-        if (!requestIdToFunctionsRequests[requestId].exists) {
+        FunctionsRequests memory _request = requestIdToFunctionsRequests[requestId];
+
+        if (!_request.exists) {
             revert ChainlinkFeed__InvalidFunctionRequestId();
         }
 
-        requestIdToFunctionsRequests[requestId].fulfilled = true;
+        _request.fulfilled = true;
 
-        uint256 combinedResult = abi.decode(response, (uint256));
-        uint256 value1 = combinedResult >> 128;
-        uint256 value2 = combinedResult & ((1 << 128) - 1);
+        if (_request.requestType == RequestType.WEATHER_SCORE) {
+            uint256 weatherScore = abi.decode(response, (uint256));
+            _request.results = new uint256[](1);
+            _request.results[0] = weatherScore;
 
-        uint256[] memory values = new uint256[](2);
-        values[0] = value1;
-        values[1] = value2;
+            requestIdToFunctionsRequests[requestId] = _request;
+            _updateWeatherDataForCircuit(uint256(1), weatherScore);
+            emit WeatherResultFulfilled(requestId, _request.results);
+        } else if (_request.requestType == RequestType.RACE_RESULT) {
+            uint256 combinedResult = abi.decode(response, (uint256));
+            uint256 value1 = combinedResult >> 128;
+            uint256 value2 = combinedResult & ((1 << 128) - 1);
 
-        requestIdToFunctionsRequests[requestId].results = values;
+            uint256[] memory values = new uint256[](2);
+            values[0] = value1;
+            values[1] = value2;
 
-        emit RaceResultFulfilled(requestId, values);
+            _request.results = values;
+            requestIdToFunctionsRequests[requestId] = _request;
 
-        _finishRace(requestIdToRaceId[requestId], requestIdToRaceMode[requestId], values);
+            emit RaceResultFulfilled(requestId, values);
+
+            _finishRace(requestIdToRaceId[requestId], requestIdToRaceMode[requestId], values);
+        } else {
+            revert ChainlinkFeed__UnknownResquestType();
+        }
+    }
+
+    function updateForwarder(address _forwarder) public onlyOwner {
+        if (_forwarder == address(0)) {
+            revert ChainlinkFeed__InvalidForwarder();
+        }
+        address oldForwarder = forwarder;
+        forwarder = _forwarder;
+
+        emit ForwarderUpdated(_forwarder, oldForwarder);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -315,4 +380,6 @@ abstract contract ChainlinkFeed is
     function _startRace(uint256[] memory words, uint256 raceId, RaceMode modes) internal virtual;
 
     function _finishRace(uint256 raceId, RaceMode mode, uint256[] memory values) internal virtual;
+
+    function _updateWeatherDataForCircuit(uint256 circuit, uint256 weatherScore) internal virtual;
 }

@@ -61,7 +61,7 @@ contract RacingTest is BaseTestSetup {
 
         // Only owner can update weather data
         vm.prank(racing.owner());
-        racing.updateWeatherDataForCircuit(circuitIndex, newWeatherData);
+        racing._updateWeatherDataForCircuit(circuitIndex, newWeatherData);
 
         Circuits memory updatedCircuit = racing._getCircuit(circuitIndex);
         assertEq(updatedCircuit.factors.weather, newWeatherData);

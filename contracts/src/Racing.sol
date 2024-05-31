@@ -18,12 +18,9 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.s
  * | ----------------------------------- | ---------- | --------------------------------------------
  * |
  * | joinSoloRace                        | 73197373   |
- * joinSoloRace((uint8,uint8,uint8,uint8,uint8,uint8,uint8,uint8),(uint8,uint8,uint8,uint8,uint8,uint8,uint8,uint8),uint256)
- * |
- * | joinFreeRace                        | 3436f847   |
- * joinFreeRace((uint8,uint8,uint8,uint8,uint8,uint8,uint8,uint8),uint256) |
- * | joinRace                            | 896caa4a   |
- * joinRace((uint8,uint8,uint8,uint8,uint8,uint8,uint8,uint8),uint256) |
+ * joinSoloRace((uint8,...),(uint8,u...),uint256) |
+ * | joinFreeRace                        | 3436f847   | joinFreeRace((uint8,...),uint256)            |
+ * | joinRace                            | 896caa4a   | joinRace((uint8,...),uint256)                |
  * | sponsorWeeklyPrizePool              | e68a37c5   | sponsorWeeklyPrizePool()                     |
  * | getSoloRaceFromRaceID               | eab8ff7a   | getSoloRaceFromRaceID(uint256)               |
  * | getFreeRaceFromRaceID               | ccb3d9ee   | getFreeRaceFromRaceID(uint256)               |
@@ -31,8 +28,6 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.s
  * | getWeekAndPlayerAmount              | 192e74c6   | getWeekAndPlayerAmount()                     |
  * | getPlayerAddressForWeeklyTournament | 3aaeb807   |
  * getPlayerAddressForWeeklyTournament(uint256,uint256) |
- * | updateWeatherDataForCircuit         | 9c7ae2db   | updateWeatherDataForCircuit(uint256,uint256)
- * |
  * | addCircuit                          | e0b2b785   |
  * addCircuit((uint8,uint8,uint16,uint8,uint16),string) |
  * | setBetAmount                        | 53a79d74   | setBetAmount(uint256)                        |
@@ -189,7 +184,7 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
         if (addressToPlayer[msg.sender].playerAddress == address(0)) {
             _createPlayer(msg.sender, RaceMode.TOURNAMENT, attributes);
         } else {
-            updatePlayerAttributes(msg.sender, attributes);
+            _updatePlayerAttributes(msg.sender, attributes);
         }
 
         // 5% goes to weekly prize pool
@@ -347,20 +342,6 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     //////////////////////////////////////////////////////////////*/
 
     /**
-     * @notice Allows to update the weather data for a circuit. Is also responsable for
-     * distributing the prize pool every week. Called every hour for each circuit.
-     * @param circuitIndex The index of the circuit.
-     * @param data The new weather data for the circuit. Uint from 00 to 99 to represent a percent.
-     */
-    function updateWeatherDataForCircuit(uint256 circuitIndex, uint256 data) public onlyOwner {
-        Circuits memory circuit = _getCircuit(circuitIndex);
-        circuit.factors.weather = uint8(data);
-        circuits[circuitIndex - 1] = circuit;
-
-        _checkAndDistributePrizePool();
-    }
-
-    /**
      * @notice Allows to add new circuits to the game.
      * @param factors The external factors for the circuit. (see IRacing interface)
      * @param name The name of the circuit.
@@ -413,6 +394,20 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
     /*//////////////////////////////////////////////////////////////
                                PRIVATE
     //////////////////////////////////////////////////////////////*/
+
+    /**
+     * @notice Allows to update the weather data for a circuit. Is also responsable for
+     * distributing the prize pool every week. Called every hour for each circuit.
+     * @param circuitIndex The index of the circuit.
+     * @param data The new weather data for the circuit. Uint from 00 to 99 to represent a percent.
+     */
+    function _updateWeatherDataForCircuit(uint256 circuitIndex, uint256 data) internal override {
+        Circuits memory circuit = _getCircuit(circuitIndex);
+        circuit.factors.weather = uint8(data);
+        circuits[circuitIndex - 1] = circuit;
+
+        _checkAndDistributePrizePool();
+    }
 
     /**
      * @notice Adjusts the player attributes based on the luck factor. The total luck factor
@@ -659,7 +654,12 @@ contract Racing is ChainlinkFeed, Pausable, ReentrancyGuard {
      * @param _player The player's address.
      * @param _attributes The player's attributes.
      */
-    function updatePlayerAttributes(address _player, PlayerAttributes memory _attributes) private {
+    function _updatePlayerAttributes(
+        address _player,
+        PlayerAttributes memory _attributes
+    )
+        private
+    {
         addressToPlayer[_player].attributes = _attributes;
 
         if (weeklyBetPlayerAddressToIndex[weeklyTournamentCounter][_player] == 0) {

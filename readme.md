@@ -87,7 +87,6 @@ Please refer to each folder's README file for more details as well as informatio
 - [x] Chainlink VRF V2.5
 - [x] Chainlink Functions
 - [x] Leaderboard
-- [ ] Chainlink Automation to update the weather
 - [ ] 5v5 Tournament mode
 - [ ] Add more circuits
 - [ ] Add more cars

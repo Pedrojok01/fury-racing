@@ -30,13 +30,13 @@ const Header: FC = () => {
   const menuIems = (
     <>
       <NextLink href="/mode" className={styles.menuItems} onClick={handlePlayClick}>
-        <Box>{t("menu.play")}</Box>
+        <Box className="text-shadow">{t("menu.play")}</Box>
       </NextLink>
       <NextLink href="/leaderboard" className={`${styles.menuItems} leaderboard`}>
-        <Box>{t("menu.leaderboard")}</Box>
+        <Box className="text-shadow">{t("menu.leaderboard")}</Box>
       </NextLink>
       <Link href={GITBOOK} className={styles.menuItems} isExternal rel="noopener noreferrer">
-        <Box>{t("menu.doc")}</Box>
+        <Box className="text-shadow">{t("menu.doc")}</Box>
       </Link>
     </>
   );

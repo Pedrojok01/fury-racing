@@ -29,17 +29,17 @@ const AttributesRace: FC = () => {
 
   return (
     <CustomBox>
-      <VStack gap={isMobile ? 1.5 : 5} w="100%" minW={"200px"}>
-        <HStack w="100%" position={"relative"} mb={5}>
+      <VStack gap={isMobile ? 1.5 : 5} w="100%" minW="200px">
+        <HStack w="100%" position="relative" mb={5}>
           {shouldDisplay && (
-            <HStack textAlign={"left"}>
+            <HStack textAlign="left">
               <Badge colorScheme="teal" fontSize={isMobile ? "0.7em" : "1em"} px={4} py={2} borderRadius="md">
                 RNG Luck: {formatLuck(extraLuck)}
               </Badge>
             </HStack>
           )}
           <HStack
-            position={"absolute"}
+            position="absolute"
             top={isMobile ? "-27px" : "-54px"}
             right={isMobile ? "-32px" : "-50px"}
             zIndex={20}
@@ -55,7 +55,7 @@ const AttributesRace: FC = () => {
             <Box key={key} w="100%">
               <Stat w="100%">
                 <HStack w="100%">
-                  <HStack textAlign={"left"} w="100%">
+                  <HStack textAlign="left" w="100%">
                     <StatLabel fontSize={isMobile ? "12px" : "16px"}>
                       {key.charAt(0).toUpperCase() + key.slice(1)}:
                     </StatLabel>
@@ -64,7 +64,7 @@ const AttributesRace: FC = () => {
                     </StatNumber>
                   </HStack>
 
-                  <HStack textAlign={"right"}>
+                  <HStack textAlign="right">
                     {shouldDisplay && (
                       <>
                         <LuckBubble value={`${luckPercentage}%`} color="var(--secondary-color)" />

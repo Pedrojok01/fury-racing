@@ -306,12 +306,10 @@ const CarRace: FC = () => {
         shadowGenerator.addShadowCaster(mesh);
       });
 
-      // -- Decoration shadows.
-      trackInfo.decoCloneMeshes.forEach(() => {
-        // Disabled for now. Costs too much performance.
-        // Re-add "mesh" as argument to enable.
-        //shadowGenerator.addShadowCaster(mesh);
-      });
+      // -- Decoration shadows. Disabled for now. Costs too much performance.
+      // trackInfo.decoCloneMeshes.forEach((mesh) => {
+      //   shadowGenerator.addShadowCaster(mesh);
+      // });
 
       shadowGenerator.useExponentialShadowMap = true;
       trackInfo["tiledGround"].receiveShadows = true;

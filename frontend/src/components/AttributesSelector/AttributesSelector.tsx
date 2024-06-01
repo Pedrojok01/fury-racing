@@ -1,11 +1,11 @@
-import { useCallback, useEffect, type FC } from "react";
+import { type FC } from "react";
 
 import { VStack, Text, Box, SimpleGrid, HStack, StatLabel, StatNumber, Stat } from "@chakra-ui/react";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import { isMobile } from "react-device-detect";
 
-import { useDebounce } from "@/hooks";
+import { useAttributes } from "@/hooks";
 import { useGameStates } from "@/stores";
 import { getLuckPercentage } from "@/utils/formatters";
 import { t } from "@/utils/i18";
@@ -30,41 +30,9 @@ interface AttributesSelectorProps {
   walktrough?: { attributes: string; luck: string };
 }
 
-const totalPoints = 40;
-
 const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, walktrough }) => {
-  const { attributes, remainingPoints, setAttributes, setRemainingPoints } = useGameStates();
-
-  const debouncedAttributes = useDebounce(attributes, 1000);
-
-  useEffect(() => {
-    setAttributes(defaultAttributes);
-  }, [defaultAttributes, setAttributes]);
-
-  useEffect(() => {
-    const totalUsedPoints = Object.values(debouncedAttributes).reduce((acc, cur) => acc + cur, 0);
-    setRemainingPoints(totalPoints - totalUsedPoints);
-  }, [debouncedAttributes, setRemainingPoints]);
-
-  const handleAttributeChange = useCallback(
-    (value: number, attribute: keyof CarAttributes) => {
-      setAttributes((prev) => {
-        const newValue = Math.max(1, Math.min(value, 10)); // Ensure values are within 1-10
-        const newAttributes = { ...prev, [attribute]: newValue };
-        const totalUsedPoints = Object.values(newAttributes).reduce((acc, cur) => acc + cur, 0);
-
-        if (totalUsedPoints <= totalPoints) {
-          return newAttributes;
-        }
-        return prev;
-      });
-    },
-    [setAttributes],
-  );
-
-  const handleSliderChange = useCallback((value: number, min: number, max: number) => {
-    return Math.max(min, Math.min(value, max));
-  }, []);
+  const { attributes, remainingPoints } = useGameStates();
+  const { handleAttributeChange, handleSliderChange } = useAttributes(defaultAttributes);
 
   const renderSlider = (key: keyof CarAttributes, value: number, min: number, max: number) => (
     <Box position="relative" py={2}>
@@ -94,8 +62,8 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
 
   return (
     <CustomBox>
-      <VStack spacing={5} w={"100%"}>
-        <HStack w={"100%"} justify={"space-between"} className={walktrough?.attributes}>
+      <VStack spacing={5} w="100%">
+        <HStack w="100%" justify={"space-between"} className={walktrough?.attributes}>
           <Text className="subtitle">{t("selection.subtitles.attributes")}</Text>
           <Text fontSize={isMobile ? "14px" : "17px"}>Remaining: {remainingPoints}</Text>
         </HStack>

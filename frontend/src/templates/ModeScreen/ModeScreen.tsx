@@ -26,9 +26,9 @@ const ModeScreen: FC = () => {
   }, [getBetAmount, getCurrentPrizePool]);
 
   return (
-    <Center h={"inherit"} width={"100%"} justifyContent={"center"}>
+    <Center h={"inherit"} w="100%" justifyContent="center">
       <VStack h={isMobile ? "100%" : "auto"} spacing={isMobile ? 5 : 10}>
-        <Text fontSize={isMobile ? "1.2rem" : "3rem"} fontWeight={"bold"} color={"var(--primary-color)"}>
+        <Text fontSize={isMobile ? "1.2rem" : "3rem"} fontWeight="bold" color="var(--primary-color)">
           {t("mode.subtitles")}
         </Text>
 

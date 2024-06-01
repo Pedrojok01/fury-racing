@@ -1,7 +1,7 @@
 {
   "common": {
     "title": "Fury Racing",
-    "description": "Onchain racing manager leveraging Chainlink VRF V2.5 and Chainlink Functions."
+    "description": "Onchain racing manager leveraging Chainlink VRF v2.5, Chainlink Functions, and Chainlink Automation."
   },
   "menu": {
     "play": "Play",

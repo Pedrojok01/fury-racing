@@ -5,20 +5,33 @@ import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 
 import "@rainbow-me/rainbowkit/styles.css";
-import { DESCRIPTION, TITLE, URL } from "@/data/constants";
+import { t } from "@/utils/i18";
 
 import { Providers } from "./providers";
 
 const open_sans = Open_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: TITLE,
-  applicationName: TITLE,
-  description: DESCRIPTION,
-  authors: {
-    name: "Pedrojok01",
-    url: URL,
-  },
+  title: t("common.title"),
+  applicationName: t("common.title"),
+  description: t("common.description"),
+  authors: [
+    { name: "Pedrojok01", url: "https://github.com/Pedrojok01" },
+    { name: "hbCyber", url: "https://github.com/hbCyber" },
+  ],
+  keywords: [
+    "Next.js",
+    "babylonjs",
+    "TypeScript",
+    "Zustand",
+    "wagmi",
+    "viem",
+    "chainlink",
+    "chakra-ui",
+    "RainbowKit",
+    "ethereum-dapp",
+    "web3-game",
+  ],
   icons: "favicon.ico",
   manifest: "site.webmanifest",
 };

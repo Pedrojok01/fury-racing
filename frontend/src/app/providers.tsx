@@ -9,7 +9,7 @@ import merge from "lodash.merge";
 import { WagmiProvider } from "wagmi";
 
 import { AudioProvider, WalkthroughProvider } from "@/context";
-import { TITLE } from "@/data";
+import { t } from "@/utils/i18";
 import { wagmiConfig } from "@/wagmi";
 
 export function Providers({ children }: Readonly<{ children: ReactNode }>) {
@@ -32,7 +32,7 @@ export function Providers({ children }: Readonly<{ children: ReactNode }>) {
   } as Theme);
 
   const appInfo = {
-    appName: TITLE,
+    appName: t("common.title"),
   };
 
   if (!mounted) return null;

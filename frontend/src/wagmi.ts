@@ -14,7 +14,7 @@ import type { Transport } from "viem";
 import { createConfig, http } from "wagmi";
 import { avalancheFuji } from "wagmi/chains";
 
-import { TITLE } from "./data/constants";
+import { t } from "./utils/i18";
 
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
 
@@ -38,7 +38,7 @@ const connectors = connectorsForWallets(
       ],
     },
   ],
-  { appName: TITLE, projectId: walletConnectProjectId },
+  { appName: t("common.title"), projectId: walletConnectProjectId },
 );
 
 const transports: Record<number, Transport> = {

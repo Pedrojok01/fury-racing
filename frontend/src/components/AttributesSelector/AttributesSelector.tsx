@@ -80,7 +80,7 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
                   <HStack>
                     {!isMobile && <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} size="1.1rem" />}
                     <StatLabel fontSize={isMobile ? "12px" : "17px"}>
-                      {key.charAt(0).toUpperCase() + key.slice(1)}:
+                      {key === "breaks" ? "Brakes" : key.charAt(0).toUpperCase() + key.slice(1)}:
                     </StatLabel>
                     <StatNumber fontSize={isMobile ? "medium" : "large"}>{value}</StatNumber>
                     {key !== "luck" && (

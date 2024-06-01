@@ -57,7 +57,7 @@ const AttributesRace: FC = () => {
                 <HStack w="100%">
                   <HStack textAlign="left" w="100%">
                     <StatLabel fontSize={isMobile ? "12px" : "16px"}>
-                      {key.charAt(0).toUpperCase() + key.slice(1)}:
+                      {key === "breaks" ? "Brakes" : key.charAt(0).toUpperCase() + key.slice(1)}:
                     </StatLabel>
                     <StatNumber fontSize={isMobile ? "medium" : "large"}>
                       {key !== "luck" ? adjustedValue : value}

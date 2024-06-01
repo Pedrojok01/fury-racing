@@ -13,7 +13,7 @@ export const carMetadata: CarMetadata[] = [
       reliability: 8, // High reliability
       maniability: 3, // Low maniability
       speed: 5, // Moderate speed
-      breaks: 6, // Good breaks
+      breaks: 6, // Good brakes
       car_balance: 7, // High balance
       aerodynamics: 5, // Moderate aerodynamics
       driver_skills: 3, // Low driver skills
@@ -33,7 +33,7 @@ export const carMetadata: CarMetadata[] = [
       reliability: 5, // Moderate reliability
       maniability: 8, // High maniability
       speed: 5, // Moderate speed
-      breaks: 4, // Lower breaks
+      breaks: 4, // Lower brakes
       car_balance: 4, // Lower balance
       aerodynamics: 7, // High aerodynamics
       driver_skills: 3, // Low driver skills
@@ -53,7 +53,7 @@ export const carMetadata: CarMetadata[] = [
       reliability: 3, // Low reliability
       maniability: 3, // Low maniability
       speed: 8, // High speed
-      breaks: 5, // Moderate breaks
+      breaks: 5, // Moderate brakes
       car_balance: 5, // Moderate balance
       aerodynamics: 5, // Moderate aerodynamics
       driver_skills: 5, // Moderate driver skills

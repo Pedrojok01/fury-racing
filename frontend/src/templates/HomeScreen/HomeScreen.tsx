@@ -52,7 +52,7 @@ const HomeScreen: FC = () => {
               </Button>
             </Link>
 
-            <Checkbox mt={isMobile ? "0.25rem" : "0.5rem"} checked={audio} onChange={() => setAudio(!audio)}>
+            <Checkbox mt={isMobile ? "0.25rem" : "0.5rem"} isChecked={audio} onChange={() => setAudio(!audio)}>
               Music enabled
             </Checkbox>
           </>

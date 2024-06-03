@@ -178,9 +178,6 @@ const CarRace: FC = () => {
       // -- Global lighting.
       const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
       switch (skybox) {
-        default:
-          light.intensity = 0.6;
-          break;
         case "cloudy":
           light.intensity = 0.5;
           break;
@@ -189,6 +186,9 @@ const CarRace: FC = () => {
           break;
         case "night":
           light.intensity = 0.1;
+          break;
+        default:
+          light.intensity = 0.6;
           break;
       }
 

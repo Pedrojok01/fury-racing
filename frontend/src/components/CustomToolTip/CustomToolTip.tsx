@@ -29,7 +29,7 @@ interface CustomToolTipProps {
 
 const CustomToolTip: FC<CustomToolTipProps> = ({ children, label, size = "2rem", placement }) => (
   <Tooltip label={label} fontSize={"md"} placement={placement}>
-    {children ? children : <QuestionOutlineIcon fontSize={size} />}
+    {children ?? <QuestionOutlineIcon fontSize={size} />}
   </Tooltip>
 );
 

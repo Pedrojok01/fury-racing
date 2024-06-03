@@ -16,7 +16,7 @@ const Loading: FC = () => (
   </VStack>
 );
 
-const Error: FC<{ message: string }> = ({ message }) => (
+const ErrorDisplay: FC<{ message: string }> = ({ message }) => (
   <Flex w="100%" justifyContent="center">
     <Text color="red" fontWeight={600}>
       {message}
@@ -67,7 +67,7 @@ const Weather: FC = () => {
         {isLoading ? (
           <Loading />
         ) : isError ? (
-          <Error message={isError.message} />
+          <ErrorDisplay message={isError.message} />
         ) : (
           weather && <WeatherDisplay weather={weather} />
         )}

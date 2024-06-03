@@ -42,7 +42,7 @@ const HomeScreen: FC = () => {
               <Button
                 mt={isMobile ? "0.5rem" : "2rem"}
                 paddingBlock={isMobile ? "2.2rem" : "2.5rem"}
-                paddingInline={isMobile ? "5rem" : "5rem"}
+                paddingInline="5rem"
                 fontSize={"2rem"}
                 fontWeight={"bold"}
                 className="custom-button"

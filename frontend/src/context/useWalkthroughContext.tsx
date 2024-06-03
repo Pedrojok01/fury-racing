@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useState, useContext, type FC, type ReactNode, useEffect } from "react";
+import React, { createContext, useState, useContext, type FC, type ReactNode, useEffect, useMemo } from "react";
 
 import { usePathname } from "next/navigation";
 import Joyride, { type CallBackProps, STATUS, type Step } from "react-joyride";
@@ -71,8 +71,10 @@ export const WalkthroughProvider: FC<WalkthroughProviderProps> = ({ children }) 
     startWalkthrough();
   }, [steps]);
 
+  const value = useMemo(() => ({ run, steps, startWalkthrough }), [run, steps]);
+
   return (
-    <WalkthroughContext.Provider value={{ run, steps, startWalkthrough }}>
+    <WalkthroughContext.Provider value={value}>
       <Joyride
         steps={steps}
         run={run}

@@ -13,10 +13,8 @@ const FullScreenButton: FC = () => {
       if (elem.requestFullscreen) {
         await elem.requestFullscreen();
       }
-    } else {
-      if (document.exitFullscreen) {
-        await document.exitFullscreen();
-      }
+    } else if (document.exitFullscreen) {
+      await document.exitFullscreen();
     }
     setIsFullscreen(!isFullscreen);
   };

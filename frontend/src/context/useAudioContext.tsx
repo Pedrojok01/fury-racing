@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode, type FC } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode, type FC, useMemo } from "react";
 
 const songs = [
   "/music/gym-phonk-187854.mp3",
@@ -80,5 +80,7 @@ export const AudioProvider: FC<AudioProviderProps> = ({ children }) => {
     }
   }, [audio]);
 
-  return <AudioContext.Provider value={{ audio, setAudio, songIndex, setSongIndex }}>{children}</AudioContext.Provider>;
+  const value = useMemo(() => ({ audio, setAudio, songIndex, setSongIndex }), [audio, songIndex]);
+
+  return <AudioContext.Provider value={value}>{children}</AudioContext.Provider>;
 };

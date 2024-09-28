@@ -41,7 +41,7 @@ export const calculateBaseLuck = (randomNumber: bigint): number => {
   return Number(dividedResult) - 5;
 };
 
-export const raceModeToInt: { [key in RaceMode]: number } = {
+export const raceModeToInt: Record<RaceMode, number> = {
   SOLO: 0,
   FREE: 1,
   TOURNAMENT: 2,

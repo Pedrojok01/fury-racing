@@ -14,7 +14,7 @@ import { CustomBox } from "../CustomBox";
 import { CustomToolTip } from "../CustomToolTip";
 import { LuckBubble } from "../LuckBuble";
 
-const attributeLabels: { [key in keyof CarAttributes]: string } = {
+const attributeLabels: Record<keyof CarAttributes, string> = {
   reliability: t("selection.attributesDescription.reliability"),
   maniability: t("selection.attributesDescription.maniability"),
   speed: t("selection.attributesDescription.speed"),

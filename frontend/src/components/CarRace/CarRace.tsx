@@ -1,8 +1,7 @@
-import React, { useRef, useEffect, useMemo, type FC } from "react";
+import { useRef, useEffect, useMemo, type FC } from "react";
 
 import {
   AbstractAssetTask,
-  AbstractMesh,
   AnimationGroup,
   AssetsManager,
   AssetTaskState,
@@ -251,7 +250,8 @@ const CarRace: FC = () => {
 
       // Initialize the camera.
       const camera = initializeCamera(scene, track, gridTileSize);
-      const cameraTarget = new AbstractMesh("cameraTarget", scene);
+      // const cameraTarget = new AbstractMesh("cameraTarget", scene);
+      const cameraTarget = new Mesh("cameraTarget", scene);
       cameraTarget.parent = target;
       cameraTarget.position.y = 5; // Have the camera aim a bit higher than the car.
       camera.lockedTarget = cameraTarget;

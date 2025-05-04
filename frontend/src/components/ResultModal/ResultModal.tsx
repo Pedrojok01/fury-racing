@@ -8,11 +8,8 @@ import {
   Button,
   Link,
   Box,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
+  Dialog,
+  Portal,
   useDisclosure,
   HStack,
   VStack,
@@ -35,7 +32,7 @@ interface ResultModalProps {
 
 const ResultModal: FC<ResultModalProps> = ({ isWinner, raceInfo }) => {
   const { width, height } = useWindowSize();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { open, onOpen, onClose } = useDisclosure();
   const { mode, reset } = useGameStates();
   const { address } = useAccount();
   const { getPlayerInfo } = useReadContract();
@@ -82,58 +79,70 @@ const ResultModal: FC<ResultModalProps> = ({ isWinner, raceInfo }) => {
   );
 
   return (
-    <Box w="100vw" h="100vh">
+    <Box>
       {isWinner && !isMobile && (
         <Confetti numberOfPieces={1000} recycle={false} tweenDuration={50000} width={width} height={height} />
       )}
 
-      <Modal isOpen={isOpen} onClose={onClose} isCentered>
-        <ModalOverlay />
-        <ModalContent
-          pt={isMobile ? 0 : 2}
-          pb={isMobile ? 2 : 5}
-          bg={isWinner ? "rgba(144, 238, 144, 0.7)" : "rgba(255, 182, 193, 0.7)"}
-        >
-          <ModalHeader>
-            <Heading as="h2" size={isMobile ? "1.6em" : "1.875em"} textAlign="center" mb={isMobile ? 1 : 4}>
-              {isWinner ? "🎉 You won! 🎉" : "😢 You Lost!"}
-            </Heading>
-          </ModalHeader>
+      <Dialog.Root
+        open={open}
+        onOpenChange={(details) => {
+          if (!details.open) onClose();
+        }}
+        placement="center"
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content
+              pt={isMobile ? 2 : 8}
+              pb={isMobile ? 3 : 6}
+              bg={isWinner ? "rgba(144, 238, 144, 0.7)" : "rgba(255, 182, 193, 0.7)"}
+              w={isMobile ? "95%" : "420px"}
+              gap={isMobile ? 4 : 10}
+            >
+              <Dialog.Header justifyContent="center">
+                <Heading as="h2" size={isMobile ? "lg" : "xl"}>
+                  {isWinner ? "🎉 You won! 🎉" : "😢 You Lost!"}
+                </Heading>
+              </Dialog.Header>
 
-          <ModalBody>
-            <Text fontSize="lg" textAlign="center" mb={5}>
-              {isWinner ? "Congrats! You won the race!" : "Better luck next time!"}
-            </Text>
-            <VStack w={"100%"} wrap={"wrap"} justifyContent={"space-between"}>
-              <Text>Winner: {winner === zeroAddress ? "Computer" : getEllipsisTxt(winner, 8)}</Text>
-              <Text>
-                Time: <b>{winnerTime}</b>
-              </Text>
-              <Spacer />
-              <Text>Loser: {loser === zeroAddress ? "Computer" : getEllipsisTxt(loser, 8)}</Text>
-              <Text>
-                Time: <b>{loserTime}</b>
-              </Text>
-              {pointsUpdate}
-            </VStack>
+              <Dialog.Body>
+                <Text fontSize="lg" textAlign={"center"} mb={5}>
+                  {isWinner ? "Congrats! You won the race!" : "Better luck next time!"}
+                </Text>
+                <VStack w={"100%"} wrap={"wrap"} justifyContent={"space-between"}>
+                  <Text>Winner: {winner === zeroAddress ? "Computer" : getEllipsisTxt(winner, 8)}</Text>
+                  <Text>
+                    Time: <b>{winnerTime}</b>
+                  </Text>
+                  <Spacer />
+                  <Text>Loser: {loser === zeroAddress ? "Computer" : getEllipsisTxt(loser, 8)}</Text>
+                  <Text>
+                    Time: <b>{loserTime}</b>
+                  </Text>
+                  {pointsUpdate}
+                </VStack>
 
-            <Center>
-              <HStack mt={6} mb={0} gap={5}>
-                <Link as={NextLink} href="/mode">
-                  <Button className="custom-button" w={150} onClick={() => reset()}>
-                    Play Again
-                  </Button>
-                </Link>
-                <Link as={NextLink} href="/leaderboard" m={"auto"} style={{ textDecoration: "none" }}>
-                  <Button w={150} className="custom-button">
-                    Leaderboard
-                  </Button>
-                </Link>
-              </HStack>
-            </Center>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+                <Center>
+                  <HStack mt={6} mb={0} gap={5}>
+                    <Link as={NextLink} href="/mode">
+                      <Button className="custom-button" w={150} onClick={() => reset()} css={{ color: "initial" }}>
+                        Play Again
+                      </Button>
+                    </Link>
+                    <Link as={NextLink} href="/leaderboard" m={"auto"} style={{ textDecoration: "none" }}>
+                      <Button w={150} className="custom-button" css={{ color: "initial" }}>
+                        Leaderboard
+                      </Button>
+                    </Link>
+                  </HStack>
+                </Center>
+              </Dialog.Body>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
     </Box>
   );
 };

@@ -124,10 +124,10 @@ const CarAnim: FC = () => {
         </CustomToolTip>
       </Box>
       <HStack>
-        <Button onClick={incrementCarIdx} size="sm">
+        <Button onClick={incrementCarIdx} size="sm" width="60px" variant="surface" rounded="6px">
           Prev
         </Button>
-        <Button onClick={decrementCarIdx} size="sm">
+        <Button onClick={decrementCarIdx} size="sm" width="60px" variant="surface" rounded="6px">
           Next
         </Button>
       </HStack>

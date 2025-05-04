@@ -41,7 +41,14 @@ const LeaderboardScreen: FC = () => {
           />
         ))}
         <HStack gap={2} mt={"15px"}>
-          <Button onClick={prevPage} disabled={currentPage === 1} size="sm">
+          <Button
+            onClick={prevPage}
+            disabled={currentPage === 1}
+            size="sm"
+            width="60px"
+            variant="surface"
+            rounded="6px"
+          >
             Prev
           </Button>
           {Array.from({ length: pageCount }, (_, index) => (
@@ -49,7 +56,14 @@ const LeaderboardScreen: FC = () => {
               {index + 1}
             </Button>
           ))}
-          <Button onClick={nextPage} disabled={currentPage === pageCount} size="sm">
+          <Button
+            onClick={nextPage}
+            disabled={currentPage === pageCount}
+            size="sm"
+            width="60px"
+            variant="surface"
+            rounded="6px"
+          >
             Next
           </Button>
         </HStack>

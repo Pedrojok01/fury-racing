@@ -1,6 +1,6 @@
 import { type FC } from "react";
 
-import { Box, Divider, Flex, HStack, Heading, Spinner, StatGroup, Text, VStack } from "@chakra-ui/react";
+import { Box, Separator, Flex, HStack, Heading, Spinner, StatGroup, Text, VStack } from "@chakra-ui/react";
 import Image from "next/image";
 
 import useWeather from "@/hooks/useWeather";
@@ -41,9 +41,9 @@ const WeatherDisplay: FC<{ weather: Weather }> = ({ weather }) => {
       </Flex>
       <VStack flex={1} justifyContent="center" alignItems="center">
         <Heading fontSize="xl">{text}</Heading>
-        <Divider my={2} />
+        <Separator my={2} />
         <StatGroup>
-          <VStack spacing={1} alignItems="flex-start" minW="175px">
+          <VStack gap={1} alignItems="flex-start" minW="175px">
             <DisplayStatData label="Temperature:" data={`${temp_c}°C`} />
             <DisplayStatData label="Precipitation:" data={`${precip_mm}mm`} />
             <DisplayStatData label="Wind:" data={`${wind_kph}km/h`} />

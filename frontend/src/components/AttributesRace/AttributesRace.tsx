@@ -1,6 +1,6 @@
 import { type FC } from "react";
 
-import { VStack, Box, HStack, StatLabel, StatNumber, Stat, Badge } from "@chakra-ui/react";
+import { VStack, Box, HStack, Stat, Badge } from "@chakra-ui/react";
 import Image from "next/image";
 import { isMobile } from "react-device-detect";
 import { useAccount } from "wagmi";
@@ -53,15 +53,15 @@ const AttributesRace: FC = () => {
 
           return key !== "luck" ? (
             <Box key={key} w="100%">
-              <Stat w="100%">
+              <Stat.Root w="100%">
                 <HStack w="100%">
                   <HStack textAlign="left" w="100%">
-                    <StatLabel fontSize={isMobile ? "12px" : "16px"}>
+                    <Stat.Label fontSize={isMobile ? "12px" : "16px"}>
                       {key === "breaks" ? "Brakes" : key.charAt(0).toUpperCase() + key.slice(1)}:
-                    </StatLabel>
-                    <StatNumber fontSize={isMobile ? "medium" : "large"}>
+                    </Stat.Label>
+                    <Stat.ValueText fontSize={isMobile ? "medium" : "large"}>
                       {key !== "luck" ? adjustedValue : value}
-                    </StatNumber>
+                    </Stat.ValueText>
                   </HStack>
 
                   <HStack textAlign="right">
@@ -73,7 +73,7 @@ const AttributesRace: FC = () => {
                     )}
                   </HStack>
                 </HStack>
-              </Stat>
+              </Stat.Root>
             </Box>
           ) : (
             <Box key={key} />

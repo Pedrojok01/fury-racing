@@ -1,8 +1,9 @@
 import type { FC } from "react";
 
-import { Box, HStack, Link, Spacer, Text, useColorMode } from "@chakra-ui/react";
+import { Box, HStack, Link, Spacer, Text } from "@chakra-ui/react";
 import Image, { type StaticImageData } from "next/image";
 import Nextlink from "next/link";
+import { useTheme } from "next-themes";
 import { isMobile } from "react-device-detect";
 import { useAccount } from "wagmi";
 
@@ -19,14 +20,14 @@ type ScoreItemProps = {
 };
 
 const ScoreItem: FC<ScoreItemProps> = ({ user_address, score, index, image }) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
   const { chainId, address } = useAccount();
 
   const isPlayer = address?.toLowerCase() === user_address.toLowerCase();
 
   const backgroundColor = isPlayer
     ? "var(--secondary-color)"
-    : colorMode === "light"
+    : theme === "light"
       ? "var(--background-light)"
       : "var(--background-dark)";
 

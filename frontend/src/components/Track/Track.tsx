@@ -1,6 +1,6 @@
 import { type FC } from "react";
 
-import { Divider, Flex, HStack, Heading, StatGroup, Text, VStack } from "@chakra-ui/react";
+import { Flex, HStack, Heading, Separator, StatGroup, Text, VStack } from "@chakra-ui/react";
 import Image, { type StaticImageData } from "next/image";
 
 import { t } from "@/utils/i18";
@@ -28,9 +28,9 @@ const Track: FC<TrackProps> = ({ map, data }) => {
 
           <VStack flex={1} justifyContent="center" alignItems="center">
             <Heading fontSize="xl">{data.name}</Heading>
-            <Divider my={2} />
+            <Separator my={2} />
             <StatGroup>
-              <VStack spacing={1} align={"flex-start"} minW={"175px"}>
+              <VStack gap={1} align={"flex-start"} minW={"175px"}>
                 <DisplayStatData label="Track Length" data={data.lengthFormatted} />
                 <DisplayStatData label="Best Time" data={data.bestTimeFormatted} />
                 <DisplayStatData label="Max Speed" data={`${data.maxSpeed} km/h`} />

@@ -1,13 +1,13 @@
 import type { FC, ReactNode } from "react";
 
-import { Box, useColorMode } from "@chakra-ui/react";
-
+import { Box } from "@chakra-ui/react";
+import { useTheme } from "next-themes";
 interface CustomBoxProps {
   children: ReactNode;
 }
 
 const CustomBox: FC<CustomBoxProps> = ({ children }) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
 
   return (
     <Box
@@ -16,7 +16,7 @@ const CustomBox: FC<CustomBoxProps> = ({ children }) => {
       borderWidth="1px"
       borderRadius="12px"
       w="90%"
-      bg={colorMode === "light" ? "var(--background-light)" : "var(--background-dark)"}
+      bg={theme === "light" ? "var(--background-light)" : "var(--background-dark)"}
       alignItems={"center"}
       alignContent={"center"}
       justifyContent={"center"}

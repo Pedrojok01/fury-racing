@@ -1,8 +1,9 @@
 import { type FC } from "react";
 
-import { Box, Button, Text, VStack, Link, Flex, useColorMode, Checkbox } from "@chakra-ui/react";
+import { Box, Button, Text, VStack, Link, Flex, Checkbox } from "@chakra-ui/react";
 import Image from "next/image";
 import NextLink from "next/link";
+import { useTheme } from "next-themes";
 import { isMobile } from "react-device-detect";
 import { useAccount } from "wagmi";
 
@@ -16,7 +17,7 @@ const HomeScreen: FC = () => {
   const { isConnected } = useAccount();
   const { audio, setAudio } = useAudio();
   const { reset } = useGameStates();
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
 
   const handlePlayClick = () => {
     reset();
@@ -31,7 +32,10 @@ const HomeScreen: FC = () => {
 
         <Text
           className={`${styles.title} text-shadow`}
-          style={{ backgroundColor: colorMode === "light" ? "rgba(255, 255, 255, 0.9)" : "", borderRadius: "12px" }}
+          style={{
+            backgroundColor: theme === "light" ? "rgba(255, 255, 255, 0.9)" : "",
+            borderRadius: "12px",
+          }}
         >
           Reach the top of the <span style={{ color: "var(--primary-color)" }}>leaderboard</span>.
         </Text>
@@ -47,14 +51,21 @@ const HomeScreen: FC = () => {
                 fontWeight={"bold"}
                 className="custom-button"
                 onClick={handlePlayClick}
+                css={{ color: "initial" }}
               >
                 Play
               </Button>
             </Link>
 
-            <Checkbox mt={isMobile ? "0.25rem" : "0.5rem"} isChecked={audio} onChange={() => setAudio(!audio)}>
-              Music enabled
-            </Checkbox>
+            <Checkbox.Root
+              mt={isMobile ? "0.25rem" : "0.5rem"}
+              checked={audio}
+              onCheckedChange={({ checked }) => setAudio(!!checked)}
+            >
+              <Checkbox.HiddenInput />
+              <Checkbox.Control />
+              <Checkbox.Label>Music enabled</Checkbox.Label>
+            </Checkbox.Root>
           </>
         )}
       </VStack>

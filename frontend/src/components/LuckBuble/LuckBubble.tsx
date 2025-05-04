@@ -1,6 +1,6 @@
 import { memo, type FC } from "react";
 
-import { StatNumber } from "@chakra-ui/react";
+import { Text } from "@chakra-ui/react";
 import { isMobile } from "react-device-detect";
 
 interface LuckBubbleProps {
@@ -10,7 +10,7 @@ interface LuckBubbleProps {
 
 const LuckBubble: FC<LuckBubbleProps> = ({ value, color }) => {
   return (
-    <StatNumber
+    <Text
       fontSize="0.6em"
       fontWeight={600}
       color="white"
@@ -23,7 +23,7 @@ const LuckBubble: FC<LuckBubbleProps> = ({ value, color }) => {
       textAlign="center"
     >
       {value}
-    </StatNumber>
+    </Text>
   );
 };
 

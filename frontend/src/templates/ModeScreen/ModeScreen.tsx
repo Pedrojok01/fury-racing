@@ -27,12 +27,12 @@ const ModeScreen: FC = () => {
 
   return (
     <Center h={"inherit"} w="100%" justifyContent="center">
-      <VStack h={isMobile ? "100%" : "auto"} spacing={isMobile ? 5 : 10}>
+      <VStack h={isMobile ? "100%" : "auto"} gap={isMobile ? 5 : 10}>
         <Text fontSize={isMobile ? "1.2rem" : "3rem"} fontWeight="bold" color="var(--primary-color)">
           {t("mode.subtitles")}
         </Text>
 
-        <HStack spacing={5} wrap={"wrap"} justifyContent={"center"}>
+        <HStack gap={5} wrap={"wrap"} justifyContent={"center"}>
           <ButtonMode text="Training" label={descriptionText.SOLO} mode="SOLO" walkthrough="select-mode" />
           <ButtonMode text="Free Play" label={descriptionText.FREE} mode="FREE" />
           <ButtonMode text="Tournament" label={descriptionText.TOURNAMENT} mode="TOURNAMENT" />
@@ -91,10 +91,11 @@ const ButtonMode: FC<ButtonModeProps> = ({ text, label, mode, walkthrough }) => 
         fontSize={isMobile ? "1.5rem" : "2.5rem"}
         fontWeight={"bold"}
         className="custom-button"
+        css={{ color: "initial" }}
       >
-        <VStack>
+        <VStack gap={5}>
           <Text>{text}</Text>
-          <CustomToolTip label={label} size="1.5rem" />
+          <CustomToolTip label={label} size="lg" />
         </VStack>
       </Button>
     </Link>

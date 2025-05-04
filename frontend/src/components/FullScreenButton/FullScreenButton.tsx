@@ -20,7 +20,7 @@ const FullScreenButton: FC = () => {
   };
 
   return (
-    <Button w={"40px"} h={"40px"} onClick={toggleFullscreen} className="custom-button">
+    <Button w={"40px"} h={"40px"} onClick={toggleFullscreen} className="custom-button" css={{ color: "initial" }}>
       <Icon as={AiOutlineFullscreen} boxSize={5} />
     </Button>
   );

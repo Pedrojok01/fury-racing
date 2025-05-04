@@ -1,14 +1,21 @@
 import { type FC } from "react";
 
 import { SunIcon, MoonIcon } from "@chakra-ui/icons";
-import { Button, useColorMode } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
+import { useTheme } from "next-themes";
 
 const DarkModeButton: FC = () => {
-  const { colorMode, toggleColorMode } = useColorMode();
+  const { theme, setTheme } = useTheme();
 
   return (
-    <Button w={"40px"} h={"40px"} onClick={toggleColorMode} className="custom-button">
-      {colorMode === "light" ? <SunIcon fontSize={20} /> : <MoonIcon fontSize={17} />}
+    <Button
+      w={"40px"}
+      h={"40px"}
+      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+      className="custom-button"
+      css={{ color: "initial" }}
+    >
+      {theme === "light" ? <SunIcon fontSize={20} /> : <MoonIcon fontSize={17} />}
     </Button>
   );
 };

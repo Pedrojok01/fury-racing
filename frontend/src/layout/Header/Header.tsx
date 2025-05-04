@@ -2,10 +2,11 @@
 import { type FC } from "react";
 
 import { HamburgerIcon } from "@chakra-ui/icons";
-import { Box, HStack, IconButton, Link, Menu, MenuButton, MenuList, useColorMode } from "@chakra-ui/react";
+import { Box, HStack, IconButton, Link, Menu, Portal } from "@chakra-ui/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import NextLink from "next/link";
+import { useTheme } from "next-themes";
 import { isMobile } from "react-device-detect";
 import { useAccount } from "wagmi";
 
@@ -19,7 +20,7 @@ import styles from "./header.module.css";
 
 const Header: FC = () => {
   const { isConnected, address } = useAccount();
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
   const { reset } = useGameStates();
   const { width } = useWindowSize();
 
@@ -35,7 +36,7 @@ const Header: FC = () => {
       <NextLink href="/leaderboard" className={`${styles.menuItems} leaderboard`}>
         <Box className="text-shadow">{t("menu.leaderboard")}</Box>
       </NextLink>
-      <Link href={GITBOOK} className={styles.menuItems} isExternal rel="noopener noreferrer">
+      <Link href={GITBOOK} className={styles.menuItems} rel="noopener noreferrer">
         <Box className="text-shadow">{t("menu.doc")}</Box>
       </Link>
     </>
@@ -48,7 +49,7 @@ const Header: FC = () => {
           <Link as={NextLink} href="/" textDecoration={"none"} w={"100%"} justifyContent={"left"}>
             <HStack>
               <Image
-                src={colorMode === "light" ? images.logo.src : images.logo_black.src}
+                src={theme === "light" ? images.logo.src : images.logo_black.src}
                 alt="logo"
                 width={width < 1200 ? 160 : 180}
                 height={width < 1200 ? 72 : 81}
@@ -75,7 +76,7 @@ const Header: FC = () => {
         <HStack paddingInline={"1rem"} position="sticky" top={0} zIndex={10} justifyContent={"left"}>
           <Link as={NextLink} href="/" textDecoration={"none"} w={"100%"} justifyContent={"left"}>
             <Image
-              src={colorMode === "light" ? images.logo.src : images.logo_black.src}
+              src={theme === "light" ? images.logo.src : images.logo_black.src}
               alt="logo"
               width={120}
               height={54}
@@ -95,21 +96,22 @@ const Header: FC = () => {
                 <DarkModeButton />
               </>
             ) : (
-              <Menu>
-                <MenuButton
-                  className="menu-button"
-                  as={IconButton}
-                  aria-label="Options"
-                  icon={<HamburgerIcon />}
-                  variant="outline"
-                  borderRadius={"12px"}
-                />
-                <MenuList p={2}>
-                  <HStack gap={10} justify="center" marginBlock={1}>
-                    <ConnectButton /> <FullScreenButton /> <DarkModeButton />
-                  </HStack>
-                </MenuList>
-              </Menu>
+              <Menu.Root>
+                <Menu.Trigger asChild>
+                  <IconButton className="menu-button" aria-label="Options" variant="outline" borderRadius={"12px"}>
+                    <HamburgerIcon />
+                  </IconButton>
+                </Menu.Trigger>
+                <Portal>
+                  <Menu.Positioner>
+                    <Menu.Content p={2}>
+                      <HStack gap={10} justify="center" marginBlock={1}>
+                        <ConnectButton /> <FullScreenButton /> <DarkModeButton />
+                      </HStack>
+                    </Menu.Content>
+                  </Menu.Positioner>
+                </Portal>
+              </Menu.Root>
             )}
           </HStack>
         </HStack>

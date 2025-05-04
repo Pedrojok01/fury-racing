@@ -1,6 +1,6 @@
 import { type FC } from "react";
 
-import { VStack, Text, Box, SimpleGrid, HStack, StatLabel, StatNumber, Stat } from "@chakra-ui/react";
+import { VStack, Text, Box, SimpleGrid, HStack, Stat } from "@chakra-ui/react";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import { isMobile } from "react-device-detect";
@@ -62,7 +62,7 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
 
   return (
     <CustomBox>
-      <VStack spacing={5} w="100%">
+      <VStack gap={5} w="100%">
         <HStack w="100%" justify={"space-between"} className={walktrough?.attributes}>
           <Text className="subtitle">{t("selection.subtitles.attributes")}</Text>
           <Text fontSize={isMobile ? "14px" : "17px"}>Remaining: {remainingPoints}</Text>
@@ -76,18 +76,18 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
 
             return (
               <Box key={key} className={attributeKey === "luck" ? walktrough?.luck : ""}>
-                <Stat>
+                <Stat.Root>
                   <HStack>
-                    {!isMobile && <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} size="1.1rem" />}
-                    <StatLabel fontSize={isMobile ? "12px" : "17px"}>
+                    {!isMobile && <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} size="sm" />}
+                    <Stat.Label fontSize={isMobile ? "12px" : "17px"}>
                       {key === "breaks" ? "Brakes" : key.charAt(0).toUpperCase() + key.slice(1)}:
-                    </StatLabel>
-                    <StatNumber fontSize={isMobile ? "medium" : "large"}>{value}</StatNumber>
+                    </Stat.Label>
+                    <Stat.ValueText fontSize={isMobile ? "medium" : "large"}>{value}</Stat.ValueText>
                     {key !== "luck" && (
                       <LuckBubble value={`${getLuckPercentage(attributes.luck)}%`} color="var(--secondary-color)" />
                     )}
                   </HStack>
-                </Stat>
+                </Stat.Root>
                 {renderSlider(attributeKey, value, minRange, maxRange)}
               </Box>
             );

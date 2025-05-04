@@ -1,42 +1,42 @@
-import { type ReactNode, useCallback } from "react";
+import { type ReactNode } from "react";
 
-import { useToast } from "@chakra-ui/react";
+import { toaster } from "@/components/Toaster/Toaster";
 
-interface NotifyProps {
-  title: string;
-  message: ReactNode;
+interface NotifyAction {
+  label: string;
+  onClick: () => void;
 }
 
-export const useNotify = () => {
-  const toast = useToast();
+interface NotifyProps {
+  title?: string;
+  message: ReactNode;
+  duration?: number;
+  action?: NotifyAction;
+}
 
-  const notifySuccess = useCallback(
-    ({ title, message }: NotifyProps) => {
-      toast({
-        title,
-        description: message,
-        position: "top-right",
-        status: "success",
-        duration: 10000,
-        isClosable: true,
-      });
-    },
-    [toast],
-  );
+interface UseNotifyResult {
+  notifySuccess: (props: NotifyProps) => void;
+  notifyError: (props: NotifyProps) => void;
+}
 
-  const notifyError = useCallback(
-    ({ title, message }: NotifyProps) => {
-      toast({
-        title,
-        description: message,
-        position: "top-right",
-        status: "error",
-        duration: 10000,
-        isClosable: true,
-      });
-    },
-    [toast],
-  );
+export const useNotify = (): UseNotifyResult => {
+  const notifySuccess = ({ title, message, duration = 8000, action }: NotifyProps) => {
+    toaster.success({
+      title,
+      description: message,
+      duration,
+      action,
+    });
+  };
+
+  const notifyError = ({ title, message, duration = 8000, action }: NotifyProps) => {
+    toaster.error({
+      title,
+      description: message,
+      duration,
+      action,
+    });
+  };
 
   return {
     notifySuccess,

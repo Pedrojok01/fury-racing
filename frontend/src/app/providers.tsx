@@ -7,8 +7,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import merge from "lodash.merge";
 import { ThemeProvider } from "next-themes";
 import { WagmiProvider } from "wagmi";
-import { Toaster } from "@/components/Toaster";
 
+import { Toaster } from "@/components/Toaster";
 import { AudioProvider, WalkthroughProvider } from "@/context";
 import { t } from "@/utils/i18";
 import { wagmiConfig } from "@/wagmi";

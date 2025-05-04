@@ -78,6 +78,7 @@ const SelectionScreen: FC = () => {
             className="custom-button start-race"
             loading={loading}
             onClick={handleRaceStart}
+            css={{ color: "initial" }}
           >
             Go
           </Button>

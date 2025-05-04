@@ -1,17 +1,18 @@
 import { type FC } from "react";
 
-import { Box, Separator, Flex, HStack, Heading, Spinner, StatGroup, Text, VStack } from "@chakra-ui/react";
+import { Box, Separator, Flex, HStack, Heading, StatGroup, Text, VStack } from "@chakra-ui/react";
 import Image from "next/image";
 
 import useWeather from "@/hooks/useWeather";
 import { t } from "@/utils/i18";
 
 import { CustomBox } from "../CustomBox";
+import { CustomSpinner } from "../CustomSpinner";
 import { DisplayStatData } from "../DisplayStatData";
 
 const Loading: FC = () => (
   <VStack w="100%" justifyContent="center">
-    <Spinner size="md" />
+    <CustomSpinner size="md" />
     <Text>Loading...</Text>
   </VStack>
 );

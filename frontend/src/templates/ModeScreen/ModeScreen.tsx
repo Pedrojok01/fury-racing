@@ -95,7 +95,7 @@ const ButtonMode: FC<ButtonModeProps> = ({ text, label, mode, walkthrough }) => 
       >
         <VStack gap={5}>
           <Text>{text}</Text>
-          <CustomToolTip label={label} size="lg" />
+          <CustomToolTip label={label} size="2rem" />
         </VStack>
       </Button>
     </Link>

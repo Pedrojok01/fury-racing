@@ -1,4 +1,5 @@
 "use client";
+
 import { CustomLayout } from "@/layout";
 import { HomeScreen } from "@/templates";
 

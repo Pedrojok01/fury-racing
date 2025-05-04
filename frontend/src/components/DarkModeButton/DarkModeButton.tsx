@@ -1,8 +1,8 @@
 import { type FC } from "react";
 
-import { SunIcon, MoonIcon } from "@chakra-ui/icons";
 import { Button } from "@chakra-ui/react";
 import { useTheme } from "next-themes";
+import { FiSun, FiMoon } from "react-icons/fi";
 
 const DarkModeButton: FC = () => {
   const { theme, setTheme } = useTheme();
@@ -15,7 +15,7 @@ const DarkModeButton: FC = () => {
       className="custom-button"
       css={{ color: "initial" }}
     >
-      {theme === "light" ? <SunIcon fontSize={20} /> : <MoonIcon fontSize={17} />}
+      {theme === "light" ? <FiSun size={20} /> : <FiMoon size={17} />}
     </Button>
   );
 };

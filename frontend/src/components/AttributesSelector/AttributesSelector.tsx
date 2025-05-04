@@ -78,7 +78,7 @@ const AttributesSelector: FC<AttributesSelectorProps> = ({ defaultAttributes, wa
               <Box key={key} className={attributeKey === "luck" ? walktrough?.luck : ""}>
                 <Stat.Root>
                   <HStack>
-                    {!isMobile && <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} size="sm" />}
+                    {!isMobile && <CustomToolTip label={attributeLabels[key as keyof CarAttributes]} />}
                     <Stat.Label fontSize={isMobile ? "12px" : "17px"}>
                       {key === "breaks" ? "Brakes" : key.charAt(0).toUpperCase() + key.slice(1)}:
                     </Stat.Label>

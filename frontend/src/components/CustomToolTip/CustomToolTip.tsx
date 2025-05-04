@@ -1,7 +1,7 @@
 import type { FC } from "react";
 
-import { QuestionOutlineIcon } from "@chakra-ui/icons";
-import { Tooltip, Portal } from "@chakra-ui/react";
+import { Tooltip, Portal, Icon } from "@chakra-ui/react";
+import { AiOutlineQuestionCircle } from "react-icons/ai";
 
 interface CustomToolTipProps {
   children?: React.ReactNode;
@@ -10,16 +10,9 @@ interface CustomToolTipProps {
   placement?: any;
 }
 
-const returnCorrectSize = (size: string) => {
-  if (size === "lg") return <QuestionOutlineIcon size="lg" />;
-  if (size === "md") return <QuestionOutlineIcon size="md" />;
-  if (size === "sm") return <QuestionOutlineIcon size="sm" />;
-  return <QuestionOutlineIcon size="lg" />;
-};
-
-const CustomToolTip: FC<CustomToolTipProps> = ({ children, label, size = "lg", placement }) => (
+const CustomToolTip: FC<CustomToolTipProps> = ({ children, label, size = "1rem", placement }) => (
   <Tooltip.Root positioning={{ placement }}>
-    <Tooltip.Trigger asChild>{children ?? returnCorrectSize(size)}</Tooltip.Trigger>
+    <Tooltip.Trigger asChild>{children ?? <Icon as={AiOutlineQuestionCircle} boxSize={size} />}</Tooltip.Trigger>
     <Portal>
       <Tooltip.Positioner>
         <Tooltip.Content fontSize={"md"} lineHeight={"1.5"} padding={3}>

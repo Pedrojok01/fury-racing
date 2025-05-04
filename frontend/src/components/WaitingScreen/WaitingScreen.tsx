@@ -1,12 +1,13 @@
 // WaitingScreen.tsx
 import { type FC } from "react";
 
-import { VStack, Text, Spinner, Button, Link } from "@chakra-ui/react";
+import { VStack, Text, Button, Link } from "@chakra-ui/react";
 import NextLink from "next/link";
 
 import { useGameStates } from "@/stores";
 
 import { CustomBox } from "../CustomBox";
+import { CustomSpinner } from "../CustomSpinner";
 
 const WaitingScreen: FC = () => {
   const { reset } = useGameStates();
@@ -17,7 +18,7 @@ const WaitingScreen: FC = () => {
         <Text fontSize="xl" pb={10}>
           Waiting for another player to join...
         </Text>
-        <Spinner size="xl" color={"var(--primary-color)"} borderWidth="2px" />
+        <CustomSpinner size="xl" thickness="2px" />
         <Text>Loading...</Text>
 
         <Text fontSize="xs" mt={10}>
@@ -25,7 +26,7 @@ const WaitingScreen: FC = () => {
           soon as the race is over! Play another mode or come back later.
         </Text>
         <Link as={NextLink} href="/mode">
-          <Button className="custom-button" w={150} onClick={() => reset()}>
+          <Button className="custom-button" w={150} onClick={() => reset()} css={{ color: "initial" }}>
             Back
           </Button>
         </Link>

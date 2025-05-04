@@ -1,13 +1,13 @@
 "use client";
 import { type FC } from "react";
 
-import { HamburgerIcon } from "@chakra-ui/icons";
 import { Box, HStack, IconButton, Link, Menu, Portal } from "@chakra-ui/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import NextLink from "next/link";
 import { useTheme } from "next-themes";
 import { isMobile } from "react-device-detect";
+import { FiMenu } from "react-icons/fi";
 import { useAccount } from "wagmi";
 
 import { DarkModeButton, FullScreenButton } from "@/components";
@@ -99,7 +99,7 @@ const Header: FC = () => {
               <Menu.Root>
                 <Menu.Trigger asChild>
                   <IconButton className="menu-button" aria-label="Options" variant="outline" borderRadius={"12px"}>
-                    <HamburgerIcon />
+                    <FiMenu />
                   </IconButton>
                 </Menu.Trigger>
                 <Portal>

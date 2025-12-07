@@ -19,7 +19,7 @@ import NextLink from "next/link";
 import Confetti from "react-confetti";
 import { isMobile } from "react-device-detect";
 import { zeroAddress } from "viem";
-import { useConnection } from "wagmi";
+import { useAccount } from "wagmi";
 
 import { useReadContract, useWindowSize } from "@/hooks";
 import { useGameStates } from "@/stores";
@@ -34,7 +34,7 @@ const ResultModal: FC<ResultModalProps> = ({ isWinner, raceInfo }) => {
   const { width, height } = useWindowSize();
   const { open, onOpen, onClose } = useDisclosure();
   const { mode, reset } = useGameStates();
-  const { address } = useConnection();
+  const { address } = useAccount();
   const { getPlayerInfo } = useReadContract();
   const [playerScore, setPlayerScore] = useState<number | null>(null);
   const isTournament = mode === "TOURNAMENT";

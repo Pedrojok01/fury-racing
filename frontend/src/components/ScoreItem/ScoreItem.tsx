@@ -5,7 +5,7 @@ import Image, { type StaticImageData } from "next/image";
 import Nextlink from "next/link";
 import { useTheme } from "next-themes";
 import { isMobile } from "react-device-detect";
-import { useConnection } from "wagmi";
+import { useAccount } from "wagmi";
 
 import { networks } from "@/data/networks";
 import styles from "@/templates/LeaderboardScreen/leaderboard.module.css";
@@ -21,7 +21,7 @@ type ScoreItemProps = {
 
 const ScoreItem: FC<ScoreItemProps> = ({ user_address, score, index, image }) => {
   const { theme } = useTheme();
-  const { chainId, address } = useConnection();
+  const { chainId, address } = useAccount();
 
   const isPlayer = address?.toLowerCase() === user_address.toLowerCase();
 

@@ -13,7 +13,7 @@ import {
 
 import { usePathname } from "next/navigation";
 import Joyride, { type CallBackProps, STATUS, type Step } from "react-joyride";
-import { useConnection } from "wagmi";
+import { useAccount } from "wagmi";
 
 import { stepsData } from "@/utils/walkthroughSteps";
 
@@ -38,7 +38,7 @@ type WalkthroughProviderProps = {
 };
 
 export const WalkthroughProvider: FC<WalkthroughProviderProps> = ({ children }) => {
-  const { isConnected } = useConnection();
+  const { isConnected } = useAccount();
   const pathname = usePathname();
 
   const [run, setRun] = useState(false);

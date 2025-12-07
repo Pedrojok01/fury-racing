@@ -56,7 +56,7 @@
     "sharp": "0.34.5",
     "swr": "2.3.7",
     "viem": "2.41.2",
-    "wagmi": "3.1.0",
+    "wagmi": "2.19.5",
     "zustand": "5.0.9"
   },
   "devDependencies": {
@@ -76,9 +76,6 @@
     "husky": "9.1.7",
     "prettier": "3.7.4",
     "typescript": "5.9.3"
-  },
-  "resolutions": {
-    "@base-org/account": "latest"
   },
   "keywords": [
     "nextjs",

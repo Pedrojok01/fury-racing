@@ -3,7 +3,7 @@ import { type FC } from "react";
 import { VStack, Box, HStack, Stat, Badge } from "@chakra-ui/react";
 import Image from "next/image";
 import { isMobile } from "react-device-detect";
-import { useConnection } from "wagmi";
+import { useAccount } from "wagmi";
 
 import { CustomBox, LuckBubble } from "@/components";
 import { images } from "@/data";
@@ -17,7 +17,7 @@ const calculateAdjustedValue = (value: number, adjustment: number): number => {
 };
 
 const AttributesRace: FC = () => {
-  const { address } = useConnection();
+  const { address } = useAccount();
   const { raceInfo, luck, attributes } = useGameStates();
   const { width } = useWindowSize();
 

@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 
-import { useConnection } from "wagmi";
+import { useAccount } from "wagmi";
 
 import { useReadContract } from "@/hooks";
 import { useGameStates } from "@/stores";
 
 export const useRace = () => {
-  const { address } = useConnection();
+  const { address } = useAccount();
   const { raceId, raceInfo, mode, attributes, setLuck } = useGameStates();
   const { getRaceInfo, getRandomWords } = useReadContract();
 

@@ -26,6 +26,14 @@
   - [Asset attributions:](#asset-attributions)
   - [Music attributions:](#music-attributions)
 
+## Update:
+
+### 2025-12
+- Fix critical RCE vulnerability in Next.js 15 with React Server Component
+- Bump all dependencies (except Wagmi v3 to keep rainbowkit compatibility)
+- Fix all breaking changes
+- Migrate eslint config for eslint v9
+
 ## Description:
 
 The front end of Fury Racing has been built to make the interaction with the smart contracts as smooth as possible. Only one transaction is required to play a game, even as a new player. All racing modes are accessible directly from the front end.

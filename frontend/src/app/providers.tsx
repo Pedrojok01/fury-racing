@@ -1,7 +1,6 @@
 "use client";
-import { type ReactNode, useState, useEffect } from "react";
+import { type ReactNode, useState, useLayoutEffect } from "react";
 
-import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { RainbowKitProvider, lightTheme, type Theme } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import merge from "lodash.merge";
@@ -9,14 +8,19 @@ import { ThemeProvider } from "next-themes";
 import { WagmiProvider } from "wagmi";
 
 import { Toaster } from "@/components/Toaster";
+import { Provider as ChakraProvider } from "@/components/ui/provider";
 import { AudioProvider, WalkthroughProvider } from "@/context";
-import { t } from "@/utils/i18";
-import { wagmiConfig } from "@/wagmi";
+import { config } from "@/wagmi";
 
 export function Providers({ children }: Readonly<{ children: ReactNode }>) {
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useLayoutEffect(() => {
+    // Defer state update to avoid synchronous setState in effect
+    setTimeout(() => {
+      setMounted(true);
+    }, 0);
+  }, []);
 
   const queryClient = new QueryClient();
 
@@ -30,18 +34,14 @@ export function Providers({ children }: Readonly<{ children: ReactNode }>) {
     },
   } as Theme);
 
-  const appInfo = {
-    appName: t("common.title"),
-  };
-
   if (!mounted) return null;
 
   return (
-    <WagmiProvider config={wagmiConfig}>
+    <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <ChakraProvider value={defaultSystem}>
+        <ChakraProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-            <RainbowKitProvider coolMode appInfo={appInfo} theme={customTheme}>
+            <RainbowKitProvider theme={customTheme} initialChain={43113}>
               <AudioProvider>
                 <WalkthroughProvider>{mounted && children}</WalkthroughProvider>
                 <Toaster />

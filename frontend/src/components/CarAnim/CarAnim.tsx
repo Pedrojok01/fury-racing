@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, type FC } from "react";
+import { useRef, useEffect, type FC } from "react";
 
 import {
   Engine,

@@ -58,6 +58,16 @@ const WeatherDisplay: FC<{ weather: Weather }> = ({ weather }) => {
 const Weather: FC = () => {
   const { weather, isLoading, isError } = useWeather("Monaco");
 
+  const renderWeatherContent = () => {
+    if (isLoading) {
+      return <Loading />;
+    }
+    if (isError) {
+      return <ErrorDisplay message={isError.message} />;
+    }
+    return weather && <WeatherDisplay weather={weather} />;
+  };
+
   return (
     <CustomBox>
       <VStack alignItems="flex-start">
@@ -65,13 +75,7 @@ const Weather: FC = () => {
           {t("selection.subtitles.weather")}
         </Text>
 
-        {isLoading ? (
-          <Loading />
-        ) : isError ? (
-          <ErrorDisplay message={isError.message} />
-        ) : (
-          weather && <WeatherDisplay weather={weather} />
-        )}
+        {renderWeatherContent()}
       </VStack>
     </CustomBox>
   );

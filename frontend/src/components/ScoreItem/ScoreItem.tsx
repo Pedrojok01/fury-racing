@@ -5,7 +5,7 @@ import Image, { type StaticImageData } from "next/image";
 import Nextlink from "next/link";
 import { useTheme } from "next-themes";
 import { isMobile } from "react-device-detect";
-import { useAccount } from "wagmi";
+import { useConnection } from "wagmi";
 
 import { networks } from "@/data/networks";
 import styles from "@/templates/LeaderboardScreen/leaderboard.module.css";
@@ -21,15 +21,18 @@ type ScoreItemProps = {
 
 const ScoreItem: FC<ScoreItemProps> = ({ user_address, score, index, image }) => {
   const { theme } = useTheme();
-  const { chainId, address } = useAccount();
+  const { chainId, address } = useConnection();
 
   const isPlayer = address?.toLowerCase() === user_address.toLowerCase();
 
-  const backgroundColor = isPlayer
-    ? "var(--secondary-color)"
-    : theme === "light"
-      ? "var(--background-light)"
-      : "var(--background-dark)";
+  let backgroundColor: string;
+  if (isPlayer) {
+    backgroundColor = "var(--secondary-color)";
+  } else if (theme === "light") {
+    backgroundColor = "var(--background-light)";
+  } else {
+    backgroundColor = "var(--background-dark)";
+  }
 
   const fontWeight = isPlayer ? "bold" : "normal";
 

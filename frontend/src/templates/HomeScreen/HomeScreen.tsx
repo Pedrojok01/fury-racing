@@ -5,7 +5,7 @@ import Image from "next/image";
 import NextLink from "next/link";
 import { useTheme } from "next-themes";
 import { isMobile } from "react-device-detect";
-import { useAccount } from "wagmi";
+import { useConnection } from "wagmi";
 
 import { useAudio } from "@/context";
 import { images } from "@/data/images";
@@ -14,7 +14,7 @@ import { useGameStates } from "@/stores";
 import styles from "./home.module.css";
 
 const HomeScreen: FC = () => {
-  const { isConnected } = useAccount();
+  const { isConnected } = useConnection();
   const { audio, setAudio } = useAudio();
   const { reset } = useGameStates();
   const { theme } = useTheme();

@@ -1,17 +1,6 @@
 "use client";
-import { connectorsForWallets } from "@rainbow-me/rainbowkit";
-import {
-  argentWallet,
-  coinbaseWallet,
-  ledgerWallet,
-  metaMaskWallet,
-  rabbyWallet,
-  rainbowWallet,
-  safeWallet,
-  walletConnectWallet,
-} from "@rainbow-me/rainbowkit/wallets";
-import type { Transport } from "viem";
-import { createConfig, http } from "wagmi";
+
+import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { avalancheFuji } from "wagmi/chains";
 
 import { t } from "./utils/i18";
@@ -22,31 +11,9 @@ if (!walletConnectProjectId) {
   throw new Error("WalletConnect project ID is not defined. Please check your environment variables.");
 }
 
-const connectors = connectorsForWallets(
-  [
-    {
-      groupName: "Recommended",
-      wallets: [
-        metaMaskWallet,
-        rainbowWallet,
-        walletConnectWallet,
-        ledgerWallet,
-        rabbyWallet,
-        coinbaseWallet,
-        argentWallet,
-        safeWallet,
-      ],
-    },
-  ],
-  { appName: t("common.title"), projectId: walletConnectProjectId },
-);
-
-const transports: Record<number, Transport> = {
-  [avalancheFuji.id]: http(),
-};
-export const wagmiConfig = createConfig({
+export const config = getDefaultConfig({
+  appName: t("common.title"),
+  projectId: walletConnectProjectId,
   chains: [avalancheFuji],
-  connectors,
-  transports,
   ssr: true,
 });

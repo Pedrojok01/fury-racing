@@ -3,7 +3,7 @@ import { type FC } from "react";
 import { VStack, Box, HStack, Stat, Badge } from "@chakra-ui/react";
 import Image from "next/image";
 import { isMobile } from "react-device-detect";
-import { useAccount } from "wagmi";
+import { useConnection } from "wagmi";
 
 import { CustomBox, LuckBubble } from "@/components";
 import { images } from "@/data";
@@ -17,7 +17,7 @@ const calculateAdjustedValue = (value: number, adjustment: number): number => {
 };
 
 const AttributesRace: FC = () => {
-  const { address } = useAccount();
+  const { address } = useConnection();
   const { raceInfo, luck, attributes } = useGameStates();
   const { width } = useWindowSize();
 
@@ -51,7 +51,11 @@ const AttributesRace: FC = () => {
         {Object.entries(attributes).map(([key, value]) => {
           const adjustedValue = calculateAdjustedValue(value, totalAdjustment);
 
-          return key !== "luck" ? (
+          if (key === "luck") {
+            return <Box key={key} />;
+          }
+
+          return (
             <Box key={key} w="100%">
               <Stat.Root w="100%">
                 <HStack w="100%">
@@ -59,9 +63,7 @@ const AttributesRace: FC = () => {
                     <Stat.Label fontSize={isMobile ? "12px" : "16px"}>
                       {key === "breaks" ? "Brakes" : key.charAt(0).toUpperCase() + key.slice(1)}:
                     </Stat.Label>
-                    <Stat.ValueText fontSize={isMobile ? "medium" : "large"}>
-                      {key !== "luck" ? adjustedValue : value}
-                    </Stat.ValueText>
+                    <Stat.ValueText fontSize={isMobile ? "medium" : "large"}>{adjustedValue}</Stat.ValueText>
                   </HStack>
 
                   <HStack textAlign="right">
@@ -75,8 +77,6 @@ const AttributesRace: FC = () => {
                 </HStack>
               </Stat.Root>
             </Box>
-          ) : (
-            <Box key={key} />
           );
         })}
       </VStack>

@@ -33,9 +33,7 @@ export const AudioProvider: FC<AudioProviderProps> = ({ children }) => {
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    if (!audioElementRef.current) {
-      audioElementRef.current = new Audio(songs[songIndex]);
-    }
+    audioElementRef.current ??= new Audio(songs[songIndex]);
     const sound = audioElementRef.current;
 
     const handleEnded = () => {

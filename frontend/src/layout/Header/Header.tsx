@@ -8,7 +8,7 @@ import NextLink from "next/link";
 import { useTheme } from "next-themes";
 import { isMobile } from "react-device-detect";
 import { FiMenu } from "react-icons/fi";
-import { useAccount } from "wagmi";
+import { useConnection } from "wagmi";
 
 import { DarkModeButton, FullScreenButton } from "@/components";
 import { GITBOOK, images } from "@/data";
@@ -19,7 +19,7 @@ import { t } from "@/utils/i18";
 import styles from "./header.module.css";
 
 const Header: FC = () => {
-  const { isConnected, address } = useAccount();
+  const { isConnected, address } = useConnection();
   const { theme } = useTheme();
   const { reset } = useGameStates();
   const { width } = useWindowSize();

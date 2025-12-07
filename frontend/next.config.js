@@ -2,11 +2,6 @@
 
 const prod = process.env.NODE_ENV === "production";
 
-const withPWA = require("next-pwa")({
-  dest: "public",
-  disable: process.env.NODE_ENV === "development",
-});
-
 const nextConfig = {
   reactStrictMode: prod, // Set to 'false' for Babylon development.
   webpack: (config) => {
@@ -28,4 +23,4 @@ const nextConfig = {
   },
 };
 
-module.exports = prod ? withPWA(nextConfig) : nextConfig;
+module.exports = nextConfig;

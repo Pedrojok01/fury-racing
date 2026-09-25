@@ -2,7 +2,7 @@ import type { Abi } from "viem";
 
 import { RACING_ABI } from "./abi";
 
-export const URL = "https://fury-racing.vercel.app/";
+export const URL = "https://fury-racing.pedrojok.com/";
 export const GITHUB_REPO = "https://github.com/Pedrojok01/fury-racing";
 export const GITBOOK = "https://fury-racing.gitbook.io/fury-racing";
 

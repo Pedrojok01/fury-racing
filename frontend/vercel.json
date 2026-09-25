@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "fury-racing.vercel.app"
+        }
+      ],
+      "destination": "https://fury-racing.pedrojok.com/$1",
+      "permanent": true
+    }
+  ]
+}

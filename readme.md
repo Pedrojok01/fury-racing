@@ -14,7 +14,7 @@
 
 ![Preview](./frontend/public/img/preview.gif)
 
-Try it now on [fury-racing.vercel.app](https://fury-racing.vercel.app/)
+Try it now on [fury-racing.pedrojok.com](https://fury-racing.pedrojok.com/)
 
 </div>
 <br>
@@ -32,7 +32,7 @@ Try it now on [fury-racing.vercel.app](https://fury-racing.vercel.app/)
 
 ## Links:
 
-- [Website](https://fury-racing.vercel.app/)
+- [Website](https://fury-racing.pedrojok.com/)
 - [Gitbook documentation](https://fury-racing.gitbook.io/fury-racing)
 - [Devpost](https://devpost.com/software/fury-racing)
 

@@ -30,6 +30,5 @@ frontend/**/.env*
 backend/**/.env
 contracts/**/.env*
 
-# Ignore package lock files
+# Ignore npm lock files (this project uses Yarn v1)
 package-lock.json
-yarn.lock

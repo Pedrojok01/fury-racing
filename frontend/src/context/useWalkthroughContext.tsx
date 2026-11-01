@@ -12,7 +12,7 @@ import {
 } from "react";
 
 import { usePathname } from "next/navigation";
-import Joyride, { type CallBackProps, STATUS, type Step } from "react-joyride";
+import { Joyride, type EventData, STATUS, type Step } from "react-joyride";
 import { useAccount } from "wagmi";
 
 import { stepsData } from "@/utils/walkthroughSteps";
@@ -72,7 +72,7 @@ export const WalkthroughProvider: FC<WalkthroughProviderProps> = ({ children }) 
     }
   };
 
-  const handleJoyrideCallback = (data: CallBackProps) => {
+  const handleJoyrideCallback = (data: EventData) => {
     const { status } = data;
     if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
       setRun(false);
@@ -110,11 +110,8 @@ export const WalkthroughProvider: FC<WalkthroughProviderProps> = ({ children }) 
         steps={steps}
         run={run}
         continuous={false}
-        showSkipButton={false}
-        hideBackButton
-        hideCloseButton
-        styles={{ options: { zIndex: 10000, primaryColor: "var(--secondary-color)" } }}
-        callback={handleJoyrideCallback}
+        options={{ buttons: ["primary"], zIndex: 10000, primaryColor: "var(--secondary-color)" }}
+        onEvent={handleJoyrideCallback}
       />
       {children}
     </WalkthroughContext.Provider>
